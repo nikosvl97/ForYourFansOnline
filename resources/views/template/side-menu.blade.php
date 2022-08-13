@@ -48,7 +48,7 @@
                     </div>
                 </a>
             </li>
-	
+
 
             <li class="nav-item">
                 <a href="{{route('my.messenger.get')}}" class="nav-link {{Route::currentRouteName() == 'my.messenger.get' ? 'active' : ''}} h-pill h-pill-primary d-flex justify-content-between">
@@ -64,9 +64,9 @@
                     </div>
                 </a>
             </li>
-		
+
             @if(getSetting('streams.allow_streams'))
-		
+
                 <li class="nav-item">
                     <a href="{{route('search.get')}}?filter=live" class="nav-link {{Route::currentRouteName() == 'my.bookmarks' ? 'active' : ''}} h-pill h-pill-primary d-flex justify-content-between">
                         <div class="d-flex justify-content-center align-items-center">
@@ -210,12 +210,12 @@
             </a>
         </li>
         <li class="nav-item ">
-            <a href="/anja_diergarten" class="h-pill h-pill-primary nav-link {{Route::currentRouteName() == 'anja_diergarten' ? 'active' : ''}} d-flex justify-content-between">
+            <a href="/" class="h-pill h-pill-primary nav-link {{Route::currentRouteName() == 'anja_diergarten' ? 'active' : ''}} d-flex justify-content-between">
                 <div class="d-flex justify-content-center align-items-center">
                     <div class="icon-wrapper d-flex justify-content-center align-items-center">
-                    <img class="avatar rounded-circle" style="width: 100%;" src="https://memberarea.anja-diergarten.de/storage/users/avatar/fb56db3652704ab49000c33e2ae1c5dd.jpg">
+                    <img class="avatar rounded-circle" style="width: 100%;" src="/img/default-avatar.jpg">
                     </div>
-                    <span class="d-none d-md-block d-xl-block d-lg-block ml-2 text-truncate side-menu-label">{{__('Anja Diergarten')}} 👋</span>
+                    <span class="d-none d-md-block d-xl-block d-lg-block ml-2 text-truncate side-menu-label">{{__('Profile name')}} 👋</span>
                 </div>
             </a>
         </li>

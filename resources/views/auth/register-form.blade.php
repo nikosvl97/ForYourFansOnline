@@ -14,10 +14,10 @@
         </div>
     @endif
 
-	
-	
+
+
     <div class="form-group ">
- <img style="width :100%;" src="https://memberarea.anja-diergarten.de/storage/614483c1-d538-45cd-a064-45cb3d3d7ade-removebg-preview.png">
+ <img style="width :100%;" src="">
 		<br>
         <label for="name" class="col-form-label">{{ __('Name') }}</label>
         <div class="">
