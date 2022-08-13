@@ -71,11 +71,11 @@
                     {{__('Lists')}}</a>
             </li>
 
-			<li class="{{Route::currentRouteName() == 'my.help.all' ? 'active' : ''}}">
-                <a class="scroll-link d-flex align-items-center" href="https://anja-diergarten.de/support-member-area/" target="_blank">
-                    @include('elements.icon',['icon'=>'help-circle-outline','variant'=>'medium','centered'=>false,'classes'=>'mr-2'])
-                    {{__('Help and support')}}</a>
-            </li>
+            <li>
+                  <a class="scroll-link d-flex align-items-center" href="{{route('pages.get',['slug'=>'help'])}}">
+                      @include('elements.icon',['icon'=>'help-circle-outline','variant'=>'medium','centered'=>false,'classes'=>'mr-2'])
+                      {{__('Help and support')}}</a>
+              </li>
 
             <li class="{{Route::currentRouteName() == 'my.settings' ? 'active' : ''}}">
                 <a class="scroll-link d-flex align-items-center" href="{{route('my.settings')}}">
