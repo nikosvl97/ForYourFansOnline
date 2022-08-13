@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.2.5|^8.0",
+        "anhskohbo/no-captcha": "^3.4",
         "devfactory/minify": "1.0.*",
         "fideloper/proxy": "^4.4",
         "intervention/image": "^2.5",
