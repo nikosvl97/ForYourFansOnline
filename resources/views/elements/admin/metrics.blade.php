@@ -5,7 +5,7 @@
   		if ($count >= 0){
   		@endphp
   		<div class="alert alert-danger" role="alert">
-  		{{__("You have reached the limit of active subscription in your plan. Your Limit is")}} 1000 {{__("subscriptions.")}}
+  		{{__("You have reached the limit of active subscription in your plan. Your Limit is")}} 1000 {{__("subscriptions")}}.
 
   		</div>
   		@php
