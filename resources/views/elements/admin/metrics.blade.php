@@ -2,10 +2,11 @@
     <div class="metrics-container">
       @php
   		$count = \App\Providers\DashboardServiceProvider::getActiveSubscriptionsCount();
-  		if ($count >= 0){
+      $limit = 1000;
+  		if ($count >= $limit){
   		@endphp
   		<div class="alert alert-danger" role="alert">
-  		{{__("You have reached the limit of active subscription in your plan. Your Limit is")}} 1000 {{__("subscriptions")}}.
+  		{{__("You have reached the limit of active subscription in your plan. Your Limit is")}} $@php	echo $limit; @endphp {{__("subscriptions")}}.
 
   		</div>
   		@php
