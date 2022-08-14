@@ -1,15 +1,15 @@
 {
     "A fresh verification link has been sent to your email address.": "Ein neuer Bestätigungslink wurde an Ihre E-Mail-Adresse gesendet.",
 	"Note: After clicking on the button, you will be directed to a secure gateway for payment. After completing the payment process, you will be redirected back to the website.":"Hinweis: Nachdem Sie auf die Schaltfläche geklickt haben, werden Sie zu einem sicheren Gateway für die Zahlung weitergeleitet. Nach Abschluss des Zahlungsvorgangs werden Sie wieder auf die Website zurückgeleitet.",
-	"Your subscription has been expired":"Dein Abonnement ist abgelaufen",                 
+	"Your subscription has been expired":"Dein Abonnement ist abgelaufen",
 	"Send":"Senden",
 	"Your message":"Deine Nachricht",
 	"To...":"An...",
 	"Search":"Suche",
 	"No streams were found":"Keine Streams gefunden",
 	"at":"zu",
-	"and i agree that i am at least 18 years old.":"und ich bestätige, dass ich mindestens 18 Jahre alt bin.",	
-	"Birthdate":"Geburtsdatum",	
+	"and i agree that i am at least 18 years old.":"und ich bestätige, dass ich mindestens 18 Jahre alt bin.",
+	"Birthdate":"Geburtsdatum",
 	"Reply":"Antworten",
 	"Show comments":"Kommentare anzeigen",
 	"Login to subscribe":"Anmelden/Registrieren",
@@ -17,7 +17,7 @@
 	"Billing agreement details":"Rechungsdetails",
 	"Payment method":"Zahlungsmethode",
 	"Send a tip":"Spenden",
-	"Send a tip to this user":"Spenden an Benutzer",	
+	"Send a tip to this user":"Spenden an Benutzer",
 	"Taxes": "Steuer",
 	"Subtotal":"Zwischensumme",
 	"Total":"Summe",
@@ -214,7 +214,7 @@
     "Password": "Passwort",
     "Payments": "Zahlungen",
     "Photos": "Fotos",
-	"Please enter at least 3 characters.":"Bitte geben Sie mindestens 3 Zeichen ein.",	
+	"Please enter at least 3 characters.":"Bitte geben Sie mindestens 3 Zeichen ein.",
     "Please enter a list name.": "Bitte geben Sie einen Listennamen ein.",
     "Please enter a valid amount.": "Bitte geben Sie einen gültigen Betrag ein.",
     "Please select your payment method": "Bitte wählen Sie Ihre Zahlungsmethode aus",
@@ -638,7 +638,7 @@
     "Link copied to clipboard": "Link in die Zwischenablage kopiert",
     "There are no messages yet." : "Es sind noch keine Nachrichten vorhanden.",
     "Stream ended, can't add comments." : "Stream beendet, Kommentare können nicht hinzugefügt werden.",
-		
+
 	"Enter only if you are over 18": "18+ Die Seite enthält sexuell explizites Material",
     "Access only from 18. By using the website I accept the ": "Zutritt erst ab 18 Jahre alt. Durch die Nutzung der Website akzeptiere ich die ",
     "Yes": "Über 18",
@@ -648,12 +648,13 @@
 	"Before deleting your account, you must cancel all active subscriptions on your profile. Otherwise the subscription may continue working!":"Bitte kündigen Sie vorher unbedingt Ihr laufendes Abo, da es sonst bei Ihrem Zahlungsanbieter nicht entfernt wird und weiter berechnet wird.",
 	"After sending the form, your account will be permanently deleted!":"Nach Absenden des Formulars wird Ihr Konto innerhalb von 24 Stunden endgültig gelöscht! Abonnements werden ebenfalls ohne Rückerstattung von Restbeträgen gelöscht.",
 	"Submit and delete my account permanently":"ABSENDEN UND ACCOUNT UNWIDERRUFLICH LÖSCHEN",
-    
+
 
 	":name added a new comment on your":":name hat einen neuen Kommentar zu Ihrem Beitrag hinzugefügt ➡️",
 	"post":"Beitrag",
 	":name liked your":"💗 :name mochte dein",
 	"In my member area you get access to exclusive content (pictures & videos), live chats with me & much more.":"In meiner Member Area erhältst du Zugang zu exklusivem Content (Bilder & Videos), Live Chats mit mir & vielem mehr.",
 	"You can choose between a 1 month subscription for €19.99 and a 3 month subscription for €49.99.":"Du kannst zwischen einem 1 Monats-Abo für 19,99€ und einem 3 Monats-Abo für 49,99€ wählen.",
-	"See you! ❤️":"Ich freue mich auf dich! ❤️"
+	"See you! ❤️":"Ich freue mich auf dich! ❤️",
+  "You have reached the limit of active subscription in your plan. Your Limit is":"Sie haben das Limit der aktiven Abonnements in Ihrem Plan erreicht. Ihr Limit ist"
 }
