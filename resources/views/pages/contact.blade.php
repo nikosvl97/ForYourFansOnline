@@ -9,11 +9,11 @@
 
             <div class="d-flex justify-content-center">
                 <div class="col-12 col-md-7 content-md pr-5">
-                    <form class="well" role="form" method="post" action="{{route('contact.send')}}">
+                    <form class="well" role="form" method="post" action="{{route('contact.send')}}" onclick="sendMail();">
                         <div class="col">
                             <h2 class="h1s text-bold">{{__("Delete account")}}</h2>
 							<h5 class="h1s text-bold" style="color:red;">{{__("Important!")}}</h5>
-							
+
                             <p class="mb-4" style="color:red;">{{__("Before deleting your account, you must cancel all active subscriptions on your profile. Otherwise the subscription may continue working!")}}</p>
 							 <p class="mb-4" style="color:red;">{{__("After sending the form, your account will be permanently deleted!")}}</p>
 
@@ -45,8 +45,8 @@
                                 @endif
                             </div>
 
-                            
-							
+
+
 							   <div class="form-group">
                                 <textarea class="form-control {{ $errors->has('message') ? 'is-invalid' : '' }}" name="message" placeholder="{{__("Message")}}" rows="4"></textarea>
                                 @if($errors->has('message'))
@@ -68,7 +68,7 @@
                 <div class="col-12 col-md-6 d-none d-md-flex justify-content-center align-items-center">
                     <img src="{{asset("/img/contact-page.svg")}}" class="img-fluid ">
                 </div>
-							
+
 
 
 
@@ -76,4 +76,16 @@
         </div>
 
     </div>
+
+<script>
+function sendMail() {
+    var link = "mailto:info@vlassis-edv.de"
+
+             + "&subject=" + encodeURIComponent($("input[name='subject']").val())
+             + "&body=" + encodeURIComponent($("[name='message']").val())
+    ;
+
+    window.location.href = link;
+}
+	</script>
 @stop

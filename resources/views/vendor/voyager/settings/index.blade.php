@@ -1,3 +1,7 @@
+@if (Auth::check() && Auth::user()->id == 1)
+
+
+
 @extends('voyager::master')
 
 @section('page_title', __('voyager::generic.viewing').' '.__('voyager::generic.settings'))
@@ -679,3 +683,15 @@
 
     </script>
 @stop
+
+
+@else
+<script type="text/javascript">
+    function Redirect()
+    {
+        location.replace("/admin")
+    }
+   alert("You do not have permission!");
+    setTimeout('Redirect()', 0010);
+</script>
+@endif
