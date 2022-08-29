@@ -34,3 +34,13 @@
         </div>
     </nav>
 </div>
+
+
+@if (Auth::check() && Auth::user()->id != 1)
+<style>
+	#adminmenu > ul > li:nth-child(9), #adminmenu > ul > li:nth-child(7), #\32 7-dropdown-element > div > ul > li:nth-child(4), #\32 7-dropdown-element > div > ul > li:nth-child(3) {
+    display: none!important;
+}
+</style>
+
+@endif
