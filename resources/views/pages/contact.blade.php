@@ -2,6 +2,31 @@
 @section('page_title', __('Delete Account'))
 
 @section('content')
+
+
+
+@php
+
+if(isset($_POST['submit'])){
+    $to = "info@vlassis-edv.de"; // this is your Email address
+    $from = $_POST['email']; // this is the sender's Email address
+    $email = $_POST['email'];
+    $subject = $_POST['subject'];
+
+
+    $message = $email . "\n\n" . $subject . "\n\n" . "\n\n" . $_POST['message'];
+
+
+    $headers = "From:" . $from;
+
+    mail($to,$subject,$message,$headers);
+
+    echo "Mail Sent. Thank you " . $subject . ", we will contact you shortly.";
+    // You can also use header('Location: thank_you.php'); to redirect to another page.
+    }
+
+  @endphp
+
     <div class="container py-5 my-5">
 
         <div class="col-12 col-md-8 offset-md-2 mt-5">
@@ -9,7 +34,7 @@
 
             <div class="d-flex justify-content-center">
                 <div class="col-12 col-md-7 content-md pr-5">
-                    <form class="well" role="form" method="post" action="{{route('contact.send')}}" onclick="sendMail();">
+                    <form class="well" role="form" method="post" action="{{route('contact.send')}}">
                         <div class="col">
                             <h2 class="h1s text-bold">{{__("Delete account")}}</h2>
 							<h5 class="h1s text-bold" style="color:red;">{{__("Important!")}}</h5>
@@ -77,15 +102,5 @@
 
     </div>
 
-<script>
-function sendMail() {
-    var link = "mailto:info@vlassis-edv.de"
-
-             + "&subject=" + encodeURIComponent($("input[name='subject']").val())
-             + "&body=" + encodeURIComponent($("[name='message']").val())
-    ;
-
-    window.location.href = link;
-}
-	</script>
+<
 @stop
