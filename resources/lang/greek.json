@@ -299,8 +299,10 @@
     "with your content": "with your content",
     "DMs unavailable without subscription" : "Η συνομιλία είναι διαθέσιμη μόνο για συνδρομητές",
 
-    "The name field is required.":"Το πεδίο όνομα είναι υποχρεωτικό.",
 
+    "Send":"Αποστολή",
+    "Your message":"Μήνυμα...",
+    "To...":"Σε...",
 
     "Success": "Επιτυχία",
     "Error": "Σφάλμα",
