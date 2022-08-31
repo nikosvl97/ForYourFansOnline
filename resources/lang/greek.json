@@ -289,7 +289,7 @@
     "In order to start a promotion, reduce your monthly prices and select a future promotion end date.": "Για να ξεκινήσετε μια προωθητική ενέργεια, μειώστε τις μηνιαίες τιμές σας και επιλέξτε μια μελλοντική ημερομηνία λήξης της προωθητικής ενέργειας.",
     "members": ":number member|[2,*] :number μέλη",
     "posts": ":number δημοσίευση|[2,*] :number δημοσιεύσεις",
-    "people": ":number άτομο|[2,*] :number άτομα",
+    "people": ":number χρήστης|[2,*] :number χρήστες",
     "images": ":number εικόνα|[2,*] :number εικόνες",
     "videos": ":number βίντεο|[2,*] :number βίντεο",
     "audio": ":number ήχος|[2,*] :number ήχοι",
