@@ -50,3 +50,17 @@
     padding-top: 10px!important;
     overflow: hidden!important;
 }
+.text-break {
+
+    white-space: pre-line!important;
+}
+
+.description-content, .comments-view {
+    white-space: pre-line!important;
+}
+
+.line-clamp-1 {
+
+    -webkit-line-clamp: 2!important;
+
+}
