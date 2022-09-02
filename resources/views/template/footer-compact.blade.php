@@ -11,13 +11,13 @@
                     <p class="">&copy; {{date('Y')}} {{getSetting('site.name')}} | Powered by <a href="https://mepunkt.de" target ="_blank">mepunkt.de</a> Werbeagentur Nürnberg </p>
 					<p class="">
 					<a class="copyRightInfo" href="{{route('pages.get',['slug'=>'impressum'])}}" target="_blank">
-                                   Impressum | 
+                                   {{__('Imprint')}} | 
                                 </a>
 					<a class="copyRightInfo" href="{{route('pages.get',['slug'=>'terms-and-conditions'])}}" target="_blank">
-                                   AGB | 
+                                   {{__('Terms & Conditions')}} | 
                                 </a>
 					<a class="copyRightInfo" href="{{route('pages.get',['slug'=>'privacy'])}}" target="_blank">
-                                   Datenschutzerklärung
+                                   {{__('Privacy Policy')}}
                                 </a>
                     <ul class="d-flex flex-row nav m-2 mt-md-0">
                         @if(getSetting('social-media.facebook_url'))
