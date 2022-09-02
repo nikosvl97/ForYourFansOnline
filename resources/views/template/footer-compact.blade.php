@@ -62,8 +62,8 @@
                                 </a>
                             </li>
                         @endif
-                                <a class="copyRightInfo" href="https://grandhosting.gr" target="_blank">
-                                   <img style="width:7vh;"src="https://memberarea.anja-diergarten.de/img/logos/grandhosting_logo.png">
+                                <a class="copyRightInfo" href="https://grandhosting.gr?utm_source=foryourfans_{{getSetting('site.name')}}&utm_medium=click_banner&utm_campaign=footer_logo" target="_blank">
+                                   <img style="width:7vh;"src="/img/logos/grandhosting_logo_poweredby.png">
                                 </a>
 
                     </ul>

@@ -34,7 +34,7 @@
                                 <div class="form-group col-6">
                                     <label for="db_host" class="col-form-label">{{ __('Database host') }}</label>
                                     <div class="">
-                                        <input id="db_host" placeholder="localhost" type="text" class="form-control @error('db_host') is-invalid @enderror"  name="db_host" value="{{ old('db_host') ? old('db_host') : (session('db_host') ? session('db_host') : '') }}" autocomplete="db_host" autofocus>
+                                        <input id="db_host" placeholder="localhost" type="text" class="form-control @error('db_host') is-invalid @enderror"  name="db_host" value="{{ old('db_host') ? old('db_host') : (session('db_host') ? session('db_host') : 'localhost') }}" autocomplete="db_host" autofocus>
                                         @error('db_host')
                                         <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
