@@ -198,17 +198,22 @@
 
 
 span.tooltip-text {
-    visibility: hidden;
-    width: 120px;
-    background-color: black;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px 0;
-    position: absolute;
-    z-index: 1;
+  visibility: hidden;
+  width: auto;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  /* animation: fadeIn 5s; */
+  font-size: 12px;
+  border-radius: 6px;
+  padding: 5px 5px;
+  position: relative;
+  bottom:2px;
+  z-index: 1;
 }
 
 form.message-form.w-100.pl-3:hover span.tooltip-text {
     visibility: unset!important;
+    animation: fadeIn 0.5s;
+
 }
