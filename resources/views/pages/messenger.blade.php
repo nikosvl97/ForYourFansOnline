@@ -78,21 +78,21 @@
 
 
 
-                        @if(Auth::check() && Auth::user()->id != 5)		
+                        @if(Auth::check() && Auth::user()->id != 5)
 			<div class"
 			{{ $hasSub_completed = DB::table('subscriptions')
-						->where('sender_user_id', [Auth::user()->id])						
+						->where('sender_user_id', [Auth::user()->id])
 						->where('status', ['completed'])
                    		 ->get('status') }}
 
 				{{ $hasSub_canceled = DB::table('subscriptions')
 						->where('sender_user_id', [Auth::user()->id])
-						
+
 						->where('expires_at', '>' , Carbon\Carbon::now())
-                   		 ->get('status') }}		
+                   		 ->get('status') }}
 					   "></div>
-			
-	@if($hasSub_completed == '[{"status":"completed"}]')	
+
+	@if($hasSub_completed == '[{"status":"completed"}]')
 
                         <div class="conversation-writeup pt-1 pb-1 d-flex align-items-center mb-1 {{!$lastContactID ? 'hidden' : ''}}">
                             <form class="message-form w-100 pl-3">
@@ -114,8 +114,8 @@
                                 </button>
                             </div>
                         </div>
-						@elseif($hasSub_canceled == '[{"status":"canceled"}]')	
-							
+						@elseif($hasSub_canceled == '[{"status":"canceled"}]')
+
                         <div class="conversation-writeup pt-1 pb-1 d-flex align-items-center mb-1 {{!$lastContactID ? 'hidden' : ''}}">
                             <form class="message-form w-100 pl-3">
                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -147,19 +147,21 @@
     margin-bottom: 0.2em;
 ">
                           {{__('Your subscription has been expired')}}
-						
-                           
+
+
                         </div>
 						@endif
 
                         @else
-						
+
                         <div class="conversation-writeup pt-1 pb-1 d-flex align-items-center mb-1 {{!$lastContactID ? 'hidden' : ''}}">
                             <form class="message-form w-100 pl-3">
                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                 <input type="hidden" name="receiverID" id="receiverID" value="">
+                                <span class="tooltip-text">{{__('For a line break or paragraph in your message, use the key combination Shift+Enter.')}}</span>
                                 <textarea name="message" class="form-control messageBoxInput dropzone" placeholder="{{__('Write a message..')}}" onkeyup="messenger.textAreaAdjust(this)"></textarea>
                                 {{--                                    <span class="invalid-feedback pl-4 text-bold" role="alert">Please enter a message</span>--}}
+
                             </form>
                             <div class="messenger-buttons-wrapper d-flex">
                                 <button class="btn btn-outline-primary btn-rounded-icon messenger-button attach-file mx-2 file-upload-button">
