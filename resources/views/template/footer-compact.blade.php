@@ -8,7 +8,15 @@
                 <div class="clearfix"></div>
                 <br />
                 <div class="copyRightInfo d-flex flex-column-reverse flex-md-row d-md-flex justify-content-md-between">
-                    <p class="">&copy; {{date('Y')}} {{getSetting('site.name')}} | Powered by <a href="https://mepunkt.de" target ="_blank">mepunkt.de</a> Werbeagentur Nürnberg </p>
+<!--  <p class="">&copy; {{date('Y')}} {{getSetting('site.name')}} </p> -->
+
+                  <a class="copyRightInfo" href="https://mepunkt.de{{getSetting('site.name')}}&utm_medium=click_banner&utm_campaign=footer_logo" target="_blank">
+                     <img style="width:10vh;"src="/img/logos/mepunkt-werbeagentur-nuernberg-hell.png">
+                  </a>
+
+
+
+
 					<p class="">
 					<a class="copyRightInfo" href="{{route('pages.get',['slug'=>'impressum'])}}" target="_blank">
                                    {{__('Imprint')}} | 
