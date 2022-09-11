@@ -238,10 +238,9 @@ p.text-muted.mt-1.stripe-comment {
 }
 </style>
 <script>
-$(document).ready(function(){
-  $(".stripe-payment-provider").click(function(){
-    $("p.text-muted.mt-1.stripe-comment").css("display","block")
-      alert("Hello! I am an alert box!!");
+jQuery(document).ready(function(){
+  jQuery(".stripe-payment-provider").click(function(){
+    jQuery("p.text-muted.mt-1.stripe-comment").css("display","block")
   });
 });
 </script>
