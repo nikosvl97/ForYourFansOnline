@@ -860,7 +860,7 @@ class PaymentHelper
             }
 
             $session = \Stripe\Checkout\Session::create([
-                'payment_method_types' => ['card'],
+                'payment_method_types' => ['card','sepa_debit','sofort'],
                 'line_items' => [$stripeLineItems],
                 'locale' => 'auto',
                 'customer_email' => Auth::user()->email,
