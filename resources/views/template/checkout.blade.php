@@ -215,6 +215,7 @@
                                 </div>
                             </div>
                         </div>
+                        <p class="text-muted mt-1 stripe-comment"> {{__('Note: With Stripe, you can pay with your Credit card, SEPA Debit, SOFORT, iDeal and Bancontact.')}} </p>
                         <div class="payment-error error text-danger text-bold d-none mb-1">{{__('Please select your payment method')}}</div>
                         <p class="text-muted mt-1"> {{__('Note: After clicking on the button, you will be directed to a secure gateway for payment. After completing the payment process, you will be redirected back to the website.')}} </p>
                     </div>
