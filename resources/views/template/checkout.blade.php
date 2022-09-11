@@ -232,15 +232,3 @@
         </div>
     </div>
 </div>
-<style>
-p.text-muted.mt-1.stripe-comment {
-    display: none;
-}
-</style>
-<script>
-jQuery(document).ready(function(){
-  jQuery(".stripe-payment-provider").click(function(){
-    jQuery("p.text-muted.mt-1.stripe-comment").css("display","block")
-  });
-});
-</script>

@@ -61,3 +61,7 @@ input[type="radio"] {
 #billing-agreement-form label.error {
     color: #ea0606!important;
 }
+
+p.text-muted.mt-1.stripe-comment {
+    display: none;
+}

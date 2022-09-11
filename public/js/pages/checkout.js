@@ -602,3 +602,9 @@ var checkout = {
 
     },
 };
+
+jQuery(document).ready(function(){
+  jQuery(".stripe-payment-provider").click(function(){
+    jQuery("p.text-muted.mt-1.stripe-comment").css("display","block")
+  });
+});
