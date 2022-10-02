@@ -5,8 +5,8 @@
 @section('styles')
     {!!
         Minify::stylesheet([
-            '/libs/selectize/dist/css/selectize.css',
-            '/libs/selectize/dist/css/selectize.bootstrap3.css',
+            '/libs/@selectize/selectize/dist/css/selectize.css',
+            '/libs/@selectize/selectize/dist/css/selectize.bootstrap4.css',
             '/libs/dropzone/dist/dropzone.css',
             '/libs/photoswipe/dist/photoswipe.css',
             '/libs/photoswipe/dist/default-skin/default-skin.css',
@@ -20,13 +20,14 @@
     {!!
         Minify::javascript([
             '/js/pages/messenger.js',
-            '/libs/selectize/dist/js/standalone/selectize.min.js',
+            '/libs/@selectize/selectize/dist/js/standalone/selectize.min.js',
             '/libs/dropzone/dist/dropzone.js',
             '/js/FileUpload.js',
             '/js/plugins/media/photoswipe.js',
             '/libs/photoswipe/dist/photoswipe-ui-default.min.js',
             '/js/plugins/media/mediaswipe.js',
             '/js/plugins/media/mediaswipe-loader.js',
+            '/libs/@joeattardi/emoji-button/dist/index.js',
             '/js/pages/lists.js',
             '/js/pages/checkout.js',
             '/libs/pusher-js-auth/lib/pusher-auth.js'
@@ -45,7 +46,7 @@
         <div class="min-vh-100 col-12">
             <div class="container messenger min-vh-100">
                 <div class="row min-vh-100">
-                    <div class="col-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-2 border border-right-0 border-left-0 rounded-left conversations-wrapper min-vh-100 border-top ">
+                    <div class="col-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-2 border border-right-0 border-left-0 rounded-left conversations-wrapper min-vh-100 overflow-hidden border-top ">
                         <div class="d-flex justify-content-center justify-content-md-between pt-3 pr-1 pb-2">
                             <h5 class="d-none d-md-block text-truncate pl-3 pl-md-0 text-bold {{(Cookie::get('app_theme') == null ? (getSetting('site.default_user_theme') == 'dark' ? '' : 'text-dark-r') : (Cookie::get('app_theme') == 'dark' ? '' : 'text-dark-r'))}}">{{__('Contacts')}}</h5>
                             <span data-toggle="tooltip" title="" class="pointer-cursor " data-original-title="{{trans_choice('Send a new message',['user' => 0])}}">
@@ -105,6 +106,12 @@
                                 <button class="btn btn-outline-primary btn-rounded-icon messenger-button attach-file mx-2 file-upload-button">
                                     <div class="d-flex justify-content-center align-items-center">
                                         @include('elements.icon',['icon'=>'document','variant'=>''])
+                                <div class="input-group messageBoxInput-wrapper">
+                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="receiverID" id="receiverID" value="">
+                                    <textarea name="message" class="form-control messageBoxInput dropzone" placeholder="{{__('Write a message..')}}" onkeyup="messenger.textAreaAdjust(this)"></textarea>
+                                    <div class="input-group-append z-index-3 d-flex align-items-center justify-content-center">
+                                        <span class="h-pill h-pill-primary rounded mr-3 trigger" data-toggle="tooltip" data-placement="top" title="Like" >😊</span>
                                     </div>
                                 </button>
                                 <button class="btn btn-outline-primary btn-rounded-icon messenger-button send-message mr-2" onClick="messenger.sendMessage()">
@@ -160,6 +167,7 @@
                                 <input type="hidden" name="receiverID" id="receiverID" value="">
                                 <span class="tooltip-text">{{__('For a line break or paragraph in your message, use the key combination Shift+Enter.')}}</span>
                                 <textarea name="message" class="form-control messageBoxInput dropzone" placeholder="{{__('Write a message..')}}" onkeyup="messenger.textAreaAdjust(this)"></textarea>
+                                </div>
                                 {{--                                    <span class="invalid-feedback pl-4 text-bold" role="alert">Please enter a message</span>--}}
 
                             </form>
