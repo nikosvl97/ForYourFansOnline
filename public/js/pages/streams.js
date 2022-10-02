@@ -31,6 +31,7 @@ var Streams = {
         streamIdToDelete: null,
         streamIdToEdit: null,
         streamPosterToEdit: null,
+        isStreamSaving:false,
     },
 
     dropzone: null,
@@ -145,6 +146,9 @@ var Streams = {
      * @param type
      */
     updateStream: function () {
+        if(Streams.state.isStreamSaving) return false;
+        $('.stream-save-btn').addClass('disabled');
+        Streams.state.isStreamSaving = true;
         const type = Streams.hasActiveStream ? 'edit' : 'create';
         let endpoint = 'init';
         let data = {
@@ -200,7 +204,8 @@ var Streams = {
                 else{
                     launchToast('danger',trans('Error'),result.message);
                 }
-
+                $('.stream-save-btn').removeClass('disabled');
+                Streams.state.isStreamSaving = false;
             },
             error: function (result) {
                 $.each(result.responseJSON.errors,function (field, value) {
@@ -210,6 +215,8 @@ var Streams = {
                         $('#stream-name').focus();
                     }
                 });
+                $('.stream-save-btn').removeClass('disabled');
+                Streams.state.isStreamSaving = false;
             }
         });
     },

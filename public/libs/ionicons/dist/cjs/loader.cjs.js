@@ -2,10 +2,10 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-const index = require('./index-8e1798d9.js');
+const index = require('./index-47eac2d8.js');
 
 /*
- Stencil Client Patch Esm v2.5.0 | MIT Licensed | https://stenciljs.com
+ Stencil Client Patch Esm v2.10.0 | MIT Licensed | https://stenciljs.com
  */
 const patchEsm = () => {
     return index.promiseResolve();

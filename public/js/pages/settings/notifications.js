@@ -5,7 +5,7 @@
 /* global app, trans, launchToast */
 
 $(function () {
-    $('input').on('click',function () {
+    $('.notification-checkbox').on('click',function () {
         const key = $(this).attr('id');
         const val = $(this).prop("checked");
         NotificationsSettings.updateUserSettings(key,val);

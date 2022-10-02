@@ -45,7 +45,11 @@ $(function () {
     if(app.enable_age_verification_dialog){
         if(!getCookie('site_entry_approval')){
             $('#site-entry-approval-dialog').modal('show');
+            $('body .flex-fill').addClass('blurred');
         }
+        $('#site-entry-approval-dialog').on('hidden.bs.modal', function () {
+            $('body .flex-fill').removeClass('blurred');
+        });
     }
 
     // Auto-including the CSRF token in all AJAX Requests
@@ -120,7 +124,10 @@ $(function () {
                 incrementNotificationsCount('.menu-notification-badge.chat-menu-count');
             }
             incrementNotificationsCount('.menu-notification-badge.notifications-menu-count');
-            launchToast('success', trans(toastTitle), data.message);
+            const location = window.location.href;
+            if(!(location.indexOf('my/messenger') >= 0) && data.type === 'new-message') {
+                launchToast('success', trans(toastTitle), data.message);
+            }
             if (window.location.href !== null && window.location.href.indexOf('/my/notifications') >= 0) {
                 notifications.updateUserNotificationsList(this.getNotificationsActiveFilter());
             }

@@ -5,7 +5,7 @@ import Pusher from '../pusher';
 import UrlStore from 'core/utils/url_store';
 import { PusherEvent } from '../connection/protocol/message-types';
 import Metadata from './metadata';
-import { AuthData } from '../auth/options';
+import { ChannelAuthorizationData } from '../auth/options';
 
 export default class PresenceChannel extends PrivateChannel {
   members: Members;
@@ -20,26 +20,35 @@ export default class PresenceChannel extends PrivateChannel {
     this.members = new Members();
   }
 
-  /** Authenticates the connection as a member of the channel.
+  /** Authorizes the connection as a member of the channel.
    *
    * @param  {String} socketId
    * @param  {Function} callback
    */
   authorize(socketId: string, callback: Function) {
-    super.authorize(socketId, (error, authData) => {
+    super.authorize(socketId, async (error, authData) => {
       if (!error) {
-        authData = authData as AuthData;
-        if (authData.channel_data === undefined) {
-          let suffix = UrlStore.buildLogSuffix('authenticationEndpoint');
-          Logger.error(
-            `Invalid auth response for channel '${this.name}',` +
-              `expected 'channel_data' field. ${suffix}`
-          );
-          callback('Invalid auth response');
-          return;
+        authData = authData as ChannelAuthorizationData;
+        if (authData.channel_data != null) {
+          var channelData = JSON.parse(authData.channel_data);
+          this.members.setMyID(channelData.user_id);
+        } else {
+          await this.pusher.user.signinDonePromise;
+          if (this.pusher.user.user_data != null) {
+            // If the user is signed in, get the id of the authenticated user
+            // and allow the presence authorization to continue.
+            this.members.setMyID(this.pusher.user.user_data.id);
+          } else {
+            let suffix = UrlStore.buildLogSuffix('authorizationEndpoint');
+            Logger.error(
+              `Invalid auth response for channel '${this.name}', ` +
+                `expected 'channel_data' field. ${suffix}, ` +
+                `or the user should be signed in.`
+            );
+            callback('Invalid auth response');
+            return;
+          }
         }
-        var channelData = JSON.parse(authData.channel_data);
-        this.members.setMyID(channelData.user_id);
       }
       callback(error, authData);
     });
@@ -68,6 +77,9 @@ export default class PresenceChannel extends PrivateChannel {
     switch (eventName) {
       case 'pusher_internal:subscription_succeeded':
         this.handleSubscriptionSucceededEvent(event);
+        break;
+      case 'pusher_internal:subscription_count':
+        this.handleSubscriptionCountEvent(event);
         break;
       case 'pusher_internal:member_added':
         var addedMember = this.members.addMember(data);

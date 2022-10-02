@@ -1,7 +1,7 @@
 .conversations-wrapper{
     height:100vh;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: auto!important;
 }
 
 .conversation-wrapper{
@@ -76,7 +76,7 @@
     max-height: 120px!important;
     overflow-y: hidden;
     word-wrap:break-word;
-    border-radius: 20px;
+    border-radius: 20px!important;
 }
 
 .messenger-buttons-wrapper{}
@@ -86,7 +86,6 @@
     height: 50px;
     border-radius: 50%;
 }
-
 
 @media (max-width: 767px) {
     .contacts-wrapper{
@@ -98,8 +97,8 @@
         justify-content: center;
     }
     .conversations-wrapper{
-        height: initial!important;
-        min-height: initial!important;
+        /*height: initial!important;*/
+        /*min-height: initial!important;*/
         border-bottom: 0!important;
     }
     .container.messenger{
@@ -196,24 +195,6 @@
     color: inherit!important;
 }
 
-
-span.tooltip-text {
-  visibility: hidden;
-
-  background-color: #e8e8e8;
-  color: #000;
-  text-align: center;
-  font-size: 12px;
-  border-radius: 6px;
-  padding: 5px 5px;
-  position: absolute;
-  bottom:2px;
-  margin-bottom: 74px;
-  z-index: 1;
-}
-
-form.message-form.w-100.pl-3:hover span.tooltip-text {
-    visibility: unset!important;
-    animation: fadeIn 0.5s;
-
+.conversation-writeup .input-group-append {
+    margin-left: -45px;
 }

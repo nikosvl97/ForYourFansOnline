@@ -28,6 +28,7 @@ EasyQRCodeJS 是一个功能丰富的跨浏览器的纯 JavaScript QRCode 生成
   - [Svelte Support](#svelte-support)
   - [FQA](#fqa)
     - [Q1. Tainted canvases may not be exported.](#q1-tainted-canvases-may-not-be-exported)
+    - [Q2. How to show the QRCode image only after rendering is done?](#q2-how-to-show-the-qrcode-image-only-after-rendering-is-done)
   - [Browser Compatibility](#browser-compatibility)
   - [License](#license)
   - [EasyQRCodeJS-Premium](#easyqrcodejs-premium)
@@ -684,9 +685,10 @@ var qrcode = new QRCode(DOM_object, options_object);
     ```HTML
     <script>
      import { onMount } from 'svelte';
-     import * as QRCode from 'easyqrcodejs';
+     import QRCode from 'easyqrcodejs'
+     // import * as QRCode from 'easyqrcodejs';
 
-   	  export let text;
+   	  export let codeValue;
       let node;
 
       onMount(() => {
@@ -773,6 +775,16 @@ When use canvas drawer, Canvas toDataURL function does not allow load cross doma
   Use base64 image.
 
 
+### Q2. How to show the QRCode image only after rendering is done?
+
+```JS
+onRenderingStart: function(qrCodeOptions) {
+    qrCodeOptions._element.style.display = 'none';
+},
+onRenderingEnd: function(qrCodeOptions) {
+    qrCodeOptions._element.style.display = 'block';
+},
+```
 
 ## Browser Compatibility
 IE6+, Chrome, Firefox, Safari, Opera, Mobile Safari, Android, Windows Mobile, ETC.
@@ -783,11 +795,13 @@ MIT License
 
 ## EasyQRCodeJS-Premium
 
-**EasyQRCodeJS-Premium** is a more powerful and comprehensive business enterprise edition. You can use Canvas to customize any element, Such as Eye frame sharp, Eye ball sharp, QR Body block sharp, etc.
+*Let you draw freely!*
+
+**EasyQRCodeJS-Premium** is a more powerful and comprehensive enterprise version. You can use Canvas to customize any element, such as eye frame shape, eyeball shape, QR code block shape, and more. Also supports excavation (to prevent the QRcode overlap with the logo), random block mode.
 
 If you need more functions, we can provide you with customized development of API libraries or products. please contact me to buy the business enterprise edition.
 
-**EasyQRCodeJS-Premium** 是功能更加强大和全面的商业/企业版本。让您可以在 QRCode 中通过 Canvas 自定义任何喜欢的元素，例如  Eye frame sharp, Eye ball sharp, QR Body block sharp 等等。
+**EasyQRCodeJS-Premium** 是功能更加强大和全面的商业/企业版本。让您可以在 QRCode 中通过 Canvas 自定义任何喜欢的元素，例如  Eye frame 形状, Eye ball 形状, QR Body block 形状等等。 还支持 Logo 挖取（excavation，防止二维码与 Logo 重叠）和 Random bolock mode.
 
 如果您需要更多功能，我们可以为您提供 API 库或产品的定制开发。请联系我购买商业/企业版本。
 

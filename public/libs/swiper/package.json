@@ -1,31 +1,31 @@
 {
   "_args": [
     [
-      "swiper@6.7.1",
+      "swiper@6.8.4",
       "/mnt/f/of-tools/builds/Script"
     ]
   ],
-  "_from": "swiper@6.7.1",
-  "_id": "swiper@6.7.1",
+  "_from": "swiper@6.8.4",
+  "_id": "swiper@6.8.4",
   "_inBundle": false,
-  "_integrity": "sha512-r5Xr0WdQ7CuQiomb/8A+j9QsIl2ClQk5KoJU1jWp8/OP4OS/0ZJf5tKLWlJMPRHafy1oRsmv1lSSyzJad6XoRg==",
+  "_integrity": "sha512-O+buF9Q+sMA0H7luMS8R59hCaJKlpo8PXhQ6ZYu6Rn2v9OsFd4d1jmrv14QvxtQpKAvL/ZiovEeANI/uDGet7g==",
   "_location": "/swiper",
   "_phantomChildren": {},
   "_requested": {
     "type": "version",
     "registry": true,
-    "raw": "swiper@6.7.1",
+    "raw": "swiper@6.8.4",
     "name": "swiper",
     "escapedName": "swiper",
-    "rawSpec": "6.7.1",
+    "rawSpec": "6.8.4",
     "saveSpec": null,
-    "fetchSpec": "6.7.1"
+    "fetchSpec": "6.8.4"
   },
   "_requiredBy": [
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/swiper/-/swiper-6.7.1.tgz",
-  "_spec": "6.7.1",
+  "_resolved": "https://registry.npmjs.org/swiper/-/swiper-6.8.4.tgz",
+  "_spec": "6.8.4",
   "_where": "/mnt/f/of-tools/builds/Script",
   "author": {
     "name": "Vladimir Kharlampidi"
@@ -97,5 +97,5 @@
     "swiper-bundle.esm.js"
   ],
   "typings": "swiper.d.ts",
-  "version": "6.7.1"
+  "version": "6.8.4"
 }

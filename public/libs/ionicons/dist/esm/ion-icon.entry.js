@@ -1,5 +1,5 @@
-import { r as registerInstance, h, H as Host, a as getElement } from './index-468d974f.js';
-import { i as isStr, g as getUrl, b as getName } from './utils-4f847845.js';
+import { r as registerInstance, h, H as Host, a as getElement } from './index-f392fe63.js';
+import { i as isStr, g as getUrl, b as getName } from './utils-b4648582.js';
 
 const validateContent = (svgContent) => {
   const div = document.createElement('div');
@@ -77,7 +77,7 @@ const getSvgContent = (url, sanitize) => {
 
 const iconCss = ":host{display:inline-block;width:1em;height:1em;contain:strict;fill:currentColor;-webkit-box-sizing:content-box !important;box-sizing:content-box !important}:host .ionicon{stroke:currentColor}.ionicon-fill-none{fill:none}.ionicon-stroke-width{stroke-width:32px;stroke-width:var(--ionicon-stroke-width, 32px)}.icon-inner,.ionicon,svg{display:block;height:100%;width:100%}:host(.flip-rtl) .icon-inner{-webkit-transform:scaleX(-1);transform:scaleX(-1)}:host(.icon-small){font-size:18px !important}:host(.icon-large){font-size:32px !important}:host(.ion-color){color:var(--ion-color-base) !important}:host(.ion-color-primary){--ion-color-base:var(--ion-color-primary, #3880ff)}:host(.ion-color-secondary){--ion-color-base:var(--ion-color-secondary, #0cd1e8)}:host(.ion-color-tertiary){--ion-color-base:var(--ion-color-tertiary, #f4a942)}:host(.ion-color-success){--ion-color-base:var(--ion-color-success, #10dc60)}:host(.ion-color-warning){--ion-color-base:var(--ion-color-warning, #ffce00)}:host(.ion-color-danger){--ion-color-base:var(--ion-color-danger, #f14141)}:host(.ion-color-light){--ion-color-base:var(--ion-color-light, #f4f5f8)}:host(.ion-color-medium){--ion-color-base:var(--ion-color-medium, #989aa2)}:host(.ion-color-dark){--ion-color-base:var(--ion-color-dark, #222428)}";
 
-const Icon = class {
+let Icon = class {
   constructor(hostRef) {
     registerInstance(this, hostRef);
     this.iconName = null;

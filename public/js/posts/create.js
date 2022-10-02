@@ -2,7 +2,7 @@
 * Post create page
  */
 "use strict";
-/* global PostCreate, FileUpload, mediaSettings */
+/* global PostCreate, FileUpload, mediaSettings, isAllowedToPost */
 
 $(function () {
     // Initing button save
@@ -16,10 +16,13 @@ $(function () {
     // Populating draft data, if available
     const draftData = PostCreate.populateDraftData();
     PostCreate.initPostDraft(draftData);
-    // Initiating file manager
+    if(isAllowedToPost){
+        // Initiating file manager
+        FileUpload.initDropZone('.dropzone','/attachment/upload/post', mediaSettings.use_chunked_uploads);
+    }
 
-    FileUpload.initDropZone('.dropzone','/attachment/upload/post', mediaSettings.use_chunked_uploads);
 });
+
 
 // Saving draft data before unload
 window.addEventListener('beforeunload', function () {

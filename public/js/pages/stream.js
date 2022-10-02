@@ -35,21 +35,21 @@ var Stream = {
      */
     initVideo: function(){
         var player = videojs('my_video_1',{
-                plugins: {
-                    httpSourceSelector:
+            plugins: {
+                httpSourceSelector:
                         {
                             default: 'auto'
                         }
-                },
-                autoplay: true,
-                preload: "auto",
-                controls: true,
-                poster: streamVars.streamPoster,
-                controlBar: {
-                    pictureInPictureToggle: false
-                }
-
             },
+            autoplay: true,
+            preload: "auto",
+            controls: true,
+            poster: streamVars.streamPoster,
+            controlBar: {
+                pictureInPictureToggle: false
+            }
+
+        },
             // function onPlayerReady() {
             //     videojs.log('Your player is ready!');
             //

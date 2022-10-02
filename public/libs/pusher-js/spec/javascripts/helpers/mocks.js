@@ -94,17 +94,17 @@ var Mocks = {
     var transport = new EventsDispatcher();
 
     transport.handlesActivityChecks = jasmine.createSpy("handlesActivityChecks")
-      .andReturn(false);
+      .and.returnValue(false);
     transport.supportsPing = jasmine.createSpy("supportsPing")
-      .andReturn(false);
+      .and.returnValue(false);
     transport.initialize = jasmine.createSpy("initialize")
-      .andCallFake(function() {
+      .and.callFake(function() {
         transport.state = "initializing";
         transport.emit("initializing");
       });
     transport.connect = jasmine.createSpy("connect");
     transport.send = jasmine.createSpy("send")
-      .andReturn(true);
+      .and.returnValue(true);
     transport.ping = jasmine.createSpy("ping");
     transport.close = jasmine.createSpy("close");
     transport.state = undefined;
@@ -112,9 +112,50 @@ var Mocks = {
     return transport;
   },
 
+  getWorkingTransport: function() {
+    var transport = new EventsDispatcher();
+
+    transport.handlesActivityChecks = jasmine
+      .createSpy('handlesActivityChecks')
+      .and.returnValue(false);
+    transport.supportsPing = jasmine
+      .createSpy('supportsPing')
+      .and.returnValue(false);
+    transport.initialize = jasmine
+      .createSpy('initialize')
+      .and.callFake(function() {
+        transport.state = 'initializing';
+        transport.emit('initializing');
+        setTimeout(() => {
+          transport.state = 'initialized';
+          transport.emit('initialized');
+        }, 0);
+      });
+    transport.connect = jasmine.createSpy('connect').and.callFake(function() {
+      transport.state = 'open';
+      transport.emit('open');
+      setTimeout(() => {
+        transport.emit('message', {
+          data: JSON.stringify({
+            event: 'pusher:connection_established',
+            data: {
+              socket_id: '123.456',
+              activity_timeout: 120
+            }
+          })
+        });
+      }, 0);
+    });
+    transport.send = jasmine.createSpy('send').and.returnValue(true);
+    transport.ping = jasmine.createSpy('ping');
+    transport.close = jasmine.createSpy('close');
+    transport.state = undefined;
+    return transport;
+  },
+
   getTransportManager: function(alive) {
     return {
-      isAlive: jasmine.createSpy("isAlive").andReturn(alive !== false),
+      isAlive: jasmine.createSpy("isAlive").and.returnValue(alive !== false),
       reportDeath: jasmine.createSpy("reportDeath")
     };
   },
@@ -122,9 +163,9 @@ var Mocks = {
   getAssistantToTheTransportManager: function(transport) {
     return {
       createConnection: jasmine.createSpy("createConnection")
-        .andReturn(transport || this.getTransport()),
+        .and.returnValue(transport || this.getTransport()),
       isSupported: jasmine.createSpy("isSupported")
-        .andReturn(true)
+        .and.returnValue(true)
     };
   },
 
@@ -132,9 +173,9 @@ var Mocks = {
     var klass = {};
 
     klass.isSupported = jasmine.createSpy("isSupported")
-      .andReturn(supported);
+      .and.returnValue(supported);
     klass.createConnection = jasmine.createSpy("createConnection")
-      .andReturn(transport || this.getTransport());
+      .and.returnValue(transport || this.getTransport());
 
     return klass;
   },
@@ -156,9 +197,9 @@ var Mocks = {
     strategy._callback = null;
 
     strategy.isSupported = jasmine.createSpy("isSupported")
-      .andReturn(isSupported);
+      .and.returnValue(isSupported);
     strategy.connect = jasmine.createSpy("connect")
-      .andCallFake(function(minPriority, callback) {
+      .and.callFake(function(minPriority, callback) {
         strategy._callback = callback;
         return {
           abort: strategy._abort,
@@ -183,15 +224,15 @@ var Mocks = {
     connection.initialize = jasmine.createSpy("initialize");
     connection.connect = jasmine.createSpy("connect");
     connection.handlesActivityChecks = jasmine.createSpy("handlesActivityChecks")
-      .andReturn(false);
+      .and.returnValue(false);
     connection.supportsPing = jasmine.createSpy("supportsPing")
-      .andReturn(false);
+      .and.returnValue(false);
     connection.send = jasmine.createSpy("send")
-      .andReturn(true);
+      .and.returnValue(true);
     connection.ping = jasmine.createSpy("ping")
-      .andReturn(true);
+      .and.returnValue(true);
     connection.send_event = jasmine.createSpy("send_event")
-      .andReturn(true);
+      .and.returnValue(true);
     connection.close = jasmine.createSpy("close");
 
     return connection;
@@ -203,7 +244,7 @@ var Mocks = {
     manager.connect = jasmine.createSpy("connect");
     manager.disconnect = jasmine.createSpy("disconnect");
     manager.send_event = jasmine.createSpy("send_event");
-    manager.isUsingTLS = jasmine.createSpy("isUsingTLS").andReturn(false);
+    manager.isUsingTLS = jasmine.createSpy("isUsingTLS").and.returnValue(false);
     return manager;
   },
 
@@ -228,14 +269,6 @@ var Mocks = {
     return channel;
   },
 
-  getAuthorizer: function() {
-    var authorizer = {};
-    authorizer._callback = null;
-    authorizer.authorize = jasmine.createSpy("authorize").andCallFake(function(_, callback) {
-      authorizer._callback = callback;
-    });
-    return authorizer;
-  }
 };
 
 module.exports = Mocks;

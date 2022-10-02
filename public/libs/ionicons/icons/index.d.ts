@@ -1,4 +1,4 @@
-/* Ionicons v5.5.3, Types */
+/* Ionicons v5.5.4, Types */
 
 export declare var accessibility: string;
 export declare var accessibilityOutline: string;

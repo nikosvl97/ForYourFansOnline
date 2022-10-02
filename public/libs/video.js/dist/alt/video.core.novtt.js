@@ -1,6 +1,6 @@
 /**
  * @license
- * Video.js 7.18.1 <http://videojs.com/>
+ * Video.js 7.20.2 <http://videojs.com/>
  * Copyright Brightcove, Inc. <https://www.brightcove.com/>
  * Available under Apache License Version 2.0
  * <https://github.com/videojs/video.js/blob/main/LICENSE>
@@ -16,7 +16,7 @@
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.videojs = factory());
 }(this, (function () { 'use strict';
 
-  var version = "7.18.1";
+  var version = "7.20.2";
 
   /**
    * An Object that contains lifecycle hooks as keys which point to an array
@@ -2148,7 +2148,8 @@
         // Safari 6.0.3 warns you if you try to copy deprecated layerX/Y
         // Chrome warns you if you try to copy deprecated keyboardEvent.keyLocation
         // and webkitMovementX/Y
-        if (key !== 'layerX' && key !== 'layerY' && key !== 'keyLocation' && key !== 'webkitMovementX' && key !== 'webkitMovementY') {
+        // Lighthouse complains if Event.path is copied
+        if (key !== 'layerX' && key !== 'layerY' && key !== 'keyLocation' && key !== 'webkitMovementX' && key !== 'webkitMovementY' && key !== 'path') {
           // Chrome 32+ warns if you try to copy deprecated returnValue, but
           // we still want to if preventDefault isn't supported (IE8).
           if (!(key === 'returnValue' && old.preventDefault)) {
@@ -3744,7 +3745,7 @@
     return SetSham;
   }();
 
-  var Set = window.Set ? window.Set : SetSham;
+  var Set$1 = window.Set ? window.Set : SetSham;
 
   var keycode = createCommonjsModule(function (module, exports) {
     // Source: http://jsfiddle.net/vWx8V/
@@ -3971,17 +3972,22 @@
      *        The `Player` that this class should be attached to.
      *
      * @param {Object} [options]
-     *        The key/value store of player options.
+     *        The key/value store of component options.
      *
      * @param {Object[]} [options.children]
      *        An array of children objects to intialize this component with. Children objects have
      *        a name property that will be used if more than one component of the same type needs to be
      *        added.
      *
+     * @param  {string} [options.className]
+     *         A class or space separated list of classes to add the component
+     *
      * @param {Component~ReadyCallback} [ready]
      *        Function that gets called when the `Component` is ready.
      */
     function Component(player, options, ready) {
+      var _this = this;
+
       // The component might be the player itself and we can't pass `this` to super
       if (!player && this.play) {
         this.player_ = player = this; // eslint-disable-line
@@ -4011,6 +4017,12 @@
         this.el_ = options.el;
       } else if (options.createEl !== false) {
         this.el_ = this.createEl();
+      }
+
+      if (options.className && this.el_) {
+        options.className.split(' ').forEach(function (c) {
+          return _this.addClass(c);
+        });
       } // if evented is anything except false, we want to mixin in evented
 
 
@@ -4027,9 +4039,9 @@
       this.children_ = [];
       this.childIndex_ = {};
       this.childNameIndex_ = {};
-      this.setTimeoutIds_ = new Set();
-      this.setIntervalIds_ = new Set();
-      this.rafIds_ = new Set();
+      this.setTimeoutIds_ = new Set$1();
+      this.setIntervalIds_ = new Set$1();
+      this.rafIds_ = new Set$1();
       this.namedRafs_ = new Map$1();
       this.clearingTimersOnDispose_ = false; // Add any child components in options
 
@@ -4049,12 +4061,19 @@
      * Dispose of the `Component` and all child components.
      *
      * @fires Component#dispose
+     *
+     * @param {Object} options
+     * @param {Element} options.originalEl element with which to replace player element
      */
 
 
     var _proto = Component.prototype;
 
-    _proto.dispose = function dispose() {
+    _proto.dispose = function dispose(options) {
+      if (options === void 0) {
+        options = {};
+      }
+
       // Bail out if the component has already been disposed.
       if (this.isDisposed_) {
         return;
@@ -4098,7 +4117,11 @@
       if (this.el_) {
         // Remove element from DOM
         if (this.el_.parentNode) {
-          this.el_.parentNode.removeChild(this.el_);
+          if (options.restoreEl) {
+            this.el_.parentNode.replaceChild(options.restoreEl, this.el_);
+          } else {
+            this.el_.parentNode.removeChild(this.el_);
+          }
         }
 
         this.el_ = null;
@@ -4524,7 +4547,7 @@
     ;
 
     _proto.initChildren = function initChildren() {
-      var _this = this;
+      var _this2 = this;
 
       var children = this.options_.children;
 
@@ -4557,15 +4580,15 @@
           // reach back into the player for options later.
 
 
-          opts.playerOptions = _this.options_.playerOptions; // Create and add the child component.
+          opts.playerOptions = _this2.options_.playerOptions; // Create and add the child component.
           // Add a direct reference to the child by name on the parent instance.
           // If two of the same component are used, different names should be supplied
           // for each
 
-          var newChild = _this.addChild(name, opts);
+          var newChild = _this2.addChild(name, opts);
 
           if (newChild) {
-            _this[name] = newChild;
+            _this2[name] = newChild;
           }
         }; // Allow for an array of children details to passed in the options
 
@@ -4595,7 +4618,7 @@
 
           if (typeof child === 'string') {
             name = child;
-            opts = children[name] || _this.options_[name] || {};
+            opts = children[name] || _this2.options_[name] || {};
           } else {
             name = child.name;
             opts = child;
@@ -5335,7 +5358,7 @@
     ;
 
     _proto.setTimeout = function setTimeout(fn, timeout) {
-      var _this2 = this;
+      var _this3 = this;
 
       // declare as variables so they are properly available in timeout function
       // eslint-disable-next-line
@@ -5343,8 +5366,8 @@
       fn = bind(this, fn);
       this.clearTimersOnDispose_();
       timeoutId = window.setTimeout(function () {
-        if (_this2.setTimeoutIds_.has(timeoutId)) {
-          _this2.setTimeoutIds_["delete"](timeoutId);
+        if (_this3.setTimeoutIds_.has(timeoutId)) {
+          _this3.setTimeoutIds_["delete"](timeoutId);
         }
 
         fn();
@@ -5459,7 +5482,7 @@
     ;
 
     _proto.requestAnimationFrame = function requestAnimationFrame(fn) {
-      var _this3 = this;
+      var _this4 = this;
 
       // Fall back to using a timer.
       if (!this.supportsRaf_) {
@@ -5472,8 +5495,8 @@
       var id;
       fn = bind(this, fn);
       id = window.requestAnimationFrame(function () {
-        if (_this3.rafIds_.has(id)) {
-          _this3.rafIds_["delete"](id);
+        if (_this4.rafIds_.has(id)) {
+          _this4.rafIds_["delete"](id);
         }
 
         fn();
@@ -5496,7 +5519,7 @@
     ;
 
     _proto.requestNamedAnimationFrame = function requestNamedAnimationFrame(name, fn) {
-      var _this4 = this;
+      var _this5 = this;
 
       if (this.namedRafs_.has(name)) {
         return;
@@ -5507,8 +5530,8 @@
       var id = this.requestAnimationFrame(function () {
         fn();
 
-        if (_this4.namedRafs_.has(name)) {
-          _this4.namedRafs_["delete"](name);
+        if (_this5.namedRafs_.has(name)) {
+          _this5.namedRafs_["delete"](name);
         }
       });
       this.namedRafs_.set(name, id);
@@ -5574,7 +5597,7 @@
     ;
 
     _proto.clearTimersOnDispose_ = function clearTimersOnDispose_() {
-      var _this5 = this;
+      var _this6 = this;
 
       if (this.clearingTimersOnDispose_) {
         return;
@@ -5589,11 +5612,11 @@
           // for a `Set` key will actually be the value again
           // so forEach((val, val) =>` but for maps we want to use
           // the key.
-          _this5[idName].forEach(function (val, key) {
-            return _this5[cancelName](key);
+          _this6[idName].forEach(function (val, key) {
+            return _this6[cancelName](key);
           });
         });
-        _this5.clearingTimersOnDispose_ = false;
+        _this6.clearingTimersOnDispose_ = false;
       });
     }
     /**
@@ -8384,8 +8407,13 @@
       var cues = new TextTrackCueList(_this.cues_);
       var activeCues = new TextTrackCueList(_this.activeCues_);
       var changed = false;
-      var timeupdateHandler = bind(assertThisInitialized(_this), function () {
-        if (!this.tech_.isReady_ || this.tech_.isDisposed()) {
+      _this.timeupdateHandler = bind(assertThisInitialized(_this), function () {
+        if (this.tech_.isDisposed()) {
+          return;
+        }
+
+        if (!this.tech_.isReady_) {
+          this.rvf_ = this.tech_.requestVideoFrameCallback(this.timeupdateHandler);
           return;
         } // Accessing this.activeCues for the side-effects of updating itself
         // due to its nature as a getter function. Do not remove or cues will
@@ -8399,16 +8427,18 @@
           this.trigger('cuechange');
           changed = false;
         }
+
+        this.rvf_ = this.tech_.requestVideoFrameCallback(this.timeupdateHandler);
       });
 
       var disposeHandler = function disposeHandler() {
-        _this.tech_.off('timeupdate', timeupdateHandler);
+        _this.stopTracking();
       };
 
       _this.tech_.one('dispose', disposeHandler);
 
       if (mode !== 'disabled') {
-        _this.tech_.on('timeupdate', timeupdateHandler);
+        _this.startTracking();
       }
 
       Object.defineProperties(assertThisInitialized(_this), {
@@ -8457,10 +8487,10 @@
               loadTrack(this.src, this);
             }
 
-            this.tech_.off('timeupdate', timeupdateHandler);
+            this.stopTracking();
 
             if (mode !== 'disabled') {
-              this.tech_.on('timeupdate', timeupdateHandler);
+              this.startTracking();
             }
             /**
              * An event that fires when mode changes on this track. This allows
@@ -8563,15 +8593,26 @@
 
       return _this;
     }
+
+    var _proto = TextTrack.prototype;
+
+    _proto.startTracking = function startTracking() {
+      this.rvf_ = this.tech_.requestVideoFrameCallback(this.timeupdateHandler);
+    };
+
+    _proto.stopTracking = function stopTracking() {
+      if (this.rvf_) {
+        this.tech_.cancelVideoFrameCallback(this.rvf_);
+        this.rvf_ = undefined;
+      }
+    }
     /**
      * Add a cue to the internal list of cues.
      *
      * @param {TextTrack~Cue} cue
      *        The cue to add to our internal list
      */
-
-
-    var _proto = TextTrack.prototype;
+    ;
 
     _proto.addCue = function addCue(originalCue) {
       var cue = originalCue;
@@ -9107,9 +9148,10 @@
 
       _this.disposeSourceHandler_ = function (e) {
         return _this.disposeSourceHandler(e);
-      }; // keep track of whether the current source has played at all to
-      // implement a very limited played()
+      };
 
+      _this.queuedHanders_ = new Set(); // keep track of whether the current source has played at all to
+      // implement a very limited played()
 
       _this.hasStarted_ = false;
 
@@ -9934,6 +9976,48 @@
 
     _proto.setDisablePictureInPicture = function setDisablePictureInPicture() {}
     /**
+     * A fallback implementation of requestVideoFrameCallback using requestAnimationFrame
+     *
+     * @param {function} cb
+     * @return {number} request id
+     */
+    ;
+
+    _proto.requestVideoFrameCallback = function requestVideoFrameCallback(cb) {
+      var _this8 = this;
+
+      var id = newGUID();
+
+      if (this.paused()) {
+        this.queuedHanders_.add(id);
+        this.one('playing', function () {
+          if (_this8.queuedHanders_.has(id)) {
+            _this8.queuedHanders_["delete"](id);
+
+            cb();
+          }
+        });
+      } else {
+        this.requestNamedAnimationFrame(id, cb);
+      }
+
+      return id;
+    }
+    /**
+     * A fallback implementation of cancelVideoFrameCallback
+     *
+     * @param {number} id id of callback to be cancelled
+     */
+    ;
+
+    _proto.cancelVideoFrameCallback = function cancelVideoFrameCallback(id) {
+      if (this.queuedHanders_.has(id)) {
+        this.queuedHanders_["delete"](id);
+      } else {
+        this.cancelNamedAnimationFrame(id);
+      }
+    }
+    /**
      * A method to set a poster from a `Tech`.
      *
      * @abstract
@@ -10260,6 +10344,14 @@
    */
 
   Tech.prototype.featuresNativeTextTracks = false;
+  /**
+   * Boolean indicating whether the `Tech` supports `requestVideoFrameCallback`.
+   *
+   * @type {boolean}
+   * @default
+   */
+
+  Tech.prototype.featuresVideoFrameCallback = false;
   /**
    * A functional mixin for techs that want to use the Source Handler pattern.
    * Source handlers are scripts for handling specific formats.
@@ -10818,7 +10910,7 @@
   /**
    * Mimetypes
    *
-   * @see http://hul.harvard.edu/ois/////systems/wax/wax-public-help/mimetypes.htm
+   * @see https://www.iana.org/assignments/media-types/media-types.xhtml
    * @typedef Mimetypes~Kind
    * @enum
    */
@@ -10838,6 +10930,7 @@
     oga: 'audio/ogg',
     wav: 'audio/wav',
     m3u8: 'application/x-mpegURL',
+    mpd: 'application/dash+xml',
     jpg: 'image/jpeg',
     jpeg: 'image/jpeg',
     gif: 'image/gif',
@@ -11061,15 +11154,26 @@
      *         The `Player` that this class should be attached to.
      *
      * @param  {Object} [options]
-     *         The key/value store of player options.
+     *         The key/value store of component options.
      *
      * @param  {function} [options.clickHandler]
      *         The function to call when the button is clicked / activated
+     *
+     * @param  {string} [options.controlText]
+     *         The text to set on the button
+     *
+     * @param  {string} [options.className]
+     *         A class or space separated list of classes to add the component
+     *
      */
     function ClickableComponent(player, options) {
       var _this;
 
       _this = _Component.call(this, player, options) || this;
+
+      if (_this.options_.controlText) {
+        _this.controlText(_this.options_.controlText);
+      }
 
       _this.handleMouseOver_ = function (e) {
         return _this.handleMouseOver(e);
@@ -14923,6 +15027,21 @@
 
       _this.on(player, ['disablepictureinpicturechanged', 'loadedmetadata'], function (e) {
         return _this.handlePictureInPictureEnabledChange(e);
+      });
+
+      _this.on(player, ['loadedmetadata', 'audioonlymodechange', 'audiopostermodechange'], function () {
+        // This audio detection will not detect HLS or DASH audio-only streams because there was no reliable way to detect them at the time
+        var isSourceAudio = player.currentType().substring(0, 5) === 'audio';
+
+        if (isSourceAudio || player.audioPosterMode() || player.audioOnlyMode()) {
+          if (player.isInPictureInPicture()) {
+            player.exitPictureInPicture();
+          }
+
+          _this.hide();
+        } else {
+          _this.show();
+        }
       }); // TODO: Deactivate button on player emptied event.
 
 
@@ -16607,8 +16726,10 @@
 
       if (this.items && this.items.length <= this.hideThreshold_) {
         this.hide();
+        this.menu.contentEl_.removeAttribute('role');
       } else {
         this.show();
+        this.menu.contentEl_.setAttribute('role', 'menu');
       }
     }
     /**
@@ -17572,7 +17693,6 @@
       _this = _MenuItem.call(this, player, options) || this;
       _this.track = track;
       _this.cue = cue;
-      track.addEventListener('cuechange', bind(assertThisInitialized(_this), _this.update));
       return _this;
     }
     /**
@@ -17594,23 +17714,6 @@
       _MenuItem.prototype.handleClick.call(this);
 
       this.player_.currentTime(this.cue.startTime);
-      this.update(this.cue.startTime);
-    }
-    /**
-     * Update chapter menu item
-     *
-     * @param {EventTarget~Event} [event]
-     *        The `cuechange` event that caused this function to run.
-     *
-     * @listens TextTrack#cuechange
-     */
-    ;
-
-    _proto.update = function update(event) {
-      var cue = this.cue;
-      var currentTime = this.player_.currentTime(); // vjs.log(currentTime, cue.startTime);
-
-      this.selected(cue.startTime <= currentTime && currentTime < cue.endTime);
     };
 
     return ChaptersTrackMenuItem;
@@ -17642,7 +17745,17 @@
      *        The function to call when this function is ready.
      */
     function ChaptersButton(player, options, ready) {
-      return _TextTrackButton.call(this, player, options, ready) || this;
+      var _this;
+
+      _this = _TextTrackButton.call(this, player, options, ready) || this;
+
+      _this.selectCurrentItem_ = function () {
+        _this.items.forEach(function (item) {
+          item.selected(_this.track_.activeCues[0] === item.cue);
+        });
+      };
+
+      return _this;
     }
     /**
      * Builds the default DOM `className`.
@@ -17674,11 +17787,20 @@
     ;
 
     _proto.update = function update(event) {
-      if (!this.track_ || event && (event.type === 'addtrack' || event.type === 'removetrack')) {
-        this.setTrack(this.findChaptersTrack());
+      if (event && event.track && event.track.kind !== 'chapters') {
+        return;
       }
 
-      _TextTrackButton.prototype.update.call(this);
+      var track = this.findChaptersTrack();
+
+      if (track !== this.track_) {
+        this.setTrack(track);
+
+        _TextTrackButton.prototype.update.call(this);
+      } else if (!this.items || track && track.cues && track.cues.length !== this.items.length) {
+        // Update the menu initially or if the number of cues has changed since set
+        _TextTrackButton.prototype.update.call(this);
+      }
     }
     /**
      * Set the currently selected track for the chapters button.
@@ -17706,6 +17828,7 @@
           remoteTextTrackEl.removeEventListener('load', this.updateHandler_);
         }
 
+        this.track_.removeEventListener('cuechange', this.selectCurrentItem_);
         this.track_ = null;
       }
 
@@ -17719,6 +17842,8 @@
         if (_remoteTextTrackEl) {
           _remoteTextTrackEl.addEventListener('load', this.updateHandler_);
         }
+
+        this.track_.addEventListener('cuechange', this.selectCurrentItem_);
       }
     }
     /**
@@ -19599,7 +19724,8 @@
     _proto.createEl = function createEl() {
       return _Component.prototype.createEl.call(this, 'iframe', {
         className: 'vjs-resize-manager',
-        tabIndex: -1
+        tabIndex: -1,
+        title: this.localize('No content')
       }, {
         'aria-hidden': 'true'
       });
@@ -20462,7 +20588,8 @@
 
       _this = _Tech.call(this, options, ready) || this;
       var source = options.source;
-      var crossoriginTracks = false; // Set the source if one is provided
+      var crossoriginTracks = false;
+      _this.featuresVideoFrameCallback = _this.featuresVideoFrameCallback && _this.el_.tagName === 'VIDEO'; // Set the source if one is provided
       // 1) Check if the source is new (if not, we want to keep the original so playback isn't interrupted)
       // 2) Check to see if the network state of the tag was failed at init, and if so, reset the source
       // anyway so the error gets fired.
@@ -21184,6 +21311,38 @@
       return this.el_.requestPictureInPicture();
     }
     /**
+     * Native requestVideoFrameCallback if supported by browser/tech, or fallback
+     * Don't use rVCF on Safari when DRM is playing, as it doesn't fire
+     * Needs to be checked later than the constructor
+     * This will be a false positive for clear sources loaded after a Fairplay source
+     *
+     * @param {function} cb function to call
+     * @return {number} id of request
+     */
+    ;
+
+    _proto.requestVideoFrameCallback = function requestVideoFrameCallback(cb) {
+      if (this.featuresVideoFrameCallback && !this.el_.webkitKeys) {
+        return this.el_.requestVideoFrameCallback(cb);
+      }
+
+      return _Tech.prototype.requestVideoFrameCallback.call(this, cb);
+    }
+    /**
+     * Native or fallback requestVideoFrameCallback
+     *
+     * @param {number} id request id to cancel
+     */
+    ;
+
+    _proto.cancelVideoFrameCallback = function cancelVideoFrameCallback(id) {
+      if (this.featuresVideoFrameCallback && !this.el_.webkitKeys) {
+        this.el_.cancelVideoFrameCallback(id);
+      } else {
+        _Tech.prototype.cancelVideoFrameCallback.call(this, id);
+      }
+    }
+    /**
      * A getter/setter for the `Html5` Tech's source object.
      * > Note: Please use {@link Html5#setSource}
      *
@@ -21748,7 +21907,14 @@
    * @default
    */
 
-  Html5.prototype.featuresTimeupdateEvents = true; // HTML5 Feature detection and Device Fixes --------------------------------- //
+  Html5.prototype.featuresTimeupdateEvents = true;
+  /**
+   * Whether the HTML5 el supports `requestVideoFrameCallback`
+   *
+   * @type {boolean}
+   */
+
+  Html5.prototype.featuresVideoFrameCallback = !!(Html5.TEST_VID && Html5.TEST_VID.requestVideoFrameCallback); // HTML5 Feature detection and Device Fixes --------------------------------- //
 
   var canPlayType;
 
@@ -22853,7 +23019,16 @@
 
       _this.userActive_ = false; // Init debugEnabled_
 
-      _this.debugEnabled_ = false; // if the global option object was accidentally blown away by
+      _this.debugEnabled_ = false; // Init state audioOnlyMode_
+
+      _this.audioOnlyMode_ = false; // Init state audioPosterMode_
+
+      _this.audioPosterMode_ = false; // Init state audioOnlyCache_
+
+      _this.audioOnlyCache_ = {
+        playerHeight: null,
+        hiddenChildren: []
+      }; // if the global option object was accidentally blown away by
       // someone, bail early with an informative error
 
       if (!_this.options_ || !_this.options_.techOrder || !_this.options_.techOrder.length) {
@@ -23034,7 +23209,17 @@
 
       _this.breakpoints(_this.options_.breakpoints);
 
-      _this.responsive(_this.options_.responsive);
+      _this.responsive(_this.options_.responsive); // Calling both the audio mode methods after the player is fully
+      // setup to be able to listen to the events triggered by them
+
+
+      _this.on('ready', function () {
+        // Calling the audioPosterMode method first so that
+        // the audioOnlyMode can take precedence when both options are set to true
+        _this.audioPosterMode(_this.options_.audioPosterMode);
+
+        _this.audioOnlyMode(_this.options_.audioOnlyMode);
+      });
 
       return _this;
     }
@@ -23110,9 +23295,11 @@
         if (list && list.off) {
           list.off();
         }
-      }); // the actual .el_ is removed here
+      }); // the actual .el_ is removed here, or replaced if
 
-      _Component.prototype.dispose.call(this);
+      _Component.prototype.dispose.call(this, {
+        restoreEl: this.options_.restoreEl
+      });
     }
     /**
      * Create the `Player`'s DOM element.
@@ -23549,7 +23736,7 @@
 
 
       this.addClass(idClass);
-      setTextContent(this.styleEl_, "\n      ." + idClass + " {\n        width: " + width + "px;\n        height: " + height + "px;\n      }\n\n      ." + idClass + ".vjs-fluid {\n        padding-top: " + ratioMultiplier * 100 + "%;\n      }\n    ");
+      setTextContent(this.styleEl_, "\n      ." + idClass + " {\n        width: " + width + "px;\n        height: " + height + "px;\n      }\n\n      ." + idClass + ".vjs-fluid:not(.vjs-audio-only-mode) {\n        padding-top: " + ratioMultiplier * 100 + "%;\n      }\n    ");
     }
     /**
      * Load/Create an instance of playback {@link Tech} including element
@@ -25954,7 +26141,7 @@
         this.setTimeout(function () {
           this.error({
             code: 4,
-            message: this.localize(this.options_.notSupportedMessage)
+            message: this.options_.notSupportedMessage
           });
         }, 0);
         return;
@@ -25992,7 +26179,7 @@
           _this15.setTimeout(function () {
             this.error({
               code: 4,
-              message: this.localize(this.options_.notSupportedMessage)
+              message: this.options_.notSupportedMessage
             });
           }, 0); // we could not find an appropriate tech, but let's still notify the delegate that this is it
           // this needs a better comment about why this is needed
@@ -26162,9 +26349,10 @@
 
     _proto.resetProgressBar_ = function resetProgressBar_() {
       this.currentTime(0);
-      var _this$controlBar = this.controlBar,
-          durationDisplay = _this$controlBar.durationDisplay,
-          remainingTimeDisplay = _this$controlBar.remainingTimeDisplay;
+
+      var _ref3 = this.controlBar || {},
+          durationDisplay = _ref3.durationDisplay,
+          remainingTimeDisplay = _ref3.remainingTimeDisplay;
 
       if (durationDisplay) {
         durationDisplay.updateContent();
@@ -26876,6 +27064,182 @@
       }
 
       return !!this.isAudio_;
+    };
+
+    _proto.enableAudioOnlyUI_ = function enableAudioOnlyUI_() {
+      var _this19 = this;
+
+      // Update styling immediately to show the control bar so we can get its height
+      this.addClass('vjs-audio-only-mode');
+      var playerChildren = this.children();
+      var controlBar = this.getChild('ControlBar');
+      var controlBarHeight = controlBar && controlBar.currentHeight(); // Hide all player components except the control bar. Control bar components
+      // needed only for video are hidden with CSS
+
+      playerChildren.forEach(function (child) {
+        if (child === controlBar) {
+          return;
+        }
+
+        if (child.el_ && !child.hasClass('vjs-hidden')) {
+          child.hide();
+
+          _this19.audioOnlyCache_.hiddenChildren.push(child);
+        }
+      });
+      this.audioOnlyCache_.playerHeight = this.currentHeight(); // Set the player height the same as the control bar
+
+      this.height(controlBarHeight);
+      this.trigger('audioonlymodechange');
+    };
+
+    _proto.disableAudioOnlyUI_ = function disableAudioOnlyUI_() {
+      this.removeClass('vjs-audio-only-mode'); // Show player components that were previously hidden
+
+      this.audioOnlyCache_.hiddenChildren.forEach(function (child) {
+        return child.show();
+      }); // Reset player height
+
+      this.height(this.audioOnlyCache_.playerHeight);
+      this.trigger('audioonlymodechange');
+    }
+    /**
+     * Get the current audioOnlyMode state or set audioOnlyMode to true or false.
+     *
+     * Setting this to `true` will hide all player components except the control bar,
+     * as well as control bar components needed only for video.
+     *
+     * @param {boolean} [value]
+     *         The value to set audioOnlyMode to.
+     *
+     * @return {Promise|boolean}
+     *        A Promise is returned when setting the state, and a boolean when getting
+     *        the present state
+     */
+    ;
+
+    _proto.audioOnlyMode = function audioOnlyMode(value) {
+      var _this20 = this;
+
+      if (typeof value !== 'boolean' || value === this.audioOnlyMode_) {
+        return this.audioOnlyMode_;
+      }
+
+      this.audioOnlyMode_ = value;
+      var PromiseClass = this.options_.Promise || window.Promise;
+
+      if (PromiseClass) {
+        // Enable Audio Only Mode
+        if (value) {
+          var exitPromises = []; // Fullscreen and PiP are not supported in audioOnlyMode, so exit if we need to.
+
+          if (this.isInPictureInPicture()) {
+            exitPromises.push(this.exitPictureInPicture());
+          }
+
+          if (this.isFullscreen()) {
+            exitPromises.push(this.exitFullscreen());
+          }
+
+          if (this.audioPosterMode()) {
+            exitPromises.push(this.audioPosterMode(false));
+          }
+
+          return PromiseClass.all(exitPromises).then(function () {
+            return _this20.enableAudioOnlyUI_();
+          });
+        } // Disable Audio Only Mode
+
+
+        return PromiseClass.resolve().then(function () {
+          return _this20.disableAudioOnlyUI_();
+        });
+      }
+
+      if (value) {
+        if (this.isInPictureInPicture()) {
+          this.exitPictureInPicture();
+        }
+
+        if (this.isFullscreen()) {
+          this.exitFullscreen();
+        }
+
+        this.enableAudioOnlyUI_();
+      } else {
+        this.disableAudioOnlyUI_();
+      }
+    };
+
+    _proto.enablePosterModeUI_ = function enablePosterModeUI_() {
+      // Hide the video element and show the poster image to enable posterModeUI
+      var tech = this.tech_ && this.tech_;
+      tech.hide();
+      this.addClass('vjs-audio-poster-mode');
+      this.trigger('audiopostermodechange');
+    };
+
+    _proto.disablePosterModeUI_ = function disablePosterModeUI_() {
+      // Show the video element and hide the poster image to disable posterModeUI
+      var tech = this.tech_ && this.tech_;
+      tech.show();
+      this.removeClass('vjs-audio-poster-mode');
+      this.trigger('audiopostermodechange');
+    }
+    /**
+     * Get the current audioPosterMode state or set audioPosterMode to true or false
+     *
+     * @param {boolean} [value]
+     *         The value to set audioPosterMode to.
+     *
+     * @return {Promise|boolean}
+     *         A Promise is returned when setting the state, and a boolean when getting
+     *        the present state
+     */
+    ;
+
+    _proto.audioPosterMode = function audioPosterMode(value) {
+      var _this21 = this;
+
+      if (typeof value !== 'boolean' || value === this.audioPosterMode_) {
+        return this.audioPosterMode_;
+      }
+
+      this.audioPosterMode_ = value;
+      var PromiseClass = this.options_.Promise || window.Promise;
+
+      if (PromiseClass) {
+        if (value) {
+          if (this.audioOnlyMode()) {
+            var audioOnlyModePromise = this.audioOnlyMode(false);
+            return audioOnlyModePromise.then(function () {
+              // enable audio poster mode after audio only mode is disabled
+              _this21.enablePosterModeUI_();
+            });
+          }
+
+          return PromiseClass.resolve().then(function () {
+            // enable audio poster mode
+            _this21.enablePosterModeUI_();
+          });
+        }
+
+        return PromiseClass.resolve().then(function () {
+          // disable audio poster mode
+          _this21.disablePosterModeUI_();
+        });
+      }
+
+      if (value) {
+        if (this.audioOnlyMode()) {
+          this.audioOnlyMode(false);
+        }
+
+        this.enablePosterModeUI_();
+        return;
+      }
+
+      this.disablePosterModeUI_();
     }
     /**
      * A helper method for adding a {@link TextTrack} to our
@@ -27093,14 +27457,14 @@
     ;
 
     _proto.createModal = function createModal(content, options) {
-      var _this19 = this;
+      var _this22 = this;
 
       options = options || {};
       options.content = content || '';
       var modal = new ModalDialog(this, options);
       this.addChild(modal);
       modal.on('dispose', function () {
-        _this19.removeChild(modal);
+        _this22.removeChild(modal);
       });
       modal.open();
       return modal;
@@ -27331,7 +27695,7 @@
     ;
 
     _proto.loadMedia = function loadMedia(media, ready) {
-      var _this20 = this;
+      var _this23 = this;
 
       if (!media || typeof media !== 'object') {
         return;
@@ -27363,7 +27727,7 @@
 
       if (Array.isArray(textTracks)) {
         textTracks.forEach(function (tt) {
-          return _this20.addRemoteTextTrack(tt, false);
+          return _this23.addRemoteTextTrack(tt, false);
         });
       }
 
@@ -27684,7 +28048,9 @@
       }
     },
     breakpoints: {},
-    responsive: false
+    responsive: false,
+    audioOnlyMode: false,
+    audioPosterMode: false
   };
   [
   /**
@@ -28634,7 +29000,13 @@
       log.warn('The element supplied is not included in the DOM');
     }
 
-    options = options || {};
+    options = options || {}; // Store a copy of the el before modification, if it is to be restored in destroy()
+    // If div ingest, store the parent div
+
+    if (options.restoreEl === true) {
+      options.restoreEl = (el.parentNode && el.parentNode.hasAttribute('data-vjs-player') ? el.parentNode : el).cloneNode(true);
+    }
+
     hooks('beforesetup').forEach(function (hookFunction) {
       var opts = hookFunction(el, mergeOptions(options));
 
@@ -28672,7 +29044,7 @@
         head.insertBefore(style, head.firstChild);
       }
 
-      setTextContent(style, "\n      .video-js {\n        width: 300px;\n        height: 150px;\n      }\n\n      .vjs-fluid {\n        padding-top: 56.25%\n      }\n    ");
+      setTextContent(style, "\n      .video-js {\n        width: 300px;\n        height: 150px;\n      }\n\n      .vjs-fluid:not(.vjs-audio-only-mode) {\n        padding-top: 56.25%\n      }\n    ");
     }
   } // Run Auto-load players
   // You have to wait at least once in case this script is loaded after your

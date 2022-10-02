@@ -67,10 +67,12 @@ export default function updateSlides() {
 
   if (rtl) slides.css({
     marginLeft: '',
+    marginBottom: '',
     marginTop: ''
   });else slides.css({
     marginRight: '',
-    marginBottom: ''
+    marginBottom: '',
+    marginTop: ''
   });
   var slidesNumberEvenToRows;
 

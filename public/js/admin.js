@@ -2,7 +2,7 @@
  * Admin panel JS functions
  */
 "use strict";
-/* global toastr, site_settings */
+/* global toastr, site_settings, appUrl, Pickr */
 
 $(function () {
     const location = window.location.href;
@@ -17,14 +17,25 @@ $(function () {
         Admin.paymentsSettingsSwitch('stripe');
         Admin.paymentsSettingsSubTabSwitch('general');
 
-
-        // Ctrl save on settings
-        $(document).bind("keyup keydown", function(e){
-            if(e.ctrlKey && e.which == 83){
-                $('.save-settings-form').submit();
+        // CTRL+S Override
+        $(document).keydown(function(e) {
+            var key = undefined;
+            var possible = [ e.key, e.keyIdentifier, e.keyCode, e.which ];
+            while (key === undefined && possible.length > 0) {
+                key = possible.pop();
             }
+            if (key && (key == '115' || key == '83' ) && (e.ctrlKey || e.metaKey) && !(e.altKey)) {
+                e.preventDefault();
+                $('.save-settings-form').submit();
+                return false;
+            }
+            return true;
         });
 
+        Admin.initThemeColorPickers();
+        if(site_settings['license.product_license_key']){
+            $(".theme_license_field").val(site_settings['license.product_license_key']);
+        }
     }
 
     // master
@@ -86,13 +97,18 @@ $(function () {
 
     $('.save-settings-form').on('submit',function(evt){
         // code
-        if(Admin.activeSettingsTab == 'payments-processors' || Admin.activeSettingsTab == 'payments-general' || Admin.activeSettingsTab == 'payments-invoices' ) {
+        if(Admin.activeSettingsTab === 'payments-processors' || Admin.activeSettingsTab === 'payments-general' || Admin.activeSettingsTab === 'payments-invoices' || Admin.activeSettingsTab === 'payments-withdrawals') {
             $('.setting_tab').val('Payments');
         }
 
-        if(Admin.activeSettingsTab == 'colors'){
+        if(Admin.activeSettingsTab === 'colors'){
             evt.preventDefault();
             Admin.generateTheme();
+        }
+
+        if(Admin.activeSettingsTab === 'license'){
+            evt.preventDefault();
+            Admin.saveLicense();
         }
 
         if(!Admin.validateSettingFields()){
@@ -101,7 +117,6 @@ $(function () {
         }
     });
 
-    Admin.initThemeColorPickers();
 
 });
 
@@ -124,7 +139,7 @@ var Admin = {
             'gradient_from' : Admin.themeColors.theme_gradient_from.replace('#',''),
             'gradient_to' : Admin.themeColors.theme_gradient_to.replace('#',''),
             'code' : $('*[name="theme_license"]').val(),
-        }
+        };
 
         $('#voyager-loader').fadeIn();
         $.ajax({
@@ -145,6 +160,28 @@ var Admin = {
         });
     },
 
+    /**
+     * Saves license data
+     */
+    saveLicense: function(){
+        $('#voyager-loader').fadeIn();
+        $.ajax({
+            type: 'POST',
+            data: {
+                'product_license_key' : $('.license_product_license_key').val()
+            },
+            url: appUrl + '/admin/license/save',
+            success: function (result) {
+                $('#voyager-loader').fadeOut();
+                toastr.success(result.message);
+            },
+            error: function (result) {
+                $('#voyager-loader').fadeOut();
+                toastr.error(result.responseJSON.error);
+            }
+        });
+    },
+
     setCustomSettingsTabEvents: function(){
         $('.settings  .nav a').on('click',function () {
             const tab = $(this).attr('href').replace('#','');
@@ -156,6 +193,7 @@ var Admin = {
      * Binds few setting field custom events
      */
     settingsPageInit: function(){
+        // $('.settings-menu-site').click(); // Avoiding settings mess up bug
         $('select[name="emails.driver"]').on('change',function () {
             Admin.emailSettingsSwitch($(this).val());
         });
@@ -206,7 +244,6 @@ var Admin = {
                 $('input[name="storage.do_access_key').val().length > 0 &&
                 $('input[name="storage.do_secret_key').val().length > 0 &&
                 $('input[name="storage.do_region').val().length > 0 &&
-                $('input[name="storage.do_endpoint').val().length > 0 &&
                 $('input[name="storage.do_bucket_name').val().length > 0
             ){
                 return true;
@@ -235,48 +272,55 @@ var Admin = {
     paymentsSettingsSwitch: function(type){
         Admin.settingsHide('payments');
         switch (type) {
-            case 'stripe':
-                $('.setting-row').each(function(key,element) {
-                    if($(element).attr('class').indexOf('payments.stripe') >= 0){
-                        $(element).show();
-                    }
-                });
-                break;
-            case 'paypal':
-                $('.setting-row').each(function(key,element) {
-                    if($(element).attr('class').indexOf('payments.paypal') >= 0){
-                        $(element).show();
-                    }
-                });
-                break;
-            case 'coinbase':
-                $('.setting-row').each(function(key,element) {
-                    if($(element).attr('class').indexOf('payments.coinbase') >= 0){
-                        $(element).show();
-                    }
-                });
-                break;
-            case 'nowpayments':
-                $('.setting-row').each(function(key,element) {
-                    if($(element).attr('class').indexOf('payments.nowpayments') >= 0){
-                        $(element).show();
-                    }
-                });
-                break;
-            case 'ccbill':
-                $('.setting-row').each(function(key,element) {
-                    if($(element).attr('class').indexOf('payments.ccbill') >= 0){
-                        $(element).show();
-                    }
-                });
-                break;
-            case 'offline':
-                $('.setting-row').each(function(key,element) {
-                    if($(element).attr('class').indexOf('payments.allow_manual_payments') >= 0 || $(element).attr('class').indexOf('payments.offline_payments') >= 0){
-                        $(element).show();
-                    }
-                });
-                break;
+        case 'stripe':
+            $('.setting-row').each(function(key,element) {
+                if($(element).attr('class').indexOf('payments.stripe') >= 0){
+                    $(element).show();
+                }
+            });
+            break;
+        case 'paypal':
+            $('.setting-row').each(function(key,element) {
+                if($(element).attr('class').indexOf('payments.paypal') >= 0){
+                    $(element).show();
+                }
+            });
+            break;
+        case 'coinbase':
+            $('.setting-row').each(function(key,element) {
+                if($(element).attr('class').indexOf('payments.coinbase') >= 0){
+                    $(element).show();
+                }
+            });
+            break;
+        case 'nowpayments':
+            $('.setting-row').each(function(key,element) {
+                if($(element).attr('class').indexOf('payments.nowpayments') >= 0){
+                    $(element).show();
+                }
+            });
+            break;
+        case 'ccbill':
+            $('.setting-row').each(function(key,element) {
+                if($(element).attr('class').indexOf('payments.ccbill') >= 0){
+                    $(element).show();
+                }
+            });
+            break;
+        case 'offline':
+            $('.setting-row').each(function(key,element) {
+                if($(element).attr('class').indexOf('payments.allow_manual_payments') >= 0 || $(element).attr('class').indexOf('payments.offline_payments') >= 0){
+                    $(element).show();
+                }
+            });
+            break;
+        case 'paystack':
+            $('.setting-row').each(function(key,element) {
+                if($(element).attr('class').indexOf('payments.paystack') >= 0){
+                    $(element).show();
+                }
+            });
+            break;
         }
         $('#payments.driver').val(type);
 
@@ -320,26 +364,26 @@ var Admin = {
             if($(element).attr('class').indexOf(prefix+'.') >= 0){
                 let settingName = $(element).data('settingkey');
                 switch (prefix) {
-                    case 'emails':
-                        if(settingName !== 'emails.driver' && settingName !== 'emails.from_name' && settingName !== 'emails.from_address'){
+                case 'emails':
+                    if(settingName !== 'emails.driver' && settingName !== 'emails.from_name' && settingName !== 'emails.from_address'){
+                        $(element).hide();
+                    }
+                    break;
+                case 'storage':
+                    if(settingName !== 'storage.driver'){
+                        $(element).hide();
+                    }
+                    break;
+                case 'payments':
+                    if(hideAll){
+                        $(element).hide();
+                    }
+                    else{
+                        if(!['payments.driver','payments.currency_code','payments.currency_symbol','payments.default_subscription_price','payments.min_tip_value','payments.max_tip_value','payments.maximum_subscription_price','payments.minimum_subscription_price'].includes(settingName)){
                             $(element).hide();
                         }
-                        break;
-                    case 'storage':
-                        if(settingName !== 'storage.driver'){
-                            $(element).hide();
-                        }
-                        break;
-                    case 'payments':
-                        if(hideAll){
-                            $(element).hide();
-                        }
-                        else{
-                            if(!['payments.driver','payments.currency_code','payments.currency_symbol','payments.default_subscription_price','payments.min_tip_value','payments.max_tip_value','payments.maximum_subscription_price','payments.minimum_subscription_price'].includes(settingName)){
-                                $(element).hide();
-                            }
-                        }
-                        break;
+                    }
+                    break;
                 }
             }
         });
@@ -356,22 +400,27 @@ var Admin = {
             if($(element).attr('class').indexOf('payments'+'.') >= 0){
                 let settingName = $(element).data('settingkey');
                 switch (prefix) {
-                    case 'general':
-                        if(['payments.withdrawal_payment_methods', 'payments.withdrawal_min_amount', 'payments.withdrawal_max_amount', 'payments.deposit_min_amount', 'payments.deposit_max_amount', 'payments.currency_code','payments.currency_symbol','payments.default_subscription_price','payments.min_tip_value','payments.max_tip_value','payments.maximum_subscription_price','payments.minimum_subscription_price'].includes(settingName)){
-                            $(element).show();
-                        }
-                        break;
-                    case 'processors':
-                        Admin.paymentsSettingsSwitch('stripe');
-                        if(['payments.driver'].includes(settingName)){
-                            $(element).show();
-                        }
-                        break;
-                    case 'invoices':
-                        if(settingName.indexOf('payments.invoices_') >= 0){
-                            $(element).show();
-                        }
-                        break;
+                case 'general':
+                    if(['payments.deposit_min_amount', 'payments.deposit_max_amount', 'payments.currency_code','payments.currency_symbol','payments.default_subscription_price','payments.min_tip_value','payments.max_tip_value','payments.maximum_subscription_price','payments.minimum_subscription_price'].includes(settingName)){
+                        $(element).show();
+                    }
+                    break;
+                case 'processors':
+                    Admin.paymentsSettingsSwitch('stripe');
+                    if(['payments.driver'].includes(settingName)){
+                        $(element).show();
+                    }
+                    break;
+                case 'invoices':
+                    if(settingName.indexOf('payments.invoices_') >= 0){
+                        $(element).show();
+                    }
+                    break;
+                case 'withdrawals':
+                    if(settingName.indexOf('payments.withdrawal_') >= 0){
+                        $(element).show();
+                    }
+                    break;
                 }
             }
         });
@@ -387,7 +436,7 @@ var Admin = {
         }
 
         if(site_settings['colors.theme_gradient_from']){
-            Admin.themeColors.theme_gradient_to = '#' + site_settings['colors.theme_gradient_from'];
+            Admin.themeColors.theme_gradient_from = '#' + site_settings['colors.theme_gradient_from'];
         }
 
         if(site_settings['colors.theme_gradient_to']){
@@ -411,6 +460,7 @@ var Admin = {
             'rgb(255, 193, 7)'
         ];
 
+        // eslint-disable-next-line no-unused-vars
         const theme_color_code_pickr = Pickr.create({
             el: '#theme_color_code',
             theme: 'nano', // or 'monolith', or 'nano'
@@ -429,11 +479,13 @@ var Admin = {
                     input: true,
                 }
             }
+            // eslint-disable-next-line no-unused-vars
         }).on('change', (color, instance) => {
             Admin.themeColors.theme_color_code = color.toHEXA().toString();
             $('.setting-theme_color_code .pickr button').attr('style','background-color:'+color.toHEXA().toString());
         });
 
+        // eslint-disable-next-line no-unused-vars
         const theme_gradient_from_pickr = Pickr.create({
             el: '#theme_gradient_from',
             theme: 'nano', // or 'monolith', or 'nano'
@@ -451,11 +503,13 @@ var Admin = {
                     input: true,
                 }
             }
+            // eslint-disable-next-line no-unused-vars
         }).on('change', (color, instance) => {
             Admin.themeColors.theme_gradient_from = color.toHEXA().toString();
             $('.setting-theme_gradient_from .pickr button').attr('style','background-color:'+color.toHEXA().toString());
         });
 
+        // eslint-disable-next-line no-unused-vars
         const theme_gradient_to_pickr = Pickr.create({
             el: '#theme_gradient_to',
             theme: 'nano', // or 'monolith', or 'nano'
@@ -473,6 +527,7 @@ var Admin = {
                     input: true,
                 }
             }
+            // eslint-disable-next-line no-unused-vars
         }).on('change', (color, instance) => {
             Admin.themeColors.theme_gradient_to = color.toHEXA().toString();
             $('.setting-theme_gradient_to .pickr button').attr('style','background-color:'+color.toHEXA().toString());

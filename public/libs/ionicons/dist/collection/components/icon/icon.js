@@ -314,8 +314,8 @@ export class Icon {
       "optional": false,
       "docs": {
         "tags": [{
-            "text": "true",
-            "name": "default"
+            "name": "default",
+            "text": "true"
           }],
         "text": "When set to `false`, SVG content that is HTTP fetched will not be checked\nif the response SVG content has any `<script>` elements, or any attributes\nthat start with `on`, such as `onclick`."
       },

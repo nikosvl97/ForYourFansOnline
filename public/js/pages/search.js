@@ -53,7 +53,8 @@ $(function () {
         Search.initSearchFilterLiveReloads();
     }
 
-    SuggestionsSlider.init();
+    SuggestionsSlider.init('.suggestions-box-mobile');
+    SuggestionsSlider.init('.suggestions-box');
 });
 
 $(window).scroll(function () {

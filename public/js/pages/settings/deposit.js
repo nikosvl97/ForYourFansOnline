@@ -92,6 +92,9 @@ var DepositSettings = {
             case 'payment-ccbill':
                 DepositSettings.provider = 'ccbill';
                 break;
+            case 'payment-paystack':
+                DepositSettings.provider = 'paystack';
+                break;
             }
             return DepositSettings.provider;
         }

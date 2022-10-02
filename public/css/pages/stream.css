@@ -82,3 +82,9 @@
     height:64px;
 }
 
+@media (min-width: 767px) {
+    .stream-locked{
+        padding-left: 150px;
+        padding-right: 150px;
+    }
+}

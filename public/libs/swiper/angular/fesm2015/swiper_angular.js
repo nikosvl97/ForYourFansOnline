@@ -1060,7 +1060,7 @@ SwiperComponent.propDecorators = {
     nextElRef: [{ type: ViewChild, args: ['nextElRef', { static: false },] }],
     scrollbarElRef: [{ type: ViewChild, args: ['scrollbarElRef', { static: false },] }],
     paginationElRef: [{ type: ViewChild, args: ['paginationElRef', { static: false },] }],
-    slidesEl: [{ type: ContentChildren, args: [SwiperSlideDirective, { descendants: true, emitDistinctChangesOnly: true },] }],
+    slidesEl: [{ type: ContentChildren, args: [SwiperSlideDirective, { descendants: false, emitDistinctChangesOnly: true },] }],
     containerClasses: [{ type: HostBinding, args: ['class',] }]
 };
 

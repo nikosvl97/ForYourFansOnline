@@ -10,10 +10,7 @@
   "_inBundle": false,
   "_integrity": "sha512-UVkHH92l/4zLH/acfukry419K2yAKiDf6VmFQ9hZzMpWW2epE7xJIgK47mJLjAQnimP0ROo8BStfwelWcoTQyg==",
   "_location": "/@selectize/selectize",
-  "_phantomChildren": {
-    "humanize": "0.0.9",
-    "wordwrap": "0.0.3"
-  },
+  "_phantomChildren": {},
   "_requested": {
     "type": "version",
     "registry": true,

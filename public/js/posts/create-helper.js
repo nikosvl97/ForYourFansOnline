@@ -2,7 +2,7 @@
  * Post create (helper) component
  */
 "use strict";
-/* global app, Post, user, FileUpload, updateButtonState, launchToast, trans, redirect */
+/* global app, Post, user, FileUpload, updateButtonState, launchToast, trans, redirect, trans_choice, mediaSettings */
 
 $(function () {
     $("#post-price").keypress(function(e) {
@@ -169,9 +169,16 @@ var PostCreate = {
                 if(result.status === 422 || result.status === 500) {
                     $.each(result.responseJSON.errors, function (field, error) {
                         if (field === 'text') {
+                            $('.post-invalid-feedback').html(trans_choice('Your post must contain more than 10 characters.',mediaSettings.max_post_description_size, {'num':mediaSettings.max_post_description_size}));
                             $('#dropzone-uploader').addClass('is-invalid');
                             $('#dropzone-uploader').focus();
                         }
+                        if (field === 'attachments') {
+                            $('.post-invalid-feedback').html(trans('Your post must contain at least one attachment.'));
+                            $('#dropzone-uploader').addClass('is-invalid');
+                            $('#dropzone-uploader').focus();
+                        }
+
                         if(field === 'permissions'){
                             launchToast('danger',trans('Error'),error);
                         }

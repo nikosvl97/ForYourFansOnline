@@ -82,6 +82,16 @@ var LoginModal = {
                     result.responseJSON.errors = {email:[trans('These credentials do not match our records.')]} ;
                 }
                 $.each(result.responseJSON.errors,function (field,error) {
+                    if(field === 'g-recaptcha-response'){
+                        $('.captcha-field .text-danger').addClass('d-flex');
+                        $('.captcha-field').append(
+                            `
+                            <span class="invalid-feedback text-danger d-flex justify-content-center" role="alert">
+                                <strong>${trans("Please check the captcha field.")}</strong>
+                            </span>
+                        `
+                        );
+                    }
                     let fieldElement = $('input[name="'+field+'"]');
                     fieldElement.addClass('is-invalid');
                     fieldElement.parent().append(

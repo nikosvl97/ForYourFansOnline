@@ -47,7 +47,9 @@ var Wallet = {
             url: app.baseUrl + '/withdrawals/request',
             success: function (result) {
                 // eslint-disable-next-line no-undef
-                launchToast('success', 'Success', result.message);
+                const msgType = result.success ? 'success' : 'danger';
+                const msgLabel = result.success ? trans('Success') : trans('Error');
+                launchToast(msgType, msgLabel, result.message);
 
                 // append new amounts
                 $('.wallet-total-amount').html(result.totalAmount);

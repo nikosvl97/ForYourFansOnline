@@ -37,7 +37,8 @@ input[type="radio"] {
     color: #000000
 }
 
-.stripe-payment-provider, .paypal-payment-provider, .coinbase-payment-provider, .ccbill-payment-provider, .credit-payment-provider, .nowpayments-payment-provider {
+.stripe-payment-provider, .paypal-payment-provider, .coinbase-payment-provider,
+.ccbill-payment-provider, .credit-payment-provider, .nowpayments-payment-provider, .paystack-payment-provider {
     background: #ffffff;
     width: 109px;
     height: 59px;
@@ -45,7 +46,7 @@ input[type="radio"] {
 
 }
 
-.coinbase-payment-provider img, .paypal-payment-provider img, .ccbill-payment-provider img{
+.coinbase-payment-provider img, .paypal-payment-provider img, .ccbill-payment-provider img, .paystack-payment-provider img{
     width:90px
 }
 
@@ -60,8 +61,4 @@ input[type="radio"] {
 
 #billing-agreement-form label.error {
     color: #ea0606!important;
-}
-
-p.text-muted.mt-1.stripe-comment {
-    display: none;
 }

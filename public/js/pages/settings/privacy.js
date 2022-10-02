@@ -2,7 +2,7 @@
  * Privacy settings component
  */
 "use strict";
-/* global GeneralSettings, app, launchToast, trans, reload */
+/* global GeneralSettings, app, launchToast, trans, reload, NotificationsSettings, userGeoBlocking */
 
 $(function () {
     $('.custom-control-input').on('change',function () {
@@ -19,6 +19,20 @@ $(function () {
             $('.allowed-devices').addClass('d-none');
         }
     });
+
+    if(userGeoBlocking.enabled){
+
+        var $select = $("#countrySelect").selectize({
+            onChange(value) {
+                NotificationsSettings.updateUserSettings('geoblocked_countries',JSON.stringify(value));
+            }
+        });
+
+        userGeoBlocking.countries.map((v)=>{
+            var selectize = $select[0].selectize;
+            selectize.addItem(v, true);
+        });
+    }
 
 });
 

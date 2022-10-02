@@ -32,6 +32,7 @@ var VerifySettings = {
             addRemoveLinks: true,
             dictRemoveFile: "x",
             acceptedFiles: mediaSettings.allowed_file_extensions,
+            dictDefaultMessage: trans("Drop files here to upload"),
             autoDiscover: false,
             previewsContainer: ".dropzone-previews",
             autoProcessQueue: true,

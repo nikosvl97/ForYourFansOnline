@@ -1,16 +1,15 @@
-var Authorizer = require('core/auth/pusher_authorizer').default;
 var Errors = require('core/errors');
 var PrivateChannel = require('core/channels/private_channel').default;
-var Factory = require('core/utils/factory').default;
 var Mocks = require("mocks");
 
 describe("PrivateChannel", function() {
   var pusher;
   var channel;
-  var factorySpy;
+  var channelAuthorizer;
 
   beforeEach(function() {
-    pusher = Mocks.getPusher({ foo: "bar" });
+    channelAuthorizer = jasmine.createSpy("channelAuthorizer")
+    pusher = Mocks.getPusher({ channelAuthorizer: channelAuthorizer });
     channel = new PrivateChannel("private-test", pusher);
   });
 
@@ -29,69 +28,22 @@ describe("PrivateChannel", function() {
   });
 
   describe("#authorize", function() {
-    var authorizer;
-
-    beforeEach(function() {
-      authorizer = Mocks.getAuthorizer();
-      factorySpy = spyOn(Factory, "createAuthorizer").andReturn(authorizer);
-    });
-
-    it("should create and call an authorizer", function() {
-      channel.authorize("1.23", function() {});
-      expect(Factory.createAuthorizer.calls.length).toEqual(1);
-      expect(Factory.createAuthorizer).toHaveBeenCalledWith(
-        channel,
-        { foo: "bar" }
-      );
-    });
-
-    it("should call back with authorization data", function() {
-      var callback = jasmine.createSpy("callback");
+    it("should call channelAuthorizer", function() {
+      const callback = function(){}
       channel.authorize("1.23", callback);
-
-      expect(callback).not.toHaveBeenCalled();
-      authorizer._callback(false, { foo: "bar" });
-
-      expect(callback).toHaveBeenCalledWith(false, { foo: "bar" });
-    });
-
-    describe('with custom authorizer', function() {
-      beforeEach(function() {
-        pusher = Mocks.getPusher({ 
-          authorizer: function(channel, options) {
-            return authorizer;
-          }
-        });
-        channel = new PrivateChannel("private-test-custom-auth", pusher);
-        factorySpy.andCallThrough();
-      });
-
-      it("should call the authorizer", function() {
-        var callback = jasmine.createSpy("callback");
-        channel.authorize("1.23", callback);
-        authorizer._callback(false, { foo: "bar" });
-        expect(callback).toHaveBeenCalledWith(false, { foo: "bar" });
-      });
+      expect(channelAuthorizer.calls.count()).toEqual(1);
+      expect(channelAuthorizer).toHaveBeenCalledWith(
+        { socketId: "1.23", channelName: "private-test" }, callback);
     });
   });
 
   describe("#trigger", function() {
     beforeEach(function() {
       channel.subscribed = true;
-    })
+    });
+
     it("should raise an exception if the event name does not start with client-", function() {
-      // we can't use toThrow with jasmine.any because it compares
-      // (exception.message || exception) with (expected.message || expected)
-      // the thrown exception has a message so it's passed to the matcher. The
-      // message is a string, and *not* an instanceof the expected class
-      // https://github.com/jasmine/jasmine/blob/v1.3.1/src/core/Matchers.js#L331-L333
-      var exception;
-      try {
-        channel.trigger("whatever", {});
-      } catch(e) {
-        exception = e;
-      }
-      expect(exception).toMatch(jasmine.any(Errors.BadEventName));
+      expect(() => channel.trigger('whatever', {})).toThrow(jasmine.any(Errors.BadEventName));
     });
 
     it("should call send_event on connection", function() {
@@ -101,12 +53,12 @@ describe("PrivateChannel", function() {
     });
 
     it("should return true if connection sent the event", function() {
-      pusher.send_event.andReturn(true);
+      pusher.send_event.and.returnValue(true);
       expect(channel.trigger("client-test", {})).toBe(true);
     });
 
     it("should return false if connection didn't send the event", function() {
-      pusher.send_event.andReturn(false);
+      pusher.send_event.and.returnValue(false);
       expect(channel.trigger("client-test", {})).toBe(false);
     });
   });

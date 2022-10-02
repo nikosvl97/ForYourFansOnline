@@ -14,22 +14,18 @@ var SuggestionsSlider = {
      * Instantiates the suggested members slider
      * @returns {*}
      */
-    init: function () {
+    init: function (container) {
         let swiperConfig ={
             pagination: {
-                el: ".suggestions-box .swiper-pagination",
+                el: container+" .swiper-pagination",
                 // type: "fraction",
                 dynamicBullets: true,
             },
-            navigation: {
-                nextEl: ".suggestions-next-slide",
-                prevEl: ".suggestions-prev-slide",
-            }
         };
         if(sliderConfig.autoslide === true){
             swiperConfig.autoplay = {delay: 10000};
         }
-        return new Swiper(".suggestions-box .mySwiper", swiperConfig);
+        return new Swiper(container+" .mySwiper", swiperConfig);
     },
 
     /**

@@ -1457,7 +1457,7 @@
         nextElRef: [{ type: core.ViewChild, args: ['nextElRef', { static: false },] }],
         scrollbarElRef: [{ type: core.ViewChild, args: ['scrollbarElRef', { static: false },] }],
         paginationElRef: [{ type: core.ViewChild, args: ['paginationElRef', { static: false },] }],
-        slidesEl: [{ type: core.ContentChildren, args: [SwiperSlideDirective, { descendants: true, emitDistinctChangesOnly: true },] }],
+        slidesEl: [{ type: core.ContentChildren, args: [SwiperSlideDirective, { descendants: false, emitDistinctChangesOnly: true },] }],
         containerClasses: [{ type: core.HostBinding, args: ['class',] }]
     };
 

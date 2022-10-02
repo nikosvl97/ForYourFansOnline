@@ -224,14 +224,14 @@ export interface SwiperEvents {
   /**
    * !INTERNAL: Event will fired after setting CSS classes on swiper slide element
    */
-  _slideClass?: (swiper: Swiper, el: HTMLElement, classNames: string) => void;
+  _slideClass?: (swiper: Swiper, slideEl: HTMLElement, classNames: string) => void;
 
   /**
    * !INTERNAL: Event will fired after setting CSS classes on all swiper slides
    */
   _slideClasses?: (
     swiper: Swiper,
-    slides: { el: HTMLElement; classNames: string; index: number }[],
+    slides: { slideEl: HTMLElement; classNames: string; index: number }[],
   ) => void;
 
   /**
@@ -324,6 +324,14 @@ export interface SwiperEvents {
    * Event will be fired after swiper.update() call
    */
   update: (swiper: Swiper) => void;
+  /**
+   * Event will be fired when swiper is locked (when `watchOverflow` enabled)
+   */
+  lock: (swiper: Swiper) => void;
+  /**
+   * Event will be fired when swiper is unlocked (when `watchOverflow` enabled)
+   */
+  unlock: (swiper: Swiper) => void;
   // CORE_EVENTS_END
 }
 

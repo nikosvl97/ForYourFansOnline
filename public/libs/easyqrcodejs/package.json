@@ -1,31 +1,31 @@
 {
   "_args": [
     [
-      "easyqrcodejs@4.4.10",
+      "easyqrcodejs@4.4.12",
       "/mnt/f/of-tools/builds/Script"
     ]
   ],
-  "_from": "easyqrcodejs@4.4.10",
-  "_id": "easyqrcodejs@4.4.10",
+  "_from": "easyqrcodejs@4.4.12",
+  "_id": "easyqrcodejs@4.4.12",
   "_inBundle": false,
-  "_integrity": "sha512-DEr/Txdyfo0RsKuC0tX6t72GF5oqNFbnKVL9dTLatL5yiLJaId65BSfa5HKl4FaJt71yRX3DF1sf977FwynWtw==",
+  "_integrity": "sha512-ilibrPulpJNBM8Oy2ypNNcI0Y0/aJfJpx1lkLrfRA1Tg682ehLkULbp5rSNr/L1EjNbfaHzak+ufw2iSwhCkRQ==",
   "_location": "/easyqrcodejs",
   "_phantomChildren": {},
   "_requested": {
     "type": "version",
     "registry": true,
-    "raw": "easyqrcodejs@4.4.10",
+    "raw": "easyqrcodejs@4.4.12",
     "name": "easyqrcodejs",
     "escapedName": "easyqrcodejs",
-    "rawSpec": "4.4.10",
+    "rawSpec": "4.4.12",
     "saveSpec": null,
-    "fetchSpec": "4.4.10"
+    "fetchSpec": "4.4.12"
   },
   "_requiredBy": [
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/easyqrcodejs/-/easyqrcodejs-4.4.10.tgz",
-  "_spec": "4.4.10",
+  "_resolved": "https://registry.npmjs.org/easyqrcodejs/-/easyqrcodejs-4.4.12.tgz",
+  "_spec": "4.4.12",
   "_where": "/mnt/f/of-tools/builds/Script",
   "author": {
     "name": "Ray",
@@ -72,5 +72,5 @@
     "url": "git+https://github.com/ushelp/EasyQRCodeJS.git"
   },
   "scripts": {},
-  "version": "4.4.10"
+  "version": "4.4.12"
 }

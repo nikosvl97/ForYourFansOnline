@@ -8,7 +8,8 @@ body {
 }
 
 .navbar-brand img{
-    width: 180px;
+    max-width: 180px;
+    max-height: 60px;
 }
 
 .error-container{
@@ -390,6 +391,9 @@ footer .copyRightInfo .nav-link:nth-child(1){
 footer .text-lg{
     font-size: 1.1rem!important;
 }
+footer .ion-icon-wrapper{
+    font-size: 1.25rem!important;
+}
 
 /* Profile / Posts widget */
 .recent-media .card-body img{
@@ -527,7 +531,6 @@ footer .text-lg{
 
 
 /* Streams CSS */
-
 .stream-cover, .stream-cover-public{
     max-height: 40px;
     max-width: 150px;
@@ -537,4 +540,29 @@ footer .text-lg{
 
 .stream-chat-no-message{
     height: 300px;
+}
+
+.grecaptcha-badge{
+    z-index: 100;
+}
+
+.captcha-field .text-danger{
+    font-size: .875em;
+}
+
+.blurred{
+    -webkit-filter: blur(10px);
+    -moz-filter: blur(10px);
+    -o-filter: blur(10px);
+    -ms-filter: blur(10px);
+    filter: blur(10px);
+}
+
+/*Vanilla emojis*/
+.emoji-picker__content {
+    overflow: hidden;
+}
+
+.emoji-picker__wrapper{
+    margin-bottom: 10px!important;
 }

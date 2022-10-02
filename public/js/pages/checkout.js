@@ -79,24 +79,33 @@ $(function () {
             $('.payment-body .checkout-amount-input').removeClass('d-none');
             paymentTitle = trans("Send a tip");
             paymentDescription = trans("Send a tip to this user");
-            checkout.toggleCryptoPaymentProviders(true);
-            checkout.toggleCCBillPaymentProvider(true);
+            checkout.togglePaymentProviders(true, ['.nowpayments-payment-method', '.coinbase-payment-method', '.ccbill-payment-method', '.stripe-payment-method', '.paypal-payment-method', '.paystack-payment-method']);
         } else if (type === 'one-month-subscription'
             || type === 'three-months-subscription'
             || type === 'six-months-subscription'
             || type === 'yearly-subscription') {
             let numberOfMonths = 1;
-            checkout.toggleCCBillPaymentProvider(true);
-            if (type === 'three-months-subscription') {
-                numberOfMonths = 3;
-            checkout.toggleCCBillPaymentProvider(true);
-            } else if (type === 'six-months-subscription') {
-                numberOfMonths = 6;
-            checkout.toggleCCBillPaymentProvider(false);
-            } else if (type === 'yearly-subscription') {
-                numberOfMonths = 12;
-                checkout.toggleCCBillPaymentProvider(false);
+            let showStripeProvider = !app.stripeRecurringDisabled;
+            let showPaypalProvider = !app.paypalRecurringDisabled;
+            let showCCBillProvider = !app.ccBillRecurringDisabled;
+
+            // handles ccbill provider as they only allow 30 or 90 days subscriptions
+            if(showCCBillProvider){
+                if (type === 'three-months-subscription') {
+                    numberOfMonths = 3;
+                } else if (type === 'six-months-subscription') {
+                    numberOfMonths = 6;
+                    showCCBillProvider = false;
+                } else if (type === 'yearly-subscription') {
+                    numberOfMonths = 12;
+                    showCCBillProvider = false;
+                }
             }
+
+            checkout.togglePaymentProvider(showCCBillProvider, '.ccbill-payment-method');
+            checkout.togglePaymentProvider(showStripeProvider, '.stripe-payment-method');
+            checkout.togglePaymentProvider(showPaypalProvider, '.paypal-payment-method');
+
             $('.payment-body .checkout-amount-input').addClass('d-none');
             paymentTitle = trans(type);
             let subscriptionInterval = trans_choice('months', numberOfMonths, {'number': numberOfMonths});
@@ -111,14 +120,12 @@ $(function () {
             $('.payment-body .checkout-amount-input').addClass('d-none');
             paymentTitle = trans('Unlock post');
             paymentDescription = trans('Unlock post for') + ' ' + app.currencySymbol + amount;
-            checkout.toggleCryptoPaymentProviders(true);
-            checkout.toggleCCBillPaymentProvider(true);
+            checkout.togglePaymentProviders(true, ['.nowpayments-payment-method', '.coinbase-payment-method', '.ccbill-payment-method', '.stripe-payment-method', '.paypal-payment-method', '.paystack-payment-method']);
         } else if (type === 'stream-access') {
             $('.payment-body .checkout-amount-input').addClass('d-none');
             paymentTitle = trans('Join streaming');
             paymentDescription = trans('Join streaming now for') + ' ' + app.currencySymbol + amount;
-            checkout.toggleCryptoPaymentProviders(true);
-            checkout.toggleCCBillPaymentProvider(true);
+            checkout.togglePaymentProviders(true, ['.nowpayments-payment-method', '.coinbase-payment-method', '.ccbill-payment-method', '.stripe-payment-method', '.paypal-payment-method', '.paystack-payment-method']);
         }
 
         if (paymentTitle !== '' || paymentDescription !== '') {
@@ -156,7 +163,7 @@ $(function () {
  * Checkout class
  */
 var checkout = {
-    allowedPaymentProcessors: ['stripe', 'paypal', 'credit', 'coinbase', 'nowpayments', 'ccbill'],
+    allowedPaymentProcessors: ['stripe', 'paypal', 'credit', 'coinbase', 'nowpayments', 'ccbill', 'paystack'],
     paymentData: {},
 
     /**
@@ -280,6 +287,7 @@ var checkout = {
         const coinbaseProvider = $('.coinbase-payment-provider').hasClass('selected');
         const nowPaymentsProvider = $('.nowpayments-payment-provider').hasClass('selected');
         const ccbillProvider = $('.ccbill-payment-provider').hasClass('selected');
+        const paystackProvider = $('.paystack-payment-provider').hasClass('selected');
         let val = null;
         if (paypalProvider) {
             val = 'paypal';
@@ -293,6 +301,8 @@ var checkout = {
             val = 'nowpayments';
         } else if(ccbillProvider){
             val = 'ccbill';
+        } else if(paystackProvider){
+            val = 'paystack';
         }
         if (val) {
             checkout.paymentData.provider = val;
@@ -326,7 +336,7 @@ var checkout = {
      */
     validateFirstNameField: function () {
         let firstNameField = $('input[name="firstName"]');
-            checkout.paymentData.firstName = firstNameField.val();
+        checkout.paymentData.firstName = firstNameField.val();
     },
 
     /**
@@ -334,7 +344,7 @@ var checkout = {
      */
     validateLastNameField: function () {
         let lastNameField = $('input[name="lastName"]');
-            checkout.paymentData.lastName = lastNameField.val();
+        checkout.paymentData.lastName = lastNameField.val();
     },
 
     /**
@@ -342,7 +352,7 @@ var checkout = {
      */
     validateBillingAddressField: function () {
         let billingAddressField = $('textarea[name="billingAddress"]');
-            checkout.paymentData.billingAddress = billingAddressField.val();
+        checkout.paymentData.billingAddress = billingAddressField.val();
     },
 
     /**
@@ -350,7 +360,7 @@ var checkout = {
      */
     validateCityField: function () {
         let cityField = $('input[name="billingCity"]');
-            checkout.paymentData.city = cityField.val();
+        checkout.paymentData.city = cityField.val();
     },
 
     /**
@@ -358,7 +368,7 @@ var checkout = {
      */
     validateStateField: function () {
         let stateField = $('input[name="billingState"]');
-            checkout.paymentData.state = stateField.val();
+        checkout.paymentData.state = stateField.val();
     },
 
     /**
@@ -366,7 +376,7 @@ var checkout = {
      */
     validatePostcodeField: function () {
         let postcodeField = $('input[name="billingPostcode"]');
-            checkout.paymentData.postcode = postcodeField.val();
+        checkout.paymentData.postcode = postcodeField.val();
     },
 
     /**
@@ -588,23 +598,24 @@ var checkout = {
 
     },
 
-    toggleCCBillPaymentProvider: function(toggle){
-        let ccbillPaymentMethod = $('.ccbill-payment-method');
+    togglePaymentProvider: function(toggle, paymentMethodClass){
+        let paymentMethod = $(paymentMethodClass);
         if(toggle){
-            if(ccbillPaymentMethod.hasClass('d-none')){
-                ccbillPaymentMethod.removeClass('d-none');
+            if(paymentMethod.hasClass('d-none')){
+                paymentMethod.removeClass('d-none');
             }
         } else {
-            if(!ccbillPaymentMethod.hasClass('d-none')){
-                ccbillPaymentMethod.addClass('d-none');
+            if(!paymentMethod.hasClass('d-none')){
+                paymentMethod.addClass('d-none');
             }
         }
 
     },
-};
 
-jQuery(document).ready(function(){
-  jQuery(".stripe-payment-provider").click(function(){
-    jQuery("p.text-muted.mt-1.stripe-comment").css("display","block")
-  });
-});
+    togglePaymentProviders: function(toggle, paymentMethodClasses){
+        paymentMethodClasses.forEach(function(paymentMethodClass){
+            checkout.togglePaymentProvider(toggle, paymentMethodClass);
+        });
+
+    },
+};

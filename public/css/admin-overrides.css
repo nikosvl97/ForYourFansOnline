@@ -90,6 +90,15 @@
     padding-left: 0px!important;
 }
 
+.settings .nav-tabs li{
+    font-weight: 500!important;
+}
+
+.settings .panel-title {
+    font-size: 16px;
+}
+
+
 .settings .voyager .nav-tabs>li.active>a:hover {
     background-color: #CB0C9F!important;
 }
@@ -162,6 +171,10 @@
 
 .mb-2{
     margin-bottom: 1.2rem!important;
+}
+
+.mt-2{
+    margin-top: 1.2rem!important;
 }
 
 .p-5{
@@ -332,7 +345,7 @@
     margin-bottom: 0px!important;
 }
 
-.settings .emails-info a, .settings .payments-info a{
+.settings .emails-info a, .settings .payments-info a, .recaptcha-info a{
     color:#FFF;
     font-weight: 500;
 }
@@ -341,33 +354,98 @@
     color:#f1f1f1;
 }
 
-.text-break {
+/**
+Additional themes overrides
+ */
 
-    white-space: pre-line!important;
+/*.voyager .side-menu.sidebar-inverse {*/
+/*    background: #293042!important;*/
+/*}*/
+
+/*.voyager .side-menu.sidebar-inverse .navbar li>a:hover {*/
+/*    color: #fff;*/
+/*    background: #2d364c!important;*/
+/*}*/
+
+
+/*#voyager-loader {*/
+/*   background-color: #EDEEF0!important;*/
+/*}*/
+
+/*.app-container {*/
+/*    background-color: #EDEEF0!important;*/
+/*}*/
+
+/*body{*/
+/*    background-color: #EDEEF0!important;*/
+/*}*/
+
+/*    background-color: #EDEEF0; */
+
+
+.table {
+    margin-bottom: 0px;
 }
 
-.description-content, .comments-view {
-    white-space: pre-line!important;
+.voyager .table>thead>tr>th {
+    padding-top: 15px;
+    padding-bottom: 15px;
 }
 
-.line-clamp-1 {
 
-    -webkit-line-clamp: 2!important;
-
+th{
+    color: #acacac!important;
+    font-weight: 600!important;
 }
 
-span.tooltip-text {
-    visibility: hidden;
-    width: 120px;
-    background-color: black;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px 0;
-    position: absolute;
-    z-index: 1;
+th a {
+    color: #777!important;
+    font-weight: 600!important;
 }
 
-form.message-form.w-100.pl-3:hover span.tooltip-text {
-    visibility: unset!important;
+th a:hover {
+    color: #E585CF!important;
+}
+
+.actions.text-right.dt-not-orderable{
+    padding-right: 15px!important;
+}
+
+.table-responsive{
+    border: 1px solid #eaeaea;
+    border-radius: 5px;
+}
+
+#search-input .select2-selection {
+    border:none!important;
+}
+
+.btn i{
+    margin-right: 3px;
+}
+
+hr {
+    margin-top: 15px!important;
+    margin-bottom: 15px!important;
+}
+
+ .voyager .navbar .navbar-nav>li:hover>a {
+    color: #FFF!important;
+}
+
+.voyager .side-menu .navbar-header {
+    background: transparent!important;
+}
+
+.analytics-container {
+    padding: 0px 25px 25px!important;
+}
+
+label{
+    color: #37474f;
+    font-weight: 500;
+}
+
+.custom-pages .no-sort.no-click.bread-actions{
+    width: 300px;
 }

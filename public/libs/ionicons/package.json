@@ -1,31 +1,31 @@
 {
   "_args": [
     [
-      "ionicons@5.5.3",
+      "ionicons@5.5.4",
       "/mnt/f/of-tools/builds/Script"
     ]
   ],
-  "_from": "ionicons@5.5.3",
-  "_id": "ionicons@5.5.3",
+  "_from": "ionicons@5.5.4",
+  "_id": "ionicons@5.5.4",
   "_inBundle": false,
-  "_integrity": "sha512-L71djrMi8pAad66tpwdnO1vwcyluCFvehzxU1PpH1k/HpYBZhZ5IaYhqXipmqUvu5aEbd4cbRguYyI5Fd4bxTw==",
+  "_integrity": "sha512-3ph8X9my3inhabWEZ7N0XRA0MnnNQ1v9a602mLNgWsIXnxE9G5BybIZ/pws/OZZ/hoNlvSjk801N03yL9/FNgQ==",
   "_location": "/ionicons",
   "_phantomChildren": {},
   "_requested": {
     "type": "version",
     "registry": true,
-    "raw": "ionicons@5.5.3",
+    "raw": "ionicons@5.5.4",
     "name": "ionicons",
     "escapedName": "ionicons",
-    "rawSpec": "5.5.3",
+    "rawSpec": "5.5.4",
     "saveSpec": null,
-    "fetchSpec": "5.5.3"
+    "fetchSpec": "5.5.4"
   },
   "_requiredBy": [
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/ionicons/-/ionicons-5.5.3.tgz",
-  "_spec": "5.5.3",
+  "_resolved": "https://registry.npmjs.org/ionicons/-/ionicons-5.5.4.tgz",
+  "_spec": "5.5.4",
   "_where": "/mnt/f/of-tools/builds/Script",
   "author": {
     "name": "Ben Sperry",
@@ -43,7 +43,7 @@
     }
   ],
   "dependencies": {
-    "@stencil/core": "^2.5.0"
+    "@stencil/core": "~2.10.0"
   },
   "description": "Premium icons for Ionic.",
   "devDependencies": {
@@ -99,5 +99,5 @@
   ],
   "types": "dist/types/index.d.ts",
   "unpkg": "dist/ionicons.js",
-  "version": "5.5.3"
+  "version": "5.5.4"
 }

@@ -4,7 +4,7 @@
  *
  */
 "use strict";
-/* global app, user, messengerVars, pusher, FileUpload, Lists, Pusher, PusherBatchAuthorizer, updateButtonState, mswpScanPage, trans, bootstrapDetectBreakpoint, incrementNotificationsCount  */
+/* global app, user, messengerVars, pusher, FileUpload, Lists, Pusher, PusherBatchAuthorizer, updateButtonState, mswpScanPage, trans, bootstrapDetectBreakpoint, incrementNotificationsCount, EmojiButton */
 
 $(function () {
 
@@ -14,7 +14,8 @@ $(function () {
         messenger.initAutoScroll();
         messenger.initMarkAsSeen();
         messenger.resetTextAreaHeight();
-        if(messengerVars.lastContactID !== false){
+        messenger.initEmojiPicker();
+        if(messengerVars.lastContactID !== false && messengerVars.lastContactID !== 0){
             messenger.fetchConversation(messengerVars.lastContactID);
         }
         FileUpload.initDropZone('.dropzone','/attachment/upload/message');
@@ -579,6 +580,40 @@ var messenger = {
      */
     showNewMessageDialog: function () {
         $('#messageModal').modal('show');
+    },
+
+    /**
+     * Instantiates the emoji picker messenger
+     * @param post_id
+     */
+    initEmojiPicker: function(){
+        try{
+            const button = document.querySelector('.conversation-writeup .trigger');
+            const picker = new EmojiButton(
+                {
+                    position: 'top-end',
+                    theme: app.theme,
+                    autoHide: false,
+                    rows: 4,
+                    recentsCount: 16,
+                    emojiSize: '1.3em',
+                    showSearch: false,
+                }
+            );
+            picker.on('emoji', emoji => {
+                document.querySelector('input').value += emoji;
+                $('.messageBoxInput').val($('.messageBoxInput').val() + emoji);
+
+            });
+            button.addEventListener('click', () => {
+                picker.togglePicker(button);
+            });
+        }
+        catch (e) {
+            // Maybe avoid ending up in here entirely
+            // console.error(e)
+        }
+
     }
 
 };

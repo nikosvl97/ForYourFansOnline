@@ -225,14 +225,14 @@ interface Swiper extends SwiperOptions {
   /**
    * !INTERNAL: Event will fired after setting CSS classes on swiper slide element
    */
-  _slideClass?: (swiper: SwiperClass, el: HTMLElement, classNames: string) => void;
+  _slideClass?: (swiper: SwiperClass, slideEl: HTMLElement, classNames: string) => void;
 
   /**
    * !INTERNAL: Event will fired after setting CSS classes on all swiper slides
    */
   _slideClasses?: (
     swiper: SwiperClass,
-    slides: { el: HTMLElement; classNames: string; index: number }[],
+    slides: { slideEl: HTMLElement; classNames: string; index: number }[],
   ) => void;
 
   /**
@@ -325,6 +325,14 @@ interface Swiper extends SwiperOptions {
    * Event will be fired after swiper.update() call
    */
   onUpdate?: (swiper: SwiperClass) => void;
+  /**
+   * Event will be fired when swiper is locked (when `watchOverflow` enabled)
+   */
+  onLock?: (swiper: SwiperClass) => void;
+  /**
+   * Event will be fired when swiper is unlocked (when `watchOverflow` enabled)
+   */
+  onUnlock?: (swiper: SwiperClass) => void;
   
   /**
    * Event will be fired in when autoplay started
