@@ -29,24 +29,6 @@
     </div>
 
     <ul class="list-unstyled menu-elements p-0">
-
-
-
-    <div class="menu-divider"></div>
-                    <li class="{{Route::currentRouteName() == 'my.bookmarks' ? 'active' : ''}}">
-
-                    <a class="scroll-link d-flex align-items-center" href="/">
-
-                        <div class="avatar-wrapper" style ="margin-right :5px; width:10%;">
-                    <img class="avatar rounded-circle" style="width: 100%;" src="/img/default-avatar.jpg">
-                </div>{{__('Profile name')}} 👋</a>
-                </li>
-                    <div class="menu-divider"></div>
-
-
-
-
-
         @if((Auth::check() && Auth::user()->email_verified_at) || (Auth::check() && !getSetting('site.enforce_email_validation')))
             <li class="{{Route::currentRouteName() == 'profile' && (request()->route("username") == Auth::user()->username) ? 'active' : ''}}">
                 <a class="scroll-link d-flex align-items-center" href="{{route('profile',['username'=>Auth::user()->username])}}">

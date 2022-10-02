@@ -1,18 +1,5 @@
 <div class="col">
     <div class="metrics-container">
-      @php
-  		$count = \App\Providers\DashboardServiceProvider::getActiveSubscriptionsCount();
-      $limit = 1000;
-  		if ($count >= $limit){
-  		@endphp
-  		<div class="alert alert-danger" role="alert">
-  		{{__("You have reached the limit of active subscription in your plan. Your Limit is")}} $@php	echo $limit; @endphp {{__("subscriptions")}}.
-
-  		</div>
-  		@php
-  		}
-  		@endphp
-        <h3 class="d-flex align-items-center mb-4"><div class="icon voyager-dashboard"></div>{{__("Platform statistics")}}</h3>
 
         <div class="row">
             <div class="mb-4 col-md-4">

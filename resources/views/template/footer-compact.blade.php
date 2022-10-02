@@ -8,25 +8,7 @@
                 <div class="clearfix"></div>
                 <br />
                 <div class="copyRightInfo d-flex flex-column-reverse flex-md-row d-md-flex justify-content-md-between">
-<!--  <p class="">&copy; {{date('Y')}} {{getSetting('site.name')}} </p> -->
-
-                  <a class="copyRightInfo" href="https://mepunkt.de{{getSetting('site.name')}}&utm_medium=click_banner&utm_campaign=footer_logo" target="_blank">
-                     <img style="width:10vh;"src="/img/logos/mepunkt-werbeagentur-nuernberg-hell.png">
-                  </a>
-
-
-
-
-					<p class="">
-					<a class="copyRightInfo" href="{{route('pages.get',['slug'=>'impressum'])}}" target="_blank">
-                                   {{__('Imprint')}} | 
-                                </a>
-					<a class="copyRightInfo" href="{{route('pages.get',['slug'=>'terms-and-conditions'])}}" target="_blank">
-                                   {{__('Terms & Conditions')}} | 
-                                </a>
-					<a class="copyRightInfo" href="{{route('pages.get',['slug'=>'privacy'])}}" target="_blank">
-                                   {{__('Privacy Policy')}}
-                                </a>
+                    <p class="">&copy; {{date('Y')}} {{getSetting('site.name')}}. {{__('All rights reserved.')}}</p>
                     <ul class="d-flex flex-row nav m-2 mt-md-0">
                         @if(getSetting('social-media.facebook_url'))
                             <li class="nav-item">
@@ -70,8 +52,6 @@
                                 </a>
                             </li>
                         @endif
-                                <a class="copyRightInfo" href="https://grandhosting.gr?utm_source=foryourfans_{{getSetting('site.name')}}&utm_medium=click_banner&utm_campaign=footer_logo" target="_blank">
-                                   <img style="width:7vh;"src="/img/logos/grandhosting_logo_poweredby.png">
                         @if(getSetting('social-media.telegram_link'))
                             <li class="nav-item">
                                 <a class="nav-link pe-1" href="{{getSetting('social-media.telegram_link')}}" target="_blank">

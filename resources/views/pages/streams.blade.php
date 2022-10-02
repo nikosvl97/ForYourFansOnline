@@ -21,7 +21,7 @@
 @stop
 
 @section('content')
-@if (Auth::check() && Auth::user()->id == 5)
+
     <div class="row">
         <div class="col-12">
             <div class="pt-4 d-flex justify-content-between align-items-center px-3 pb-3 border-bottom">
@@ -86,7 +86,6 @@
         </div>
 
     </div>
-@endif
     @include('elements.streams.stream-create-update-dialog')
     @include('elements.streams.stream-stop-dialog')
     @include('elements.streams.stream-delete-dialog')

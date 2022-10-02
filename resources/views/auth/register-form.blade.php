@@ -15,8 +15,6 @@
     @endif
 
     <div class="form-group ">
- <img style="width :100%;" src="">
-		<br>
         <label for="name" class="col-form-label">{{ __('Name') }}</label>
         <div class="">
             <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}"  autocomplete="name" autofocus>
@@ -71,9 +69,7 @@
             <div class="">
                 <input class="custom-control-input @error('terms') is-invalid @enderror" id="tosAgree" type="checkbox" name="terms" value="1" placeholder="{{ __('Terms and Conditions') }}">
                 <label class="custom-control-label" for="tosAgree">
-                    <span>{{ __('I agree to the') }} <a href="{{route('pages.get',['slug'=>'terms-and-conditions'])}}">{{ __('Terms of Use') }}</a> {{ __('and') }} <a href="{{route('pages.get',['slug'=>'privacy'])}}">{{ __('Privacy Policy') }}</a>
-				{{__('at')}}	{{__('and i agree that i am at least 18 years old.') }}
-					</span>
+                    <span>{{ __('I agree to the') }} <a href="{{route('pages.get',['slug'=>'terms-and-conditions'])}}">{{ __('Terms of Use') }}</a> {{ __('and') }} <a href="{{route('pages.get',['slug'=>'privacy'])}}">{{ __('Privacy Policy') }}</a>.</span>
                 </label>
             </div>
         </div>

@@ -9,7 +9,7 @@
                     {{__('Contact page')}}
                 </a>
                 <a href="{{route('pages.get',['slug'=>'privacy'])}}" target="" class="text-secondary text-lg m-2">
-                    {{__('Privacy Policy')}}
+                    {{__('Privacy')}}
                 </a>
                 <a href="{{route('pages.get',['slug'=>'terms-and-conditions'])}}" target="" class="text-secondary text-lg m-2">
                     {{__('Terms & conditions')}}

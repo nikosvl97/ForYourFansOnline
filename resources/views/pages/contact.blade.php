@@ -1,46 +1,23 @@
 @extends('layouts.generic')
-@section('page_title', __('Delete Account'))
+@section('page_title', __('Contact us'))
+
+@if(getSetting('security.recaptcha_enabled'))
+    @section('meta')
+        {!! NoCaptcha::renderJs() !!}
+    @stop
+@endif
 
 @section('content')
-
-
-
-@php
-
-if(isset($_POST['submit'])){
-    $to = "info@vlassis-edv.de"; // this is your Email address
-    $from = $_POST['email']; // this is the sender's Email address
-    $email = $_POST['email'];
-    $subject = $_POST['subject'];
-
-
-    $message = $email . "\n\n" . $subject . "\n\n" . "\n\n" . $_POST['message'];
-
-
-    $headers = "From:" . $from;
-
-    mail($to,$subject,$message,$headers);
-
-    echo "Mail Sent. Thank you " . $subject . ", we will contact you shortly.";
-    // You can also use header('Location: thank_you.php'); to redirect to another page.
-    }
-
-  @endphp
-
     <div class="container py-5 my-5">
 
         <div class="col-12 col-md-8 offset-md-2 mt-5">
-
 
             <div class="d-flex justify-content-center">
                 <div class="col-12 col-md-7 content-md pr-5">
                     <form class="well" role="form" method="post" action="{{route('contact.send')}}">
                         <div class="col">
-                            <h2 class="h1s text-bold">{{__("Delete account")}}</h2>
-							<h5 class="h1s text-bold" style="color:red;">{{__("Important!")}}</h5>
-
-                            <p class="mb-4" style="color:red;">{{__("Before deleting your account, you must cancel all active subscriptions on your profile. Otherwise the subscription may continue working!")}}</p>
-							 <p class="mb-4" style="color:red;">{{__("After sending the form, your account will be permanently deleted!")}}</p>
+                            <h3 class="h1s text-bold">{{__("Contact us")}}</h3>
+                            <p class="mb-4">{{__("Don't hesitate to contact us for any matter. We will get back to you asap.")}}</p>
 
                             @csrf
                             @if(session('success'))
@@ -53,7 +30,7 @@ if(isset($_POST['submit'])){
                             @endif
 
                             <div class="form-group">
-                                <input type="email" class="form-control title-form {{ $errors->has('email') ? 'is-invalid' : '' }}" name="email" placeholder="{{__("Email address")}}" autocomplete="email">
+                                <input type="email" class="form-control title-form {{ $errors->has('email') ? 'is-invalid' : '' }}"  value="{{ old('email') }}" name="email" placeholder="{{__("Email address")}}" autocomplete="email">
                                 @if($errors->has('email'))
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{$errors->first('email')}}</strong>
@@ -62,7 +39,7 @@ if(isset($_POST['submit'])){
                             </div>
 
                             <div class="form-group">
-                                <input type="text" class="form-control title-form {{ $errors->has('subject') ? 'is-invalid' : '' }}" name="subject" placeholder="{{__("Username")}}">
+                                <input type="text" class="form-control title-form {{ $errors->has('subject') ? 'is-invalid' : '' }}"  value="{{ old('subject') }}" name="subject" placeholder="{{__("Subject")}}">
                                 @if($errors->has('subject'))
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{$errors->first('subject')}}</strong>
@@ -70,10 +47,8 @@ if(isset($_POST['submit'])){
                                 @endif
                             </div>
 
-
-
-							   <div class="form-group">
-                                <textarea class="form-control {{ $errors->has('message') ? 'is-invalid' : '' }}" name="message" placeholder="{{__("Message")}}" rows="4"></textarea>
+                            <div class="form-group">
+                                <textarea class="form-control {{ $errors->has('message') ? 'is-invalid' : '' }}" name="message" placeholder="{{__("Message")}}" rows="4">{{ old('message') }}</textarea>
                                 @if($errors->has('message'))
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{$errors->first('message')}}</strong>
@@ -81,8 +56,20 @@ if(isset($_POST['submit'])){
                                 @endif
                             </div>
 
-                           <div class="form-group">
-                                <button class="btn btn-primary " type="submit">{{__("Submit and delete my account permanently")}}</button>
+                            @if(getSetting('security.recaptcha_enabled'))
+                                <div class="form-group captcha-field">
+                                    {!! NoCaptcha::display(['data-theme' => (Cookie::get('app_theme') == null ? (getSetting('site.default_user_theme')) : Cookie::get('app_theme') )]) !!}
+                                    {{--        {!! NoCaptcha::displaySubmit('register-form', 'submit now!', ['data-theme' => (Cookie::get('app_theme') == null ? (getSetting('site.default_user_theme')) : Cookie::get('app_theme') )]) !!}--}}
+                                    @error('g-recaptcha-response')
+                                    <span class="text-danger" role="alert">
+                                        <strong>{{__("Please check the captcha field.")}}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                            @endif
+
+                            <div class="form-group">
+                                <button class="btn btn-primary " type="submit">{{__("Submit")}}</button>
                             </div>
 
                         </div>
@@ -95,12 +82,8 @@ if(isset($_POST['submit'])){
                 </div>
 
 
-
-
             </div>
         </div>
 
     </div>
-
-<
 @stop

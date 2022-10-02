@@ -18,9 +18,6 @@
                     </div>
                 </div>
             </a>
-<!-- NIKOS CHANGES ANJAS PROJECT-->
-@if (Auth::check() && Auth::user()->id == 5)
-<!-- NIKOS CHANGES ANJAS PROJECT-->
             <a href="{{route('posts.create')}}" class="h-pill h-pill-primary nav-link d-flex justify-content-between px-3 {{Route::currentRouteName() == 'posts.create' ? 'active' : ''}}">
                 <div class="d-flex justify-content-center align-items-center">
                     <div class="icon-wrapper d-flex justify-content-center align-items-center">
@@ -28,7 +25,6 @@
                     </div>
                 </div>
             </a>
-            @endif
             <a href="{{route('my.messenger.get')}}" class="h-pill h-pill-primary nav-link d-flex justify-content-between px-3 {{Route::currentRouteName() == 'my.messenger.get' ? 'active' : ''}}">
                 <div class="d-flex justify-content-center align-items-center">
                     <div class="icon-wrapper d-flex justify-content-center align-items-center position-relative">

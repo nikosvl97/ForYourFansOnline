@@ -43,9 +43,3 @@
     <button class="btn btn-primary btn-block rounded mr-0" type="submit">{{__('Save')}}</button>
 
 </form>
-
-<br><br>
- <div class="form-group">
-        <label for="username">{{__('Delete account')}}</label>
-</div>
-<a href="https://anja-diergarten.de/delete-account/" target="_blank"><button class="btn btn-primary btn-block rounded mr-0">{{__('Delete account')}}</button></a>

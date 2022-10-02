@@ -1,8 +1,3 @@
-<!-- NIKOS CHANGES ANJAS PROJECT-->
-@if (Auth::check() && Auth::user()->id == 5)
-<!-- NIKOS CHANGES ANJAS PROJECT-->
-
-
 <form action="{{ route('search.get')}}" class="search-box-wrapper w-100" method="GET">
     <div class="input-group input-group-seamless-append">
         <input type="text" class="form-control shadow-none" aria-label="Text input with dropdown button" placeholder="{{__("Search")}}" name="query" value="{{isset($searchTerm) && $searchTerm ? $searchTerm : ''}}">
@@ -33,4 +28,3 @@
     @endif
 
 </form>
-@endif
