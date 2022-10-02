@@ -72,7 +72,7 @@ class PostsController extends Controller
         ];
 
         $data['recentMedia'] = false;
-        if ($post->isSubbed || Auth::user()->id == $post->user->id) {
+        if ($post->isSubbed || Auth::user()->id == $post->user->id  || (getSetting('site.allow_users_enabling_open_profiles') && $post->user->open_profile)) {
             $data['recentMedia'] = PostsHelperServiceProvider::getLatestUserAttachments($user->id, 'image');
         }
 
@@ -86,12 +86,20 @@ class PostsController extends Controller
      */
     public function create()
     {
+        $canPost = true;
+        if(getSetting('site.enforce_user_identity_checks')){
+            if(!GenericHelperServiceProvider::isUserVerified()){
+                $canPost = false;
+            }
+        }
         Javascript::put([
+            'isAllowedToPost' => $canPost,
             'mediaSettings' => [
                 'allowed_file_extensions' => '.' . str_replace(',', ',.', AttachmentServiceProvider::filterExtensions('videosFallback')),
                 'max_file_upload_size' => (int)getSetting('media.max_file_upload_size'),
                 'use_chunked_uploads' => (bool)getSetting('media.use_chunked_uploads'),
                 'upload_chunk_size' => (int)getSetting('media.upload_chunk_size'),
+                'max_post_description_size' => (int)getSetting('feed.min_post_description')
             ],
         ]);
 
@@ -123,6 +131,7 @@ class PostsController extends Controller
                 'max_file_upload_size' => (int) getSetting('media.max_file_upload_size'),
                 'use_chunked_uploads' => (bool)getSetting('media.use_chunked_uploads'),
                 'upload_chunk_size' => (int)getSetting('media.upload_chunk_size'),
+                'max_post_description_size' => (int)getSetting('feed.min_post_description')
             ],
         ]);
 
@@ -388,9 +397,8 @@ class PostsController extends Controller
         $post = Post::where('id', $postID)->where('user_id', Auth::user()->id)->first();
         if ($post) {
             // Deleting attachments from storage
-            $storage = Storage::disk(config('filesystems.defaultFilesystemDriver'));
             foreach($post->attachments as $attachment){
-                $storage->delete($attachment->filename);
+                AttachmentServiceProvider::removeAttachment($attachment);
             }
             $post->delete();
             return response()->json(['success' => true, 'message' => __('Post deleted successfully.')]);
@@ -402,6 +410,7 @@ class PostsController extends Controller
     private function validateUserAccessForPost($post) {
         return PostsHelperServiceProvider::hasActiveSub(Auth::user()->id, $post->user_id)
             || Auth::user()->id == $post->user_id
+            || (getSetting('site.allow_users_enabling_open_profiles') && $post->user->open_profile)
             || (!$post->user->paid_profile && ListsHelperServiceProvider::loggedUserIsFollowingUser($post->user->id))
             // check if logged user is admin
             || Auth::user()->role_id === 1;

@@ -50,16 +50,12 @@ class LocaleSetter
         // Prepping the translation files for frontend usage
         $langPath = resource_path('lang/'.App::getLocale());
         if (env('APP_ENV') == 'production') {
-            Cache::rememberForever('translations', function () use ($langPath) {
-                return file_get_contents($langPath.'.json');
-            });
+            Session::put('translations', file_get_contents($langPath.'.json'));
         } else {
             if(!file_exists($langPath.'.json')){
                 $langPath = resource_path('lang/en');
             }
-            Cache::remember('translations', 5, function () use ($langPath) {
-                return file_get_contents($langPath.'.json');
-            });
+            Session::put('translations', file_get_contents($langPath.'.json'));
         }
 
         return $next($request);

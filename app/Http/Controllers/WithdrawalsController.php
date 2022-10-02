@@ -46,13 +46,19 @@ class WithdrawalsController extends Controller
                     return response()->json(['success' => false, 'message' => __('You cannot withdraw this amount, try with a lower one')]);
                 }
 
+                $fee = 0;
+                if(getSetting('payments.withdrawal_allow_fees') && floatval(getSetting('payments.withdrawal_default_fee_percentage')) > 0) {
+                    $fee = (floatval(getSetting('payments.withdrawal_default_fee_percentage')) / 100) * floatval($amount);
+                }
+
                 Withdrawal::create([
                     'user_id' => Auth::user()->id,
                     'amount' => floatval($amount),
                     'status' => Withdrawal::REQUESTED_STATUS,
                     'message' => $message,
                     'payment_method' => $method,
-                    'payment_identifier' => $identifier
+                    'payment_identifier' => $identifier,
+                    'fee' => $fee
                 ]);
 
                 $user->wallet->update([

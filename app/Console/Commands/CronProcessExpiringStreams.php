@@ -40,7 +40,7 @@ class CronProcessExpiringStreams extends Command
      */
     public function handle()
     {
-        Log::channel()->info('[*]['.date('H:i:s')."] Processing about to expire streams.\r\n");
+        Log::channel('cronjobs')->info('[*]['.date('H:i:s')."] Processing about to expire streams.\r\n");
 
         $maxStreamDuration = intval(getSetting('streams.max_live_duration'));
         $maxStreamDuration = $maxStreamDuration >= 1 ? $maxStreamDuration : 1;
@@ -71,5 +71,6 @@ class CronProcessExpiringStreams extends Command
         }
 
         Log::channel('cronjobs')->info('[*]['.date('H:i:s')."] Finished processing expiring streams.\r\n");
+        return 0;
     }
 }

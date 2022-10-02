@@ -63,7 +63,7 @@ class PostsHelperServiceProvider extends ServiceProvider
             $attachments->whereIn('attachments.type', $extensions);
         }
         // validate access for paid posts attachments
-        if(Auth::check() && Auth::user()->role_id !== 1) {
+        if(Auth::check() && Auth::user()->role_id !== 1 && Auth::user()->id !== $userID) {
             $attachments->leftJoin('posts', 'posts.id', '=', 'attachments.post_id')
                 ->leftJoin('transactions', 'transactions.post_id', '=', 'posts.id')
                 ->where(function ($query) {
@@ -123,7 +123,7 @@ class PostsHelperServiceProvider extends ServiceProvider
         $followingList = UserList::where('user_id', $userId)->where('type', 'followers')->with(['members','members.user'])->first();
         $followingUserIds = [];
         foreach($followingList->members as $member){
-            if(!$member->user->paid_profile){
+            if(!$member->user->paid_profile || (getSetting('site.allow_users_enabling_open_profiles') && $member->user->open_profile)){
                 $followingUserIds[] =  $member->user->id;
             }
         }

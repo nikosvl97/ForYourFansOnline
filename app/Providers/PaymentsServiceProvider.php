@@ -150,7 +150,7 @@ class PaymentsServiceProvider extends ServiceProvider
                 $data['recipient_user_id'] = $withdrawal->user_id;
                 $data['sender_user_id'] = Auth::user()->id;
                 $data['type'] = Transaction::WITHDRAWAL_TYPE;
-                $data['amount'] = $withdrawal->amount;
+                $data['amount'] = $withdrawal->amount - $withdrawal->fee;
                 $data['payment_provider'] = Transaction::MANUAL_PROVIDER;
                 $data['currency'] = SettingsServiceProvider::getAppCurrencyCode();
                 $data['status'] = Transaction::APPROVED_STATUS;
@@ -186,6 +186,6 @@ class PaymentsServiceProvider extends ServiceProvider
     public static function ccbillCredentialsProvided() {
         return getSetting('payments.ccbill_account_number') && (getSetting('payments.ccbill_subaccount_number_recurring')
                 || getSetting('payments.ccbill_subaccount_number_one_time'))
-            && getSetting('payments.ccbill_flex_form_id') && getSetting('payments.ccbill_salt_key');
+            && getSetting('payments.ccbill_flex_form_id') && getSetting('payments.ccbill_salt_key') && !getSetting('payments.ccbill_checkout_disabled');
     }
 }

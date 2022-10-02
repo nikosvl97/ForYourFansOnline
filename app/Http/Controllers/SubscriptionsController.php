@@ -35,19 +35,34 @@ class SubscriptionsController extends Controller
                             ->with('error', __('This subscription is already canceled.'));
                     }
 
+                    $cancelSubscription = false;
+
                     if ($subscription->provider != null) {
                         if ($subscription->provider === Transaction::PAYPAL_PROVIDER && $subscription->paypal_agreement_id != null) {
                             $this->paymentHelper->cancelPaypalAgreement($subscription->paypal_agreement_id);
+                            $cancelSubscription = true;
                         } elseif ($subscription->provider === Transaction::STRIPE_PROVIDER && $subscription->stripe_subscription_id != null) {
                             $this->paymentHelper->cancelStripeSubscription($subscription->stripe_subscription_id);
+                            $cancelSubscription = true;
+                        } elseif ($subscription->provider === Transaction::CCBILL_PROVIDER && $subscription->ccbill_subscription_id != null) {
+                            if($this->paymentHelper->cancelCCBillSubscription($subscription->ccbill_subscription_id)){
+                                $cancelSubscription = true;
+                            };
+                        } elseif($subscription->provider === Transaction::CREDIT_PROVIDER) {
+                            $cancelSubscription = true;
                         }
                     }
 
                     // handle cancel subscription
-                    $subscription->status = Subscription::CANCELED_STATUS;
-                    $subscription->canceled_at = new \DateTime();
+                    if($cancelSubscription) {
+                        $subscription->status = Subscription::CANCELED_STATUS;
+                        $subscription->canceled_at = new \DateTime();
 
-                    $subscription->save();
+                        $subscription->save();
+                    } else {
+                        return Redirect::route('my.settings', ['type' => 'subscriptions'])
+                            ->with('error', __('Something went wrong when cancelling this subscription'));
+                    }
                 }
             }
         } catch (\Exception $exception) {

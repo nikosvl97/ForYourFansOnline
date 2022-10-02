@@ -12,6 +12,9 @@ class CheckForMaintenanceMode extends Middleware
      * @var array
      */
     protected $except = [
-        //
+        // TODO: In the future, add Admin > Tools > maintenance
+        'admin/*',
+        'update',
+        'update/*',
     ];
 }

@@ -31,7 +31,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // Deleting cached views & cache once in a while, so shared hosting file quota won't go crazy
-        $schedule->command('cron:clear_cache_files')->weekly();
+        $schedule->command('cron:clear_cache_files')->monthly();
         $schedule->command('cron:email_upcoming_renewals')->daily();
         $schedule->command('cron:email_expiring_subs')->daily();
         $schedule->command('cron:renew_subscriptions')->hourly();

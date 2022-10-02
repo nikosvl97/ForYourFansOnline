@@ -28,6 +28,8 @@ class UserMessage extends Model
      * @var array
      */
     protected $casts = [
+        'sender_id' => 'integer',
+        'receiver_id' => 'integer'
     ];
 
     /*

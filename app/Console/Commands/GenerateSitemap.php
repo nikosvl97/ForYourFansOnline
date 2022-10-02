@@ -46,5 +46,6 @@ class GenerateSitemap extends Command
             echo '[*]['.date('H:i:s').']Sitemap generation failed';
             Log::channel('cronjobs')->info('[*] Sitemap generation failed. \r\n');
         }
+        return 0;
     }
 }

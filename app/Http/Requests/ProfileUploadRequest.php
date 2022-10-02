@@ -24,7 +24,7 @@ class ProfileUploadRequest extends FormRequest
     public function rules()
     {
         return [
-            'file' => 'required|mimes:png,jpg,jpeg|max:4000',
+            'file' => 'required|mimes:png,jpg,jpeg|max:'.(getSetting('media.max_avatar_cover_file_size') ? ((int)getSetting('media.max_avatar_cover_file_size') * 1000) : 4000),
         ];
     }
 }

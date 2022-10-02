@@ -39,8 +39,10 @@ class JavascriptVariables
             $jsData['depositMaxAmount'] = App\Providers\PaymentsServiceProvider::getDepositMaximumAmount();
             $jsData['tipMinAmount'] = (int)getSetting('payments.min_tip_value');
             $jsData['tipMaxAmount'] = (int)getSetting('payments.max_tip_value');
+            $jsData['stripeRecurringDisabled'] = getSetting('payments.stripe_recurring_disabled');
+            $jsData['paypalRecurringDisabled'] = getSetting('payments.paypal_recurring_disabled');
+            $jsData['ccBillRecurringDisabled'] = getSetting('payments.ccbill_recurring_disabled');
             $jsData['enable_age_verification_dialog'] = getSetting('compliance.enable_age_verification_dialog');
-
         }
         JavaScript::put(['app'=>$jsData]);
 

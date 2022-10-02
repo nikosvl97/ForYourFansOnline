@@ -24,6 +24,7 @@ class VerifyCsrfToken extends Middleware
         'payment/coinbaseStatusUpdate',
         'payment/nowPaymentsStatusUpdate',
         'payment/ccBillPaymentStatusUpdate',
+        'payment/paystackPaymentStatusUpdate',
         'beacon/feed',
     ];
 }

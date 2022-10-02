@@ -106,9 +106,8 @@ class InstallerController extends Controller
             return Redirect::to(route('installer.install').'?step=3')
                 ->with('error', $license->error);
         }
-        session([
-            'license' => json_encode(array_merge((array)$license,['code'=>$licenseCode])),
-        ]);
+        session(['license' => json_encode(array_merge((array)$license,['code'=>$licenseCode]))]);
+        session(['licenseCode' => $licenseCode]);
         if(!$this->saveEnvValues($request)){
             return Redirect::to(route('installer.install').'?step=3')
                 ->with('error', InstallerServiceProvider::$acError);
@@ -148,9 +147,10 @@ class InstallerController extends Controller
         }
 
 
-        // 2. Set site title
+        // 2. Sitet settings
         DB::statement("UPDATE settings SET `value` = :title WHERE `key` = 'site.name'", ['title'=>$site_title]);
         DB::statement("UPDATE settings SET `value` = :url WHERE `key` = 'site.app_url'", ['url'=>$app_url]);
+        DB::statement("UPDATE settings SET `value` = :val WHERE `key` = 'license.product_license_key'", ['val'=> session()->get('licenseCode')]);
 
         // 3. Add user & make it admin
         AuthServiceProvider::createUser([
@@ -167,7 +167,7 @@ class InstallerController extends Controller
         // 5. Create storage symlink
         Artisan::call('storage:link');
 
-        return Redirect::to(route('home'));
+        return Redirect::to($app_url);
     }
 
     /**

@@ -190,6 +190,15 @@ class LocalesServiceProvider extends ServiceProvider
         "yo" => "Yoruba",
         "za" => "Zhuang",
         "zh" => "Chinese",
+        "zh-CHS" => "Chinese (Simplified)",
+        "zh-Hans" => "Chinese (Simplified)",
+        "zh-CN" => "Chinese (Simplified)",
+        "zh-SG" => "Chinese (Simplified)",
+        "zh-CHT" => "Chinese (Traditional)",
+        "zh-Hant" => "Chinese (Traditional)",
+        "zh-HK" => "Chinese (Traditional)",
+        "zh-MO" => "Chinese (Traditional)",
+        "zh-TW" => "Chinese (Traditional)",
         "zu" => "Zulu"
     );
 

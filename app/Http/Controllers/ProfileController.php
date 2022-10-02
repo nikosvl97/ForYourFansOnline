@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Model\Country;
 use App\Providers\ListsHelperServiceProvider;
 use App\Providers\PostsHelperServiceProvider;
 use App\Providers\StreamsServiceProvider;
@@ -13,6 +14,9 @@ use Illuminate\Support\ViewErrorBag;
 use JavaScript;
 use Session;
 
+
+
+
 class ProfileController extends Controller
 {
     protected $user;
@@ -20,6 +24,7 @@ class ProfileController extends Controller
     protected $hasSub = false;
     protected $isOwner = false;
     protected $isPublic = false;
+    protected $viewerHasChatAccess = false;
 
     public function __construct(Request $request)
     {
@@ -45,9 +50,20 @@ class ProfileController extends Controller
         header('Pragma: no-cache'); // HTTP 1.0.
         header('Expires: 0 '); // Proxies.
 
+        // General access rules
         $this->setAccessRules();
         if (!$this->user->public_profile && !Auth::check()) {
-            abort(403);
+            abort(403,__('Profile access is denied.'));
+        }
+
+        // Geoblocking rule
+        try{
+            if($this->isGeoLocationBlocked()){
+                abort(403,__('Profile access is denied.'));
+            }
+        }
+        catch (\Exception $e){
+            // Log error, fail silently
         }
 
         $data['showLoginDialog'] = false;
@@ -83,6 +99,7 @@ class ProfileController extends Controller
             'activeFilter' => $postsFilter,
             'filterTypeCounts' => PostsHelperServiceProvider::getUserMediaTypesCount($this->user->id),
             'offer'=> $offer,
+            'viewerHasChatAccess'=> $this->viewerHasChatAccess,
         ]);
 
         if($postsFilter == 'streams'){
@@ -92,7 +109,7 @@ class ProfileController extends Controller
         $data['hasActiveStream'] = StreamsServiceProvider::getUserInProgressStream(true, $this->user->id) ? true : false;
 
         $data['recentMedia'] = false;
-        if ($this->hasSub || (Auth::check() && Auth::user()->id == $this->user->id)) {
+        if ($this->hasSub || (Auth::check() && Auth::user()->id == $this->user->id) || (getSetting('site.allow_users_enabling_open_profiles') && $this->user->open_profile)) {
             $data['recentMedia'] = PostsHelperServiceProvider::getLatestUserAttachments($this->user->id, 'image');
         }
 
@@ -191,6 +208,32 @@ class ProfileController extends Controller
                 $this->hasSub = true;
                 $this->isOwner = true;
             }
+            // handles chat access for creators so they can message their subscribers without subscribing back
+            $this->viewerHasChatAccess = PostsHelperServiceProvider::hasActiveSub($this->user->id, $viewerUser->id);
         }
     }
+
+    protected function isGeoLocationBlocked(){
+        if(getSetting('security.allow_geo_blocking')){
+            if($this->user->enable_geoblocking){
+                if(isset($this->user->settings['geoblocked_countries'])){
+                    $countries = json_decode($this->user->settings['geoblocked_countries']);
+                    $blockedCountries = Country::whereIn('name',$countries)->get();
+                    $client = new \GuzzleHttp\Client();
+                    $apiRequest = $client->get('https://ipgeolocation.abstractapi.com/v1/?api_key='.getSetting('security.abstract_api_key'));
+                    $apiData = json_decode($apiRequest->getBody()->getContents());
+                    foreach($blockedCountries as $country){
+                        if($country->country_code == $apiData->country_code){
+                            if(!(Auth::check() && Auth::user()->id === $this->user->id)){
+                                return true;
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+        return false;
+    }
+
 }

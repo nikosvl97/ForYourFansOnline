@@ -2,14 +2,21 @@
 
 namespace App\Providers;
 
+use App\Model\Attachment;
 use App\Model\PaymentRequest;
+use App\Model\Transaction;
+use App\Model\UserMessage;
 use App\Model\UserVerify;
 use App\Model\Withdrawal;
+use App\Observers\AttachmentsObserver;
 use App\Observers\PaymentRequestsObserver;
+use App\Observers\TransactionsObserver;
+use App\Observers\UserMessagesObserver;
 use App\Observers\UserVerifyObserver;
 use App\Observers\WithdrawalsObserver;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -36,12 +43,16 @@ class AppServiceProvider extends ServiceProvider
         UserVerify::observe(UserVerifyObserver::class);
         Withdrawal::observe(WithdrawalsObserver::class);
         PaymentRequest::observe(PaymentRequestsObserver::class);
-        if(getSetting('site.enforce_app_ssl')){
+        UserMessage::observe(UserMessagesObserver::class);
+        Attachment::observe(AttachmentsObserver::class);
+        Transaction::observe(TransactionsObserver::class);
+        if(getSetting('security.enforce_app_ssl')){
             \URL::forceScheme('https');
         }
         Schema::defaultStringLength(191);
         if(!InstallerServiceProvider::glck()){
             dd(base64_decode('SW52YWxpZCBzY3JpcHQgc2lnbmF0dXJl'));
         }
+        Paginator::useBootstrap();
     }
 }

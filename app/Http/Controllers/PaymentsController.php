@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Stripe\StripeClient;
+use Yabacon\Paystack;
 
 class PaymentsController extends Controller
 {
@@ -62,10 +63,14 @@ class PaymentsController extends Controller
             $transaction['payment_provider'] = $request->get('provider');
             $transaction['taxes'] = $request->get('taxes');
             $transaction['stream_id'] = $request->get('stream');
+            $errorMessage = __('Something went wrong with this transaction. Please try again');
 
-            if ($transaction['amount'] == 0) {
-                $errorMessage = __('Something went wrong with this transaction. Please try again');
+            $recipientUser = User::query()->where('id', $transaction['recipient_user_id'])->first();
+            if ($transaction['amount'] <= 0 || (!$recipientUser && $transactionType !== Transaction::DEPOSIT_TYPE)) {
+                return $this->paymentHandler->redirectByTransaction($transaction, $errorMessage);
+            }
 
+            if(!$this->paymentHandler->validateTransaction($transaction, $recipientUser)) {
                 return $this->paymentHandler->redirectByTransaction($transaction, $errorMessage);
             }
 
@@ -99,6 +104,13 @@ class PaymentsController extends Controller
                     $userId = Auth::user()->id;
                     $postId = $transaction['post_id'];
                     $streamId = $transaction['stream_id'];
+                    if($recipientUser->id === $transaction['sender_user_id']) {
+                        return $this->paymentHandler->redirectByTransaction(
+                            $transaction,
+                            $errorMessage = __('Cannot pay to yourself.')
+                        );
+                    }
+
                     if($transactionType === Transaction::POST_UNLOCK && PostsHelperServiceProvider::userPaidForPost($userId, $postId)){
                         return $this->paymentHandler->redirectByTransaction(
                             $transaction,
@@ -121,6 +133,8 @@ class PaymentsController extends Controller
                         $redirectLink = $this->paymentHandler->generateNowPaymentsTransaction($transaction);
                     } elseif($transaction['payment_provider'] == Transaction::CCBILL_PROVIDER) {
                         $redirectLink = $this->paymentHandler->generateCCBillOneTimePaymentTransaction($transaction);
+                    } elseif($transaction['payment_provider'] == Transaction::PAYSTACK_PROVIDER) {
+                        $redirectLink = $this->paymentHandler->generatePaystackTransaction($transaction, Auth::user()->email);
                     }
                     break;
                 case Transaction::DEPOSIT_TYPE:
@@ -133,12 +147,21 @@ class PaymentsController extends Controller
                         $redirectLink = $this->paymentHandler->generateNowPaymentsTransaction($transaction);
                     } elseif($transaction['payment_provider'] == Transaction::CCBILL_PROVIDER) {
                         $redirectLink = $this->paymentHandler->generateCCBillOneTimePaymentTransaction($transaction);
+                    } elseif($transaction['payment_provider'] == Transaction::PAYSTACK_PROVIDER) {
+                        $redirectLink = $this->paymentHandler->generatePaystackTransaction($transaction, Auth::user()->email);
                     }
                     break;
                 case Transaction::ONE_MONTH_SUBSCRIPTION:
                 case Transaction::THREE_MONTHS_SUBSCRIPTION:
                 case Transaction::SIX_MONTHS_SUBSCRIPTION:
                 case Transaction::YEARLY_SUBSCRIPTION:
+                    if($recipientUser->id === $transaction['sender_user_id']) {
+                        return $this->paymentHandler->redirectByTransaction(
+                            $transaction,
+                            $errorMessage = __('Cannot subscribe to yourself.')
+                        );
+                    }
+
                     if (PostsHelperServiceProvider::hasActiveSub($transaction['sender_user_id'], $transaction['recipient_user_id'])) {
                         $errorMessage = __('You already have an active subscription for this user.');
 
@@ -157,7 +180,6 @@ class PaymentsController extends Controller
                     break;
                 default:
                     return $this->paymentHandler->redirectByTransaction($transaction);
-                    break;
             }
             $transaction->save();
 
@@ -575,10 +597,13 @@ class PaymentsController extends Controller
     public function checkAndUpdateNowPaymentsTransaction(Request $request)
     {
         $nowPaymentsTransactionToken = $request->get('orderId');
-        $transaction = Transaction::query()->where('nowpayments_order_id', $nowPaymentsTransactionToken)->first();
-        if ($transaction) {
-            $this->paymentHandler->checkAndUpdateNowPaymentsTransaction($transaction);
-            $transaction->save();
+        $transaction = null;
+        if($nowPaymentsTransactionToken) {
+            $transaction = Transaction::query()->where('nowpayments_order_id', $nowPaymentsTransactionToken)->first();
+            if ($transaction) {
+                $this->paymentHandler->checkAndUpdateNowPaymentsTransaction($transaction);
+                $transaction->save();
+            }
         }
 
         return $this->paymentHandler->redirectByTransaction($transaction);
@@ -670,7 +695,10 @@ class PaymentsController extends Controller
     public function processCCBillTransaction(Request $request)
     {
         $paymentToken = $request->get('token');
-        $transaction = Transaction::query()->where('ccbill_payment_token', $paymentToken)->first();
+        $transaction = null;
+        if($paymentToken) {
+            $transaction = Transaction::query()->where('ccbill_payment_token', $paymentToken)->first();
+        }
 
         return $this->paymentHandler->redirectByTransaction($transaction);
     }
@@ -750,7 +778,6 @@ class PaymentsController extends Controller
                     if ($subscription) {
                         if ($eventType === 'RenewalSuccess') {
                             $this->paymentHandler->createSubscriptionRenewalTransaction($subscription, $paymentSucceeded = true, $eventBody['subscriptionId']);
-                            // TO DO -> check what comes in renewal success event and check if there is any next payment date property
                             $expiresDate = new \DateTime($eventBody['renewalDate'], new \DateTimeZone('UTC'));
                             if ($subscription->status != Subscription::ACTIVE_STATUS) {
                                 $subscription->status = Subscription::ACTIVE_STATUS;
@@ -775,5 +802,59 @@ class PaymentsController extends Controller
         } catch (\Exception $exception) {
             Log::debug('CCBill hook error:', [$exception->getMessage()]);
         }
+    }
+
+    /**
+     * Verifies paystack payment by calling their API and updating transaction in our side
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function verifyPaystackTransaction(Request $request) {
+        $reference = $request->get('reference');
+        $transaction = $this->paymentHandler->verifyPaystackTransaction($reference);
+
+        return $this->paymentHandler->redirectByTransaction($transaction);
+    }
+
+    /**
+     * @param Request $request
+     * @return void
+     */
+    public function paystackHook(Request $request) {
+        // Retrieve the request's body and parse it as JSON
+        $event = Paystack\Event::capture();
+
+        /* Verify that the signature matches one of your keys*/
+        $my_keys = [
+            'live'=>getSetting('payments.paystack_secret_key'),
+            'test'=>getSetting('payments.paystack_secret_key'),
+        ];
+        $owner = $event->discoverOwner($my_keys);
+        if(!$owner){
+            return;
+        }
+        Log::debug('Paystack hook received: ', [$event]);
+
+        switch($event->obj->event){
+            // charge.success
+            case 'charge.success':
+                if('success' === $event->obj->data->status){
+                    $this->paymentHandler->verifyPaystackTransaction($event->obj->data->reference);
+                }
+                break;
+            case 'refund.processed':
+                if($event->obj->data->transaction_reference) {
+                    $transaction = Transaction::where('paystack_payment_token', $event->obj->data->transaction_reference)->first();
+                    if($transaction->status === Transaction::APPROVED_STATUS){
+                        $transaction->status = Transaction::REFUNDED_STATUS;
+                        $transaction->save();
+                        $this->paymentHandler->deductMoneyFromUserForRefundedTransaction($transaction);
+                    }
+                }
+
+                break;
+        }
+
+        http_response_code(200);
     }
 }

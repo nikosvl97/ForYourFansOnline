@@ -8,6 +8,8 @@
 
 namespace App\Helpers;
 
+use App\Model\Post;
+use App\Model\Stream;
 use App\Model\Subscription;
 use App\Model\Tax;
 use App\Model\Transaction;
@@ -47,6 +49,8 @@ use PayPal\Rest\ApiContext;
 use Ramsey\Uuid\Uuid;
 use Stripe\StripeClient;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Yabacon\Paystack;
+use Yabacon\Paystack\Exception\ApiException;
 
 class PaymentHelper
 {
@@ -860,7 +864,7 @@ class PaymentHelper
             }
 
             $session = \Stripe\Checkout\Session::create([
-                'payment_method_types' => ['card','sepa_debit','sofort','ideal','bancontact'],
+                'payment_method_types' => ['card'],
                 'line_items' => [$stripeLineItems],
                 'locale' => 'auto',
                 'customer_email' => Auth::user()->email,
@@ -982,7 +986,7 @@ class PaymentHelper
             }
         } else {
             return Redirect::route('feed')
-                ->with('error', $message);
+                ->with('error', $errorMessage);
         }
     }
 
@@ -1443,5 +1447,159 @@ class PaymentHelper
         $transaction['subscription_id'] = $subscription['id'];
 
         return $subscription;
+    }
+
+    /**
+     * Makes the call to CCBill API to cancel a subscription
+     * @param $stripeSubscriptionId
+     * @return bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function cancelCCBillSubscription($stripeSubscriptionId)
+    {
+        $client = new Client(['debug' => fopen('php://stderr', 'w')]);
+        $res = $client->request('GET', 'https://datalink.ccbill.com/utils/subscriptionManagement.cgi', [
+            'query' => [
+                'clientAccnum' => getSetting('payments.ccbill_account_number'),
+                'clientSubacc' => getSetting('payments.ccbill_subaccount_number_recurring'),
+                'username' => getSetting('payments.ccbill_datalink_username'),
+                'password' => getSetting('payments.ccbill_datalink_password'),
+                'subscriptionId' => $stripeSubscriptionId,
+                'action' => 'cancelSubscription',
+            ],
+        ]);
+        $response = $res->getBody()->getContents();
+        if($response) {
+            $responseAsArray = str_getcsv($response, "\n");
+            if($responseAsArray && isset($responseAsArray[0]) && isset($responseAsArray[1])) {
+                if($responseAsArray[0] === 'results' && $responseAsArray[1] === '1') {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param $transaction
+     * @return string
+     * @throws \Exception
+     */
+    private function generatePaystackUniqueTransactionToken($transaction)
+    {
+        // generate unique token for transaction
+        do {
+            $id = Uuid::uuid4()->getHex();
+        } while (Transaction::query()->where('paystack_payment_token', $id)->first() != null);
+        $transaction->paystack_payment_token = $id;
+
+        return $id;
+    }
+
+    /**
+     * @param $transaction
+     * @param $email
+     * @return mixed
+     * @throws \Exception
+     */
+    public function generatePaystackTransaction($transaction, $email) {
+        $paystack = new Paystack(getSetting('payments.paystack_secret_key'));
+        $reference = self::generatePaystackUniqueTransactionToken($transaction);
+        $paystackTransaction = $paystack->transaction->initialize([
+            'amount'=>$transaction->amount * 100,
+            'email'=>$email,
+            'reference'=>$reference
+        ]);
+
+        return $paystackTransaction->data->authorization_url;
+    }
+
+    /**
+     * Calls PayStack API to verify payment status and updates transaction in our side accordingly
+     * @param $reference
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|null
+     */
+    public function verifyPaystackTransaction($reference){
+        $transaction = null;
+        if($reference){
+            $transaction = Transaction::query()->where('paystack_payment_token', $reference)->first();
+            if($transaction && $transaction->status !== Transaction::APPROVED_STATUS) {
+                $paystack = new Paystack(getSetting('payments.paystack_secret_key'));
+                try
+                {
+                    $paystackTransaction = $paystack->transaction->verify([
+                        'reference'=>$reference
+                    ]);
+
+                    if ('success' === $paystackTransaction->data->status) {
+                        $transaction->status = Transaction::APPROVED_STATUS;
+                        $transaction->save();
+
+                        $this->creditReceiverForTransaction($transaction);
+                        NotificationServiceProvider::createTipNotificationByTransaction($transaction);
+                    }
+                } catch(ApiException $e){
+                    Log::error("Failed verifying paystack transaction: ".$e->getMessage());
+                }
+            }
+        }
+
+        return $transaction;
+    }
+
+    public function validateTransaction($transaction, $recipientUser) {
+        $valid = false;
+        if($transaction) {
+            $exclusiveTaxesAmount = 0;
+            $taxes = $this->calculateTaxesForTransaction($transaction);
+            if(isset($taxes['exclusiveTaxesAmount'])) {
+                $exclusiveTaxesAmount = $taxes['exclusiveTaxesAmount'];
+            }
+            $transactionAmountWithoutTaxes = (string)($transaction['amount'] - $exclusiveTaxesAmount);
+
+            switch ($transaction->type) {
+                case Transaction::ONE_MONTH_SUBSCRIPTION:
+                    if($transactionAmountWithoutTaxes === (string)$recipientUser->profile_access_price) {
+                        $valid = true;
+                    }
+                    break;
+                case Transaction::THREE_MONTHS_SUBSCRIPTION:
+                    if($transactionAmountWithoutTaxes === (string)$recipientUser->profile_access_price_3_months) {
+                        $valid = true;
+                    }
+                    break;
+                case Transaction::SIX_MONTHS_SUBSCRIPTION:
+                    if($transactionAmountWithoutTaxes === (string)$recipientUser->profile_access_price_6_months) {
+                        $valid = true;
+                    }
+                    break;
+                case Transaction::YEARLY_SUBSCRIPTION:
+                    if($transactionAmountWithoutTaxes === (string)$recipientUser->profile_access_price_12_months) {
+                        $valid = true;
+                    }
+                    break;
+                case Transaction::POST_UNLOCK:
+                    $post = Post::query()->where('id', $transaction->post_id)->first();
+//                    dump((string)$post->price);
+//                    dump($transactionAmountWithoutTaxes);
+                    if((string)$post->price === $transactionAmountWithoutTaxes) {
+                        $valid = true;
+                    }
+                    break;
+                case Transaction::STREAM_ACCESS:
+                    $stream = Stream::query()->where('id', $transaction->stream_id)->first();
+                    if($stream && (string)$stream->price === $transactionAmountWithoutTaxes) {
+                        $valid = true;
+                    }
+                    break;
+                case Transaction::TIP_TYPE:
+                case Transaction::CHAT_TIP_TYPE:
+                case Transaction::DEPOSIT_TYPE:
+                    $valid = true;
+                    break;
+            }
+        }
+
+        return $valid;
     }
 }

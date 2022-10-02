@@ -20,7 +20,7 @@ class InvoicesController extends Controller
         $invoiceId = $request->route('id');
         $invoice = Invoice::query()->where(['id' => $invoiceId])->with('transaction')->first();
 
-        if($invoice && $invoice->transaction && $invoice->transaction->sender_user_id !== Auth::user()->id){
+        if($invoice && $invoice->transaction && $invoice->transaction->sender_user_id !== Auth::user()->id && Auth::user()->role_id !== 1){
             abort(404);
         }
 

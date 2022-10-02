@@ -47,7 +47,7 @@ class MessengerController extends Controller
         Javascript::put([
             'messengerVars' => [
                 'userAvatarPath' =>  ($request->getHost() == 'localhost' ? 'http://localhost' : 'https://'.$request->getHost()).$request->getBaseUrl().'/uploads/users/avatars/',
-                'lastContactID' => $lastContactID,
+                'lastContactID' => (int) $lastContactID,
                 'pusherDebug' => (bool) env('APP_DEBUG'),
                 'pusherCluster' => config('broadcasting.connections.pusher.options.cluster'),
                 'bootFullMessenger' => true,
@@ -84,7 +84,10 @@ class MessengerController extends Controller
     public function fetchContacts($limit = '0')
     {
         $userID = Auth::user()->id;
-        $contacts = DB::select('
+        $userBlockedList = Auth::user()->lists->firstWhere('type', 'blocked')->id;
+        $query = '
+        SELECT *
+         FROM (
             SELECT
              t1.sender_id as lastMessageSenderID,
              t1.message as lastMessage,
@@ -93,10 +96,14 @@ class MessengerController extends Controller
              senderDetails.id as senderID,
              senderDetails.name as senderName,
              senderDetails.avatar as senderAvatar,
+             senderDetails.role_id as senderRole,
              receiverDetails.id as receiverID,
              receiverDetails.name as receiverName,
              receiverDetails.avatar as receiverAvatar,
-             IF(receiverDetails.id = '.Auth::user()->id.', senderDetails.id, receiverDetails.id) as contactID
+             receiverDetails.role_id as receiverRole,
+             IF(receiverDetails.id = '.$userID.', senderDetails.id, receiverDetails.id) as contactID,
+             contactList.id as receiverFollowerListID,
+             ownerList.id as ownerFollowerListID
             FROM user_messages AS t1
             INNER JOIN
             (
@@ -114,12 +121,22 @@ class MessengerController extends Controller
                    t1.id = t2.max_id
             INNER JOIN users senderDetails ON t1.sender_id = senderDetails.id #AND senderDetails.level <> 3
             INNER JOIN users receiverDetails ON t1.receiver_id = receiverDetails.id #AND receiverDetails.level <> 3
-            LEFT JOIN user_list_members listMembers ON listMembers.list_id = '.Auth::user()->lists->firstWhere('type', 'blocked')->id.' AND (listMembers.user_id = senderID OR listMembers.user_id = receiverID)
+            LEFT JOIN user_list_members listMembers ON listMembers.list_id = '.$userBlockedList.' AND (listMembers.user_id = senderID OR listMembers.user_id = receiverID)
+            LEFT JOIN user_lists contactList ON t1.sender_id = contactList.user_id and contactList.type = "followers" #AND (senderDetails.paid_profile = 0 OR receiverDetails.paid_profile = 0)
+            LEFT JOIN user_lists ownerList ON t1.receiver_id = ownerList.user_id and ownerList.type = "followers" #AND (receiverDetails.paid_profile = 0 OR senderDetails.paid_profile = 0)
             WHERE listMembers.id IS NULL
                 AND (t1.receiver_id = ? OR t1.sender_id = ?)
-                ORDER BY created_at DESC
-                '.($limit != '0' ? "LIMIT 0,$limit" : '').'
-            ', [$userID, $userID]);
+                ) as contactsData
+                # Filtering subscriptions
+                LEFT JOIN subscriptions subsTable ON contactsData.contactID = subsTable.recipient_user_id AND (subsTable.sender_user_id = '.$userID.' OR subsTable.recipient_user_id = '.$userID.') AND subsTable.status = "completed"
+                # Filtering followed-follwed by entries
+                LEFT JOIN user_list_members following ON (following.list_id = contactsData.ownerFollowerListID OR following.list_id = contactsData.receiverFollowerListID) AND '.$userID.' = following.user_id
+                LEFT JOIN user_list_members followers ON (followers.list_id = contactsData.ownerFollowerListID OR followers.list_id = contactsData.receiverFollowerListID) AND contactsData.contactID = followers.user_id
+                WHERE ((following.id IS NOT NULL OR followers.id IS NOT NULL) OR subsTable.id IS NOT NULL OR (senderRole = 1 OR receiverRole = 1) )
+                ORDER BY contactsData.created_at DESC
+                #'.($limit != '0' ? "LIMIT 0,$limit" : '').'
+            ';
+        $contacts = DB::select($query, [$userID, $userID]);
 
         foreach ($contacts as $contact) {
             $dateDiff = Carbon::createFromTimeStamp(strtotime($contact->created_at))->diffForHumans(null, true, true);
@@ -159,10 +176,12 @@ class MessengerController extends Controller
                         ->Where('sender_id', $receiverID);
                 }
             )
-            ->get()->map(function ($message) {
+            ->orderBy('created_at')
+            ->get()
+            ->map(function ($message) {
                 $message->sender->profileUrl = route('profile', ['username'=> $message->sender->username]);
                 $message->receiver->profileUrl = route('profile', ['username'=> $message->receiver->username]);
-
+                $message = self::cleanUpMessageData($message);
                 return $message;
             });
 
@@ -181,6 +200,7 @@ class MessengerController extends Controller
      */
     public function sendMessage(Request $request)
     {
+        //TODO: Add more access in place
         $senderID = (int) Auth::user()->id;
         $receiverID = (int) $request->get('receiverID');
         $messageValue = $request->get('message');
@@ -214,15 +234,7 @@ class MessengerController extends Controller
         }
 
         $message = UserMessage::with(['sender', 'receiver', 'attachments'])->where('id', $message['id'])->first();
-
-        // Cleaning up the message data, removing any sensitive / un-needed data
-        $toRemove = ['settings','role_id','email','postcode','country','state','birthdate','billing_address','auth_provider','auth_provider_id',
-            'public_profile','identity_verified_at','enable_2fa','created_at','email_verified_at', 'updated_at', 'paid_profile',
-            'profile_access_price_3_months','profile_access_price','profile_access_price_6_months','profile_access_price_12_months'];
-        foreach($toRemove as $prop){
-            unset($message->sender[$prop]);
-            unset($message->receiver[$prop]);
-        }
+        $message = self::cleanUpMessageData($message);
 
         // Sending the email
         if (isset($message->receiver->settings['notification_email_new_message']) && $message->receiver->settings['notification_email_new_message'] == 'true') {
@@ -362,6 +374,7 @@ class MessengerController extends Controller
             $query->where('name', 'LIKE', "%$q%");
         }])
             ->where('sender_user_id', $id)
+            ->orWhere('recipient_user_id', $id)
             ->where('status', 'completed')
             ->orwhere([
                 ['status', '=', 'canceled'],
@@ -380,10 +393,11 @@ class MessengerController extends Controller
         }
         else{
             foreach ($subbedUsers as $k => $user) {
-                $values['users'][$user->creator->id]['id'] = $user->creator->id;
-                $values['users'][$user->creator->id]['name'] = $user->creator->name;
-                $values['users'][$user->creator->id]['avatar'] = $user->creator->avatar;
-                $values['users'][$user->creator->id]['label'] = '<div><img class="searchAvatar" src="uploads/users/avatars/'.$user->creator->avatar.'" alt=""><span class="name">'.$user->creator->name.'</span></div>';
+                $userData = $user->creator->id === $id ? $user->subscriber : $user->creator;
+                $values['users'][$userData->id]['id'] = $userData->id;
+                $values['users'][$userData->id]['name'] = $userData->name;
+                $values['users'][$userData->id]['avatar'] = $userData->avatar;
+                $values['users'][$userData->id]['label'] = '<div><img class="searchAvatar" src="uploads/users/avatars/'.$userData->avatar.'" alt=""><span class="name">'.$userData->name.'</span></div>';
             }
             // Fetching users followed for free
             $freeFollowIDs = PostsHelperServiceProvider::getFreeFollowingProfiles(Auth::user()->id);
@@ -396,7 +410,20 @@ class MessengerController extends Controller
             }
         }
 
-
         return $values['users'];
     }
+
+
+    public static function cleanUpMessageData($message){
+        // Cleaning up the message data, removing any sensitive / un-needed data
+        $toRemove = ['settings','role_id','email','postcode','country','state','birthdate','billing_address','auth_provider','auth_provider_id',
+            'public_profile','identity_verified_at','enable_2fa','created_at','email_verified_at', 'updated_at', 'paid_profile',
+            'profile_access_price_3_months','profile_access_price','profile_access_price_6_months','profile_access_price_12_months', 'enable_geoblocking'];
+        foreach($toRemove as $prop){
+            unset($message->sender[$prop]);
+            unset($message->receiver[$prop]);
+        }
+        return $message;
+    }
+
 }

@@ -39,7 +39,7 @@ class CronProcessEndingStreams extends Command
      */
     public function handle()
     {
-        Log::channel()->info('[*]['.date('H:i:s')."] Start processing ending streams.\r\n");
+        Log::channel('cronjobs')->info('[*]['.date('H:i:s')."] Start processing ending streams.\r\n");
 
         $maxStreamDuration = intval(getSetting('streams.max_live_duration'));
         $maxStreamDuration = $maxStreamDuration >= 1 ? $maxStreamDuration : 1;
@@ -78,5 +78,6 @@ class CronProcessEndingStreams extends Command
         }
 
         Log::channel('cronjobs')->info('[*]['.date('H:i:s')."] Finished processing ending streams.\r\n");
+        return 0;
     }
 }

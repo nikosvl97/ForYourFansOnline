@@ -33,6 +33,9 @@ class RTLSetter extends Middleware
             // Paddings
             '/pr-/' => 'ptl-',
             '/pl-/' => 'ptr-',
+            // Borders
+            '/border-left/' => 'brdr-',
+            '/border-right/' => 'brdl-',
             // Flexs
             '/flex-row/' => 'flexr-',
             '/flex-row-reverse/' => 'flexrr-',
@@ -46,6 +49,9 @@ class RTLSetter extends Middleware
             // Paddings
             '/ptr-/' => 'pr-',
             '/ptl-/' => 'pl-',
+            // Borders
+            '/brdr-/' => 'border-right',
+            '/brdl-/' => 'border-left',
             // Flexs
             '/flexr-/' => 'flex-row-reverse',
             '/flexrr-/' => 'flex-row',

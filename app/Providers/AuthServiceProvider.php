@@ -70,7 +70,7 @@ class AuthServiceProvider extends ServiceProvider
         if (isset($data['auth_provider_id'])) {
             $userData['auth_provider_id'] = $data['auth_provider_id'];
         }
-        if(getSetting('site.default_2fa_on_register')){
+        if(getSetting('security.default_2fa_on_register')){
             $userData['enable_2fa'] = true;
         }
         if(getSetting('site.default_profile_type_on_register') == 'free'){
@@ -82,6 +82,10 @@ class AuthServiceProvider extends ServiceProvider
         }
         else{
             $userData['public_profile'] = true;
+        }
+
+        if(getSetting('site.default_profile_type_on_register') === 'open') {
+            $userData['open_profile'] = true;
         }
 
         if(getSetting('payments.default_subscription_price')){
@@ -97,7 +101,7 @@ class AuthServiceProvider extends ServiceProvider
         if ($user != null) {
             GenericHelperServiceProvider::createUserWallet($user);
             ListsHelperServiceProvider::createUserDefaultLists($user->id);
-            if(getSetting('site.default_2fa_on_register')) {
+            if(getSetting('security.default_2fa_on_register')) {
                 self::addNewUserDevice($user->id, true);
             }
             if(getSetting('feed.default_users_to_follow')){

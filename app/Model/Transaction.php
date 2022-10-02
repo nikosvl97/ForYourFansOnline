@@ -33,6 +33,7 @@ class Transaction extends Model
     const COINBASE_PROVIDER = 'coinbase';
     const CCBILL_PROVIDER = 'ccbill';
     const NOWPAYMENTS_PROVIDER = 'nowpayments';
+    const PAYSTACK_PROVIDER = 'paystack';
 
     const COINBASE_API_BASE_PATH = 'https://api.commerce.coinbase.com';
     const NOWPAYMENTS_API_BASE_PATH = 'https://api.nowpayments.io/v1/';
@@ -43,9 +44,11 @@ class Transaction extends Model
         self::PAYPAL_PROVIDER,
         self::STRIPE_PROVIDER,
         self::CCBILL_PROVIDER,
+        self::PAYSTACK_PROVIDER,
     ];
 
     const CCBILL_FLEX_FORM_BASE_PATH = 'https://api.ccbill.com/wap-frontflex/flexforms/';
+    const CCBILL_CANCEL_SUBSCRIPTION_BASE_PATH = 'https://datalink.ccbill.com/utils/subscriptionManagement.cgi';
 
     /**
      * The attributes that are mass assignable.
@@ -56,7 +59,7 @@ class Transaction extends Model
         'sender_user_id', 'recipient_user_id', 'subscription_id', 'stripe_transaction_id', 'paypal_payer_id', 'post_id',
         'paypal_transaction_id', 'status', 'type', 'amount', 'payment_provider', 'paypal_transaction_token', 'currency', 'taxes',
         'coinbase_charge_id', 'coinbase_transaction_token', 'ccbill_payment_token', 'ccbill_transaction_id', 'nowpayments_payment_id',
-        'nowpayments_order_id', 'stream_id', 'ccbill_subscription_id'
+        'nowpayments_order_id', 'stream_id', 'ccbill_subscription_id', 'paystack_transaction_token'
     ];
 
     /**

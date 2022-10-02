@@ -6,6 +6,7 @@ use App\Model\CreatorOffer;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class ResetCreatorOffers extends Command
 {
@@ -41,6 +42,8 @@ class ResetCreatorOffers extends Command
     public function handle()
     {
         echo '[*]['.date('H:i:s')."] Processing expired user offers.\r\n";
+        Log::channel('cronjobs')->info('[*]['.date('H:i:s')."] Processing expired user offers.\r\n");
+
         $offers = CreatorOffer::all();
         $current_time = Carbon::now();
         foreach ($offers as $offer) {
@@ -55,5 +58,7 @@ class ResetCreatorOffers extends Command
             }
         }
         echo '[*]['.date('H:i:s')."] Expired offers cleared.\r\n";
+        Log::channel('cronjobs')->info('[*]['.date('H:i:s')."] Expired offers cleared.\r\n");
+        return 0;
     }
 }

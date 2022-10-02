@@ -21,7 +21,7 @@ class AttachmentServiceProvider extends ServiceProvider
     public static $videoEncodingPresets = [
         'size' => ['videoBitrate'=> 500, 'audioBitrate' => 128],
         'balanced' => ['videoBitrate'=> 1000, 'audioBitrate' => 256],
-        'quality' => ['videoBitrate'=> 3000, 'audioBitrate' => 512],
+        'quality' => ['videoBitrate'=> 2000, 'audioBitrate' => 512],
     ];
 
     /**
@@ -217,15 +217,25 @@ class AttachmentServiceProvider extends ServiceProvider
                 }
             }
 
-            $jpgImage->encode('jpg', 70);
+            // No processing for gifs
+            // TODO: Add watermarking via other lib - intervention has no support for it
+            if($fileExtension == 'gif'){
+                $fileExtension = 'gif';
+                $fileContent = $file;
+                $filePath = $directory.'/'.$fileId.'.'.$fileExtension;
+                $storage->put($filePath, file_get_contents($file->getRealPath()), 'public');
+            }
+            else{
+                // Saving rest of image types
+                $jpgImage->encode('jpg', 70);
+                $file = $jpgImage;
+                $fileExtension = 'jpg';
+                $fileContent = $file;
+                $filePath = $directory.'/'.$fileId.'.'.$fileExtension;
+                // Uploading to storage
+                $storage->put($filePath, $fileContent, 'public');
+            }
 
-            $file = $jpgImage;
-            $fileExtension = 'jpg';
-            $fileContent = $file;
-            $filePath = $directory.'/'.$fileId.'.'.$fileExtension;
-
-            // Uploading to storage
-            $storage->put($filePath, $fileContent, 'public');
         }
 
         // generate thumbnail
@@ -312,6 +322,13 @@ class AttachmentServiceProvider extends ServiceProvider
                     $storage->put($filePath, $fileContent, 'public');
                 }
                 else{
+                    // Overriding default ffmpeg lib temporary_files_root behaviour
+                    $ffmpegOutputLogDir = storage_path() . '/logs/ffmpeg';
+                    $ffmpegPassFile = $ffmpegOutputLogDir . '/' . uniqid();
+                    if(!is_dir($ffmpegOutputLogDir)){
+                        mkdir($ffmpegOutputLogDir);
+                    }
+
                     $videoQualityPreset = self::$videoEncodingPresets[getSetting('media.ffmpeg_video_conversion_quality_preset')];
                     $video = $video->export()
                         ->toDisk(config('filesystems.defaultFilesystemDriver'));
@@ -322,7 +339,13 @@ class AttachmentServiceProvider extends ServiceProvider
                         $video->inFormat((new X264('libmp3lame'))->setKiloBitrate($videoQualityPreset['videoBitrate'])->setAudioKiloBitrate($videoQualityPreset['audioBitrate']));
                     }
                     $video->addFilter('-preset', 'ultrafast')
+                        #->addFilter(['-strict', 2])
+                        ->addFilter(['-passlogfile', $ffmpegPassFile])
                         ->save($newfilePath);
+
+                    if(file_exists($ffmpegPassFile.'-0.log')) unlink($ffmpegPassFile.'-0.log');
+                    if(file_exists($ffmpegPassFile.'-1.log')) unlink($ffmpegPassFile.'-1.log');
+
                 }
 
                 Storage::disk('tmp')->delete($filePath);
@@ -389,9 +412,9 @@ class AttachmentServiceProvider extends ServiceProvider
      */
     public static function getThumbnailPathForAttachmentByResolution($attachment, $width, $height, $basePath = '/posts/images/')
     {
-        if ($attachment->driver === Attachment::S3_DRIVER && getSetting('storage.aws_cdn_enabled') && getSetting('storage.aws_cdn_presigned_urls_enabled')) {
+        if ($attachment->driver == Attachment::S3_DRIVER && getSetting('storage.aws_cdn_enabled') && getSetting('storage.aws_cdn_presigned_urls_enabled')) {
             return self::signAPrivateDistributionPolicy(
-                'https://' . getSetting('storage.cdn_domain_name') . '/' . self::getThumbnailFilenameByAttachmentAndResolution($attachment, $width, $height)
+                'https://' . getSetting('storage.cdn_domain_name') . '/' . self::getThumbnailFilenameByAttachmentAndResolution($attachment, $width, $height, $basePath)
             );
         } else {
             return str_replace($basePath, $basePath.$width.'X'.$height.'/', $attachment->path);
@@ -447,10 +470,8 @@ class AttachmentServiceProvider extends ServiceProvider
      * @param $height
      * @return string|string[]
      */
-    private static function getThumbnailFilenameByAttachmentAndResolution($attachment, $width, $height)
+    private static function getThumbnailFilenameByAttachmentAndResolution($attachment, $width, $height, $basePath = 'posts/images/')
     {
-        $basePath = 'posts/images/';
-
         return str_replace($basePath, $basePath.$width.'X'.$height.'/', $attachment->filename);
     }
 

@@ -130,7 +130,6 @@ class SettingsServiceProvider extends ServiceProvider
         config(['laravelpwa.manifest.name' => getSetting('site.name')]);
         config(['laravelpwa.manifest.short_name' => getSetting('site.name')]);
 
-
         // PWA overrides
         config(['laravelpwa.manifest.icons.192x192.path' => asset(config('laravelpwa.manifest.icons.192x192.path'))]);
         config(['laravelpwa.manifest.icons.512x512.path' => asset(config('laravelpwa.manifest.icons.512x512.path'))]);
@@ -161,6 +160,14 @@ class SettingsServiceProvider extends ServiceProvider
             config(['services.google.client_id' => getSetting('social-login.google_client_id')]);
             config(['services.google.client_secret' => getSetting('social-login.google_secret')]);
             config(['services.google.redirect' => rtrim(getSetting('site.app_url'),'/').'/socialAuth/google/callback']);
+        }
+
+        // Allow proxied requests, fixing 403 email verify issues on nginx and load balancers
+        config(['trustedproxy.proxies' => '*']);
+
+        if(getSetting('security.recaptcha_enabled')){
+            config(['captcha.sitekey' => getSetting('security.recaptcha_site_key')]);
+            config(['captcha.secret' => getSetting('security.recaptcha_site_secret_key')]);
         }
 
     }
@@ -217,5 +224,14 @@ class SettingsServiceProvider extends ServiceProvider
             && getSetting('websockets.pusher_app_key')
             && getSetting('websockets.pusher_app_secret')
             && getSetting('websockets.pusher_app_id');
+    }
+
+    /**
+     * Check if admin provided CCBill DataLink credentials
+     * @return bool
+     */
+    public static function providedCCBillSubscriptionCancellingCredentials() {
+        return getSetting('payments.ccbill_datalink_username')
+            && getSetting('payments.payments.ccbill_datalink_password');
     }
 }

@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateUserProfileSettingsRequest;
 use App\Http\Requests\UpdateUserRatesSettingsRequest;
 use App\Http\Requests\UpdateUserSettingsRequest;
 use App\Http\Requests\VerifyProfileAssetsRequest;
+use App\Model\Country;
 use App\Model\CreatorOffer;
 use App\Model\Subscription;
 use App\Model\Transaction;
@@ -115,6 +116,15 @@ class SettingsController extends Controller
                     return $item;
                 });
                 $data['devices'] = $devices;
+                $data['verifiedDevicesCount'] = UserDevice::where('user_id', $userID)->where('verified_at','<>',NULL)->count();
+                $data['unverifiedDevicesCount'] = UserDevice::where('user_id', $userID)->where('verified_at',NULL)->count();
+                $data['countries'] = Country::all();
+                JavaScript::put([
+                    'userGeoBlocking' => [
+                        'countries' => isset(Auth::user()->settings['geoblocked_countries']) ? json_decode(Auth::user()->settings['geoblocked_countries']) : [],
+                        'enabled' => getSetting('security.allow_geo_blocking'),
+                    ],
+                ]);
                 break;
             case 'payments':
                 $payments = Transaction::with(['receiver', 'sender'])->where('sender_user_id', $userID)->orWhere('recipient_user_id', $userID)->orderBy('id', 'desc')->paginate(6);
@@ -264,7 +274,7 @@ class SettingsController extends Controller
         $user = Auth::user();
         $key = $request->get('key');
         $value = filter_var($request->get('value'), FILTER_VALIDATE_BOOLEAN);
-        if (! in_array($key, ['public_profile', 'paid-profile','enable_2fa'])) {
+        if (! in_array($key, ['public_profile', 'paid-profile','enable_2fa', 'enable_geoblocking', 'open_profile'])) {
             return response()->json(['success' => false, 'message' => __('Settings not saved')]);
         }
         if($key === 'paid-profile'){
@@ -328,6 +338,10 @@ class SettingsController extends Controller
                 break;
             case 'privacy':
                 $additionalAssets['js'][] = '/js/pages/settings/privacy.js';
+                $additionalAssets['js'][] = '/js/pages/settings/notifications.js';
+                $additionalAssets['js'][] = '/libs/@selectize/selectize/dist/js/standalone/selectize.min.js';
+                $additionalAssets['css'][] = '/libs/@selectize/selectize/dist/css/selectize.css';
+                $additionalAssets['css'][] = '/libs/@selectize/selectize/dist/css/selectize.bootstrap4.css';
                 break;
             case 'notifications':
                 $additionalAssets['js'][] = '/js/pages/settings/notifications.js';
@@ -446,6 +460,7 @@ class SettingsController extends Controller
                 'notification_email_renewals',
                 'notification_email_new_tip',
                 'notification_email_new_comment',
+                'geoblocked_countries'
             ])) {
                 return response()->json(['success' => false, 'message' => __('Invalid setting key')]);
             }
@@ -493,7 +508,7 @@ class SettingsController extends Controller
                 session(['verifyAssets' => json_encode($data)]);
             }
         } catch (\Exception $exception) {
-            return response()->json(['success' => false, 'errors' => ['file'=>$exception->getMessage()]]);
+            return response()->json(['success' => false, 'errors' => ['file'=>$exception->getMessage()]], 500);
         }
 
         return response()->json(['success' => true, 'assetSrc' => $filePath]);
@@ -569,4 +584,14 @@ class SettingsController extends Controller
             return back()->with('error', __('Please attach photos with the front and back sides of your ID.'));
         }
     }
+
+    public static function getCountries(){
+        try {
+            $countries = Country::all();
+            return response()->json(['success' => true, 'data' => $countries]);
+        } catch (\Exception $exception) {
+            return response()->json(['success' => false, 'message' => __('Could not fetch countries list.'), 'error' => $exception->getMessage()]);
+        }
+    }
+
 }

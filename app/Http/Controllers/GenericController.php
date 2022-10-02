@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Cookie;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use TCG\Voyager\Models\Setting;
 use ZanySoft\Zip\Zip;
@@ -133,7 +134,6 @@ class GenericController extends Controller
      * @return \Illuminate\Http\JsonResponse|object
      */
     public function generateCustomTheme(Request $request){
-
         $themingServer = 'https://themes.qdev.tech';
         try{
             $response = InstallerServiceProvider::curlGetContent($themingServer.'?'.http_build_query($request->all()));
@@ -142,14 +142,14 @@ class GenericController extends Controller
                 Setting::where('key','colors.theme_color_code')->update(['value'=>$request->get('color_code')]);
                 Setting::where('key','colors.theme_gradient_from')->update(['value'=>$request->get('gradient_from')]);
                 Setting::where('key','colors.theme_gradient_to')->update(['value'=>$request->get('gradient_to')]);
-                  if (extension_loaded('zip')){
-                      $contents = InstallerServiceProvider::curlGetContent($themingServer.'/'.$response->path);
-                      Storage::disk('tmp')->put('theme.zip', $contents);
-                      $zip = Zip::open(storage_path('app/tmp/theme.zip'));
-                      $zip->extract(public_path('css/theme/'));
-                      Storage::disk('tmp')->delete('theme.zip');
-                      return response()->json(['success' => true, 'data'=>['path'=>$response->path, 'doBrowserRedirect' => false], 'message' => __("Theme generated & updated the frontend.")], 200);
-                  }
+                if (extension_loaded('zip')){
+                    $contents = InstallerServiceProvider::curlGetContent($themingServer.'/'.$response->path);
+                    Storage::disk('tmp')->put('theme.zip', $contents);
+                    $zip = Zip::open(storage_path('app/tmp/theme.zip'));
+                    $zip->extract(public_path('css/theme/'));
+                    Storage::disk('tmp')->delete('theme.zip');
+                    return response()->json(['success' => true, 'data'=>['path'=>$response->path, 'doBrowserRedirect' => false], 'message' => __("Theme generated & updated the frontend.")], 200);
+                }
                 return response()->json(['success' => true, 'data'=>['path'=>$response->path, 'doBrowserRedirect' => true], 'message' => $response->message], 200);
             }
             else{
@@ -159,6 +159,29 @@ class GenericController extends Controller
             return (object)['success' => false, 'error' => 'Error: "'.$exception->getMessage().'"'];
         }
 
+    }
+
+    /**
+     */
+    /**
+     * Saves license
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function saveLicense(Request $request){
+        try{
+            $licenseCode = $request->get('product_license_key');
+            $license = InstallerServiceProvider::gld($licenseCode);
+
+            if (isset($license->error)) {
+                return response()->json(['success' => false, 'error' => $license->error],500);
+            }
+            Storage::disk('local')->put('installed', json_encode(array_merge((array)$license,['code'=>$licenseCode])));
+            Setting::where('key','license.product_license_key')->update(['value'=>$licenseCode]);
+            return response()->json(['success' => true, 'message' => __("License key updated")], 200);
+        } catch (\Exception $exception) {
+            return response()->json(['success' => false, 'error' => 'Error: "'.$exception->getMessage().'"'],500);
+        }
     }
 
 }

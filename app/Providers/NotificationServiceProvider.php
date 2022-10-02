@@ -7,6 +7,7 @@ use App\Model\Post;
 use App\Model\PostComment;
 use App\Model\Stream;
 use App\Model\Transaction;
+use App\Model\UserListMember;
 use App\Model\UserMessage;
 use App\User;
 use GuzzleHttp\Exception\GuzzleException;
@@ -562,7 +563,13 @@ class NotificationServiceProvider extends ServiceProvider
      * @return mixed
      */
     public static function getUnreadMessages(){
-        return UserMessage::where('receiver_id',Auth::user()->id)->where('isSeen',0)->count();
+        $userID = Auth::user()->id;
+        $blockedMembers  = UserListMember::select(['user_id'])->where('list_id', DB::raw(Auth::user()->lists->firstWhere('type', 'blocked')->id))->get()->pluck('user_id')->toArray();
+        $count =  UserMessage::where('receiver_id',$userID)
+            ->whereNotIn('sender_id',$blockedMembers)
+            ->where('isSeen',0)
+            ->count();
+        return $count;
     }
 
     /**

@@ -54,3 +54,14 @@ function setLockCode($code){
 function getUserAvatarAttribute($a){
     return GenericHelperServiceProvider::getStorageAvatarPath($a);
 }
+
+function getLicenseType(){
+    $licenseType = 'Unlicensed';
+    if(file_exists(storage_path('app/installed'))){
+        $licenseV = json_decode(file_get_contents(storage_path('app/installed')));
+        if(isset($licenseV->data) && isset($licenseV->data->license)){
+            $licenseType = $licenseV->data->license;
+        }
+    }
+    return $licenseType;
+}

@@ -46,7 +46,7 @@ class CronRenewSubscriptions extends Command
      */
     public function handle()
     {
-        Log::channel()->info('[*]['.date('H:i:s')."] Processing expired subscriptions.\r\n");
+        Log::channel('cronjobs')->info('[*]['.date('H:i:s')."] Processing expired subscriptions.\r\n");
 
         $activeSubscriptions = Subscription::with('subscriber', 'creator')
             ->where('expires_at', '<=', new \DateTime())
@@ -105,5 +105,6 @@ class CronRenewSubscriptions extends Command
         }
 
         Log::channel('cronjobs')->info('[*]['.date('H:i:s')."] Finished processing subscriptions renew.\r\n");
+        return 0;
     }
 }

@@ -49,7 +49,7 @@ class LoginController extends Controller
     {
         // Handling 2FA stuff
         $force2FA = false;
-        if(getSetting('site.enable_2fa')){
+        if(getSetting('security.enable_2fa')){
             if(Auth::user()->enable_2fa && !in_array(AuthServiceProvider::generate2FaDeviceSignature(), AuthServiceProvider::getUserDevices(Auth::user()->id))  ){
                 AuthServiceProvider::generate2FACode();
                 AuthServiceProvider::addNewUserDevice(Auth::user()->id);

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\Sluggable;
 
 class SaveNewStreamRequest extends FormRequest
 {
@@ -24,7 +25,7 @@ class SaveNewStreamRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|min:5',
+            'name' => ['required','min:5',new Sluggable],
         ];
     }
 }

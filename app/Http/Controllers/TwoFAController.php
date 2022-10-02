@@ -19,7 +19,7 @@ class TwoFAController extends Controller
      */
     public function index()
     {
-        if(getSetting('site.enable_2fa')){
+        if(getSetting('security.enable_2fa')){
             if(Auth::user()->enable_2fa && !in_array(AuthServiceProvider::generate2FaDeviceSignature(), AuthServiceProvider::getUserDevices(Auth::user()->id))  ) {
                 return view('pages.2fa-verify');
             }
@@ -35,7 +35,7 @@ class TwoFAController extends Controller
     {
         $code = UserCode::where('user_id', Auth::user()->id)
             ->where('code', $request->code)
-            ->where('updated_at', '>=', now()->subMinutes(10))
+            ->where('updated_at', '>=', now()->subMinutes(30))
             ->first();
         if (!is_null($code)) {
             $device = UserDevice::where('signature',AuthServiceProvider::generate2FaDeviceSignature())->first();

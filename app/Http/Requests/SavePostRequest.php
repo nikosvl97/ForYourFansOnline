@@ -23,8 +23,15 @@ class SavePostRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'text' => 'required|min:10',
-        ];
+
+        $rules = [];
+        if((int)getSetting('feed.min_post_description') > 0){
+            $rules['text'] = 'required|min:'.getSetting('feed.min_post_description');
+        }
+        else{
+            $rules['attachments'] = 'required';
+        }
+
+        return $rules;
     }
 }

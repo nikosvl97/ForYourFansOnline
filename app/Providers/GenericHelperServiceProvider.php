@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\ServiceProvider;
+use Jenssegers\Agent\Agent;
 use Ramsey\Uuid\Uuid;
 
 class GenericHelperServiceProvider extends ServiceProvider
@@ -97,4 +98,14 @@ class GenericHelperServiceProvider extends ServiceProvider
             return str_replace('storage/','',asset(config('voyager.user.default_avatar', '/img/default-avatar.png')));
         }
     }
+
+    /**
+     * Helper to detect mobile usage
+     * @return bool
+     */
+    public static function isMobileDevice(){
+        $agent = new Agent();
+        return $agent->isMobile();
+    }
+
 }

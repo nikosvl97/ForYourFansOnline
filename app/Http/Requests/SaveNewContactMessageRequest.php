@@ -23,10 +23,18 @@ class SaveNewContactMessageRequest extends FormRequest
      */
     public function rules()
     {
-        return [
+
+        $additionalRules = [];
+        if(getSetting('security.recaptcha_enabled')){
+            $additionalRules = [
+                'g-recaptcha-response' => 'required|captcha'
+            ];
+        }
+
+        return array_merge([
             'subject' => 'required|min:5',
             'email' => 'required|email',
             'message' => 'required|min:10',
-        ];
+        ], $additionalRules);
     }
 }

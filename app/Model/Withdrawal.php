@@ -18,7 +18,7 @@ class Withdrawal extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'amount', 'status', 'message', 'processed', 'payment_identifier', 'payment_method'
+        'user_id', 'amount', 'status', 'message', 'processed', 'payment_identifier', 'payment_method', 'fee'
     ];
 
     /**

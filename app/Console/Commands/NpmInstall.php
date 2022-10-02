@@ -40,5 +40,6 @@ class NpmInstall extends Command
         echo '[*]['.date('H:i:s')."] Installing dependencies.\r\n";
         exec('npm i');
         $this->call('npm:publish');
+        return 0;
     }
 }

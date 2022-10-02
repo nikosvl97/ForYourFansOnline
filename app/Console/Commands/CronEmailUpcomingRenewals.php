@@ -68,5 +68,6 @@ class CronEmailUpcomingRenewals extends Command
         }
 
         Log::channel('cronjobs')->info('[*]['.date('H:i:s')."] Upcoming renewals emails sent successfully..\r\n");
+        return 0;
     }
 }

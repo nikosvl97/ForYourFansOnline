@@ -53,5 +53,6 @@ class NpmPublish extends Command
             exec($cmd);
             echo '[-] ['.date('H:i:s')."] Successfully published $dep under public directory.\r\n";
         }
+        return 0;
     }
 }
