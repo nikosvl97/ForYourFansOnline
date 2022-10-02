@@ -20,10 +20,13 @@ namespace PhpCsFixer\FixerConfiguration;
 final class AllowedValueSubset
 {
     /**
-     * @var array
+     * @var list<string>
      */
-    private $allowedValues;
+    private array $allowedValues;
 
+    /**
+     * @param list<string> $allowedValues
+     */
     public function __construct(array $allowedValues)
     {
         $this->allowedValues = $allowedValues;
@@ -49,7 +52,10 @@ final class AllowedValueSubset
         return true;
     }
 
-    public function getAllowedValues(): ?array
+    /**
+     * @return list<string>
+     */
+    public function getAllowedValues(): array
     {
         return $this->allowedValues;
     }

@@ -25,6 +25,7 @@ use PhpCsFixer\Console\Report\FixReport\ReportSummary;
 use PhpCsFixer\Error\ErrorsManager;
 use PhpCsFixer\Runner\Runner;
 use PhpCsFixer\ToolInfoInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -42,6 +43,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
  *
  * @internal
  */
+#[AsCommand(name: 'fix')]
 final class FixCommand extends Command
 {
     /**
@@ -49,39 +51,24 @@ final class FixCommand extends Command
      */
     protected static $defaultName = 'fix';
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
+    private EventDispatcherInterface $eventDispatcher;
 
-    /**
-     * @var ErrorsManager
-     */
-    private $errorsManager;
+    private ErrorsManager $errorsManager;
 
-    /**
-     * @var Stopwatch
-     */
-    private $stopwatch;
+    private Stopwatch $stopwatch;
 
-    /**
-     * @var ConfigInterface
-     */
-    private $defaultConfig;
+    private ConfigInterface $defaultConfig;
 
-    /**
-     * @var ToolInfoInterface
-     */
-    private $toolInfo;
+    private ToolInfoInterface $toolInfo;
 
     public function __construct(ToolInfoInterface $toolInfo)
     {
         parent::__construct();
 
-        $this->defaultConfig = new Config();
-        $this->errorsManager = new ErrorsManager();
         $this->eventDispatcher = new EventDispatcher();
+        $this->errorsManager = new ErrorsManager();
         $this->stopwatch = new Stopwatch();
+        $this->defaultConfig = new Config();
         $this->toolInfo = $toolInfo;
     }
 
@@ -194,7 +181,7 @@ Exit code of the fix command is built using following bit flags:
 * 64 - Exception raised within the application.
 
 EOF
-            ;
+        ;
     }
 
     /**
@@ -268,7 +255,6 @@ EOF
         if (null !== $stdErr) {
             if (OutputInterface::VERBOSITY_VERBOSE <= $verbosity) {
                 $stdErr->writeln($this->getApplication()->getLongVersion());
-                $stdErr->writeln(sprintf('Runtime: <info>PHP %s</info>', PHP_VERSION));
             }
 
             $configFile = $resolver->getConfigFile();

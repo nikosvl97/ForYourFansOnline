@@ -116,7 +116,7 @@ class SocialiteManager extends Manager implements Contracts\Factory
     /**
      * Create an instance of the specified driver.
      *
-     * @return \Laravel\Socialite\One\AbstractProvider
+     * @return \Laravel\Socialite\One\AbstractProvider|\Laravel\Socialite\Two\AbstractProvider
      */
     protected function createTwitterDriver()
     {
@@ -138,7 +138,7 @@ class SocialiteManager extends Manager implements Contracts\Factory
      */
     protected function createTwitterOAuth2Driver()
     {
-        $config = $this->config->get('services.twitter');
+        $config = $this->config->get('services.twitter') ?? $this->config->get('services.twitter-oauth-2');
 
         return $this->buildProvider(
             TwitterOAuth2Provider::class, $config

@@ -38,30 +38,15 @@ final class Error
      */
     public const TYPE_LINT = 3;
 
-    /**
-     * @var int
-     */
-    private $type;
+    private int $type;
 
-    /**
-     * @var string
-     */
-    private $filePath;
+    private string $filePath;
 
-    /**
-     * @var null|\Throwable
-     */
-    private $source;
+    private ?\Throwable $source;
 
-    /**
-     * @var array
-     */
-    private $appliedFixers;
+    private array $appliedFixers;
 
-    /**
-     * @var null|string
-     */
-    private $diff;
+    private ?string $diff;
 
     public function __construct(int $type, string $filePath, ?\Throwable $source = null, array $appliedFixers = [], ?string $diff = null)
     {

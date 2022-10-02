@@ -19,6 +19,7 @@ use PhpCsFixer\ConfigInterface;
 use PhpCsFixer\Console\ConfigurationResolver;
 use PhpCsFixer\ToolInfoInterface;
 use SplFileInfo;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -29,6 +30,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @internal
  */
+#[AsCommand(name: 'list-files')]
 final class ListFilesCommand extends Command
 {
     /**
@@ -36,15 +38,9 @@ final class ListFilesCommand extends Command
      */
     protected static $defaultName = 'list-files';
 
-    /**
-     * @var ConfigInterface
-     */
-    private $defaultConfig;
+    private ConfigInterface $defaultConfig;
 
-    /**
-     * @var ToolInfoInterface
-     */
-    private $toolInfo;
+    private ToolInfoInterface $toolInfo;
 
     public function __construct(ToolInfoInterface $toolInfo)
     {

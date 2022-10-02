@@ -22,6 +22,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'jsVars'], function () {
     Route::get('/metrics/subscriptions/partition', 'MetricsController@subscriptionsPartition')->name('admin.metrics.subscriptions.partition');
 
     Route::post('/theme/generate', 'GenericController@generateCustomTheme')->name('admin.theme.generate');
+    Route::post('/license/save', 'GenericController@saveLicense')->name('admin.license.save');
 
 });
 
@@ -65,6 +66,7 @@ Route::group(['middleware' => ['auth','verified','2fa']], function () {
         Route::post('/settings/verify/upload', ['uses' => 'SettingsController@verifyUpload', 'as'   => 'settings.verify.upload']);
         Route::post('/settings/verify/upload/delete', ['uses' => 'SettingsController@deleteVerifyAsset', 'as'   => 'settings.verify.delete']);
         Route::post('/settings/verify/save', ['uses' => 'SettingsController@saveVerifyRequest', 'as'   => 'settings.verify.save']);
+        Route::get('/settings/privacy/countries', ['uses' => 'SettingsController@getCountries', 'as'   => 'settings.verify.countries']);
 
         // Profile save
         Route::get('/settings/{type?}', ['uses' => 'SettingsController@index', 'as'   => 'settings']);
@@ -114,7 +116,7 @@ Route::group(['middleware' => ['auth','verified','2fa']], function () {
             Route::post('init', ['uses' => 'StreamsController@initStream', 'as'   => 'init']);
             Route::post('edit', ['uses' => 'StreamsController@saveStreamDetails', 'as'   => 'edit']);
             Route::post('stop', ['uses' => 'StreamsController@stopStream', 'as'   => 'stop']);
-            Route::delete('delete', ['uses' => 'StreamsController@deleteStream', 'as'   => 'stop']);
+            Route::delete('delete', ['uses' => 'StreamsController@deleteStream', 'as'   => 'delete']);
             Route::post('poster-upload', ['uses' => 'StreamsController@posterUpload', 'as'   => 'poster.upload']);
         });
 
@@ -136,6 +138,7 @@ Route::group(['middleware' => ['auth','verified','2fa']], function () {
         Route::get('/coinbase/status', ['uses' => 'PaymentsController@checkAndUpdateCoinbaseTransaction', 'as'   => 'checkCoinBasePaymentStatus']);
         Route::get('/nowpayments/status', ['uses' => 'PaymentsController@checkAndUpdateNowPaymentsTransaction', 'as'   => 'checkNowPaymentStatus']);
         Route::get('/ccbill/status', ['uses' => 'PaymentsController@processCCBillTransaction', 'as'   => 'checkCCBillPaymentStatus']);
+        Route::get('/paystack/status', ['uses' => 'PaymentsController@verifyPaystackTransaction', 'as'   => 'checkPaystackPaymentStatus']);
     });
 
     // Feed routes
@@ -221,6 +224,11 @@ Route::post('payment/nowPaymentsStatusUpdate', [
 Route::post('payment/ccBillPaymentStatusUpdate', [
     'as'   => 'ccBill.payment.update',
     'uses' => 'PaymentsController@ccBillHook',
+]);
+
+Route::post('payment/paystackPaymentStatusUpdate', [
+    'as'   => 'paystack.payment.update',
+    'uses' => 'PaymentsController@paystackHook',
 ]);
 
 // Install & upgrade routes

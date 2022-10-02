@@ -32,7 +32,7 @@ final class DocBlock
      *
      * @var Line[]
      */
-    private $lines = [];
+    private array $lines = [];
 
     /**
      * The array of annotations.
@@ -41,15 +41,12 @@ final class DocBlock
      */
     private $annotations;
 
-    /**
-     * @var null|NamespaceAnalysis
-     */
-    private $namespace;
+    private ?NamespaceAnalysis $namespace;
 
     /**
      * @var NamespaceUseAnalysis[]
      */
-    private $namespaceUses;
+    private array $namespaceUses;
 
     public function __construct(string $content, ?NamespaceAnalysis $namespace = null, array $namespaceUses = [])
     {

@@ -50,7 +50,7 @@ class PhpRedisConnector implements Connector
     }
 
     /**
-     * Build a single cluster seed string from array.
+     * Build a single cluster seed string from an array.
      *
      * @param  array  $server
      * @return string
@@ -75,9 +75,9 @@ class PhpRedisConnector implements Connector
         return tap(new Redis, function ($client) use ($config) {
             if ($client instanceof RedisFacade) {
                 throw new LogicException(
-                        extension_loaded('redis')
-                                ? 'Please remove or rename the Redis facade alias in your "app" configuration file in order to avoid collision with the PHP Redis extension.'
-                                : 'Please make sure the PHP Redis extension is installed and enabled.'
+                    extension_loaded('redis')
+                        ? 'Please remove or rename the Redis facade alias in your "app" configuration file in order to avoid collision with the PHP Redis extension.'
+                        : 'Please make sure the PHP Redis extension is installed and enabled.'
                 );
             }
 
@@ -101,6 +101,22 @@ class PhpRedisConnector implements Connector
 
             if (! empty($config['scan'])) {
                 $client->setOption(Redis::OPT_SCAN, $config['scan']);
+            }
+
+            if (! empty($config['name'])) {
+                $client->client('SETNAME', $config['name']);
+            }
+
+            if (array_key_exists('serializer', $config)) {
+                $client->setOption(Redis::OPT_SERIALIZER, $config['serializer']);
+            }
+
+            if (array_key_exists('compression', $config)) {
+                $client->setOption(Redis::OPT_COMPRESSION, $config['compression']);
+            }
+
+            if (array_key_exists('compression_level', $config)) {
+                $client->setOption(Redis::OPT_COMPRESSION_LEVEL, $config['compression_level']);
             }
         });
     }
@@ -175,6 +191,22 @@ class PhpRedisConnector implements Connector
 
             if (! empty($options['failover'])) {
                 $client->setOption(RedisCluster::OPT_SLAVE_FAILOVER, $options['failover']);
+            }
+
+            if (! empty($options['name'])) {
+                $client->client('SETNAME', $options['name']);
+            }
+
+            if (array_key_exists('serializer', $options)) {
+                $client->setOption(RedisCluster::OPT_SERIALIZER, $options['serializer']);
+            }
+
+            if (array_key_exists('compression', $options)) {
+                $client->setOption(RedisCluster::OPT_COMPRESSION, $options['compression']);
+            }
+
+            if (array_key_exists('compression_level', $options)) {
+                $client->setOption(RedisCluster::OPT_COMPRESSION_LEVEL, $options['compression_level']);
             }
         });
     }

@@ -61,6 +61,7 @@ final class BinaryOperatorSpacesFixer extends AbstractFixer implements Configura
 
     /**
      * @internal
+     *
      * @const Placeholder used as anchor for right alignment.
      */
     public const ALIGN_PLACEHOLDER = "\x2 ALIGNABLE%d \x3";
@@ -117,24 +118,20 @@ final class BinaryOperatorSpacesFixer extends AbstractFixer implements Configura
      * Keep track of the deepest level ever achieved while
      * parsing the code. Used later to replace alignment
      * placeholders with spaces.
-     *
-     * @var int
      */
-    private $deepestLevel;
+    private int $deepestLevel;
 
     /**
      * Level counter of the current nest level.
      * So one level alignments are not mixed with
      * other level ones.
-     *
-     * @var int
      */
-    private $currentLevel;
+    private int $currentLevel;
 
     /**
      * @var array<null|string>
      */
-    private static $allowedValues = [
+    private static array $allowedValues = [
         self::ALIGN,
         self::ALIGN_SINGLE_SPACE,
         self::ALIGN_SINGLE_SPACE_MINIMAL,
@@ -143,20 +140,17 @@ final class BinaryOperatorSpacesFixer extends AbstractFixer implements Configura
         null,
     ];
 
-    /**
-     * @var TokensAnalyzer
-     */
-    private $tokensAnalyzer;
+    private TokensAnalyzer $tokensAnalyzer;
 
     /**
      * @var array<string, string>
      */
-    private $alignOperatorTokens = [];
+    private array $alignOperatorTokens = [];
 
     /**
      * @var array<string, string>
      */
-    private $operators = [];
+    private array $operators = [];
 
     /**
      * {@inheritdoc}
@@ -468,11 +462,6 @@ $array = [
             }
         }
 
-        // @TODO: drop condition when PHP 7.4+ is required
-        if (!\defined('T_COALESCE_EQUAL')) {
-            unset($operators['??=']);
-        }
-
         return $operators;
     }
 
@@ -498,7 +487,7 @@ $array = [
             if ('=>' === $tokenContent) {
                 $this->injectAlignmentPlaceholdersForArrow($tokensClone, 0, \count($tokens));
             } else {
-                $this->injectAlignmentPlaceholders($tokensClone, 0, \count($tokens), $tokenContent);
+                $this->injectAlignmentPlaceholdersDefault($tokensClone, 0, \count($tokens), $tokenContent);
             }
 
             // for all tokens that should be aligned but do not have anything to align with, fix spacing if needed
@@ -529,30 +518,68 @@ $array = [
         }
     }
 
-    private function injectAlignmentPlaceholders(Tokens $tokens, int $startAt, int $endAt, string $tokenContent): void
+    private function injectAlignmentPlaceholdersDefault(Tokens $tokens, int $startAt, int $endAt, string $tokenContent): void
     {
+        $newLineFoundSinceLastPlaceholder = true;
+
         for ($index = $startAt; $index < $endAt; ++$index) {
             $token = $tokens[$index];
-
             $content = $token->getContent();
+
+            if (str_contains($content, "\n")) {
+                $newLineFoundSinceLastPlaceholder = true;
+            }
+
             if (
                 strtolower($content) === $tokenContent
                 && $this->tokensAnalyzer->isBinaryOperator($index)
                 && ('=' !== $content || !$this->isEqualPartOfDeclareStatement($tokens, $index))
+                && $newLineFoundSinceLastPlaceholder
             ) {
-                $tokens[$index] = new Token(sprintf(self::ALIGN_PLACEHOLDER, $this->deepestLevel).$content);
+                $tokens[$index] = new Token(sprintf(self::ALIGN_PLACEHOLDER, $this->currentLevel).$content);
+                $newLineFoundSinceLastPlaceholder = false;
 
                 continue;
             }
 
-            if ($token->isGivenKind(T_FUNCTION)) {
-                ++$this->deepestLevel;
+            if ($token->isGivenKind(T_FN)) {
+                $from = $tokens->getNextMeaningfulToken($index);
+                $until = $this->getLastTokenIndexOfFn($tokens, $index);
+                $this->injectAlignmentPlaceholders($tokens, $from + 1, $until - 1, $tokenContent);
+                $index = $until;
+
+                continue;
+            }
+
+            if ($token->isGivenKind([T_FUNCTION, T_CLASS])) {
+                $index = $tokens->getNextTokenOfKind($index, ['{', ';', '(']);
+                // We don't align `=` on multi-line definition of function parameters with default values
+                if ($tokens[$index]->equals('(')) {
+                    $index = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_PARENTHESIS_BRACE, $index);
+
+                    continue;
+                }
+
+                if ($tokens[$index]->equals(';')) {
+                    continue;
+                }
+
+                // Update the token to the `{` one in order to apply the following logic
+                $token = $tokens[$index];
+            }
+
+            if ($token->equals('{')) {
+                $until = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_CURLY_BRACE, $index);
+                $this->injectAlignmentPlaceholders($tokens, $index + 1, $until - 1, $tokenContent);
+                $index = $until;
 
                 continue;
             }
 
             if ($token->equals('(')) {
-                $index = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_PARENTHESIS_BRACE, $index);
+                $until = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_PARENTHESIS_BRACE, $index);
+                $this->injectAlignmentPlaceholders($tokens, $index + 1, $until - 1, $tokenContent);
+                $index = $until;
 
                 continue;
             }
@@ -564,21 +591,44 @@ $array = [
             }
 
             if ($token->isGivenKind(CT::T_ARRAY_SQUARE_BRACE_OPEN)) {
-                $index = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_ARRAY_SQUARE_BRACE, $index);
+                $until = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_ARRAY_SQUARE_BRACE, $index);
+                $this->injectAlignmentPlaceholders($tokens, $index + 1, $until - 1, $tokenContent);
+                $index = $until;
 
                 continue;
             }
         }
     }
 
+    private function injectAlignmentPlaceholders(Tokens $tokens, int $from, int $until, string $tokenContent): void
+    {
+        // Only inject placeholders for multi-line code
+        if ($tokens->isPartialCodeMultiline($from, $until)) {
+            ++$this->deepestLevel;
+            $currentLevel = $this->currentLevel;
+            $this->currentLevel = $this->deepestLevel;
+            $this->injectAlignmentPlaceholdersDefault($tokens, $from, $until, $tokenContent);
+            $this->currentLevel = $currentLevel;
+        }
+    }
+
     private function injectAlignmentPlaceholdersForArrow(Tokens $tokens, int $startAt, int $endAt): void
     {
+        $newLineFoundSinceLastPlaceholder = true;
+
         for ($index = $startAt; $index < $endAt; ++$index) {
             $token = $tokens[$index];
+            $content = $token->getContent();
 
-            if ($token->isGivenKind([T_FOREACH, T_FOR, T_WHILE, T_IF, T_SWITCH])) {
-                $index = $tokens->getNextMeaningfulToken($index);
-                $index = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_PARENTHESIS_BRACE, $index);
+            if (str_contains($content, "\n")) {
+                $newLineFoundSinceLastPlaceholder = true;
+            }
+
+            if ($token->isGivenKind(T_FN)) {
+                $from = $tokens->getNextMeaningfulToken($index);
+                $until = $this->getLastTokenIndexOfFn($tokens, $index);
+                $this->injectArrayAlignmentPlaceholders($tokens, $from + 1, $until - 1);
+                $index = $until;
 
                 continue;
             }
@@ -603,7 +653,9 @@ $array = [
                 continue;
             }
 
-            if ($token->isGivenKind(T_DOUBLE_ARROW)) { // no need to analyze for `isBinaryOperator` (always true), nor if part of declare statement (not valid PHP)
+            // no need to analyze for `isBinaryOperator` (always true), nor if part of declare statement (not valid PHP)
+            // there is also no need to analyse the second arrow of a line
+            if ($token->isGivenKind(T_DOUBLE_ARROW) && $newLineFoundSinceLastPlaceholder) {
                 $tokenContent = sprintf(self::ALIGN_PLACEHOLDER, $this->currentLevel).$token->getContent();
 
                 $nextToken = $tokens[$index + 1];
@@ -614,6 +666,7 @@ $array = [
                 }
 
                 $tokens[$index] = new Token([T_DOUBLE_ARROW, $tokenContent]);
+                $newLineFoundSinceLastPlaceholder = false;
 
                 continue;
             }
@@ -628,6 +681,8 @@ $array = [
             if ($token->equals(',')) {
                 for ($i = $index; $i < $endAt - 1; ++$i) {
                     if (str_contains($tokens[$i - 1]->getContent(), "\n")) {
+                        $newLineFoundSinceLastPlaceholder = true;
+
                         break;
                     }
 
@@ -647,6 +702,22 @@ $array = [
                     ++$index;
                 }
             }
+
+            if ($token->equals('{')) {
+                $until = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_CURLY_BRACE, $index);
+                $this->injectArrayAlignmentPlaceholders($tokens, $index + 1, $until - 1);
+                $index = $until;
+
+                continue;
+            }
+
+            if ($token->equals('(')) {
+                $until = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_PARENTHESIS_BRACE, $index);
+                $this->injectArrayAlignmentPlaceholders($tokens, $index + 1, $until - 1);
+                $index = $until;
+
+                continue;
+            }
         }
     }
 
@@ -655,9 +726,10 @@ $array = [
         // Only inject placeholders for multi-line arrays
         if ($tokens->isPartialCodeMultiline($from, $until)) {
             ++$this->deepestLevel;
-            ++$this->currentLevel;
+            $currentLevel = $this->currentLevel;
+            $this->currentLevel = $this->deepestLevel;
             $this->injectAlignmentPlaceholdersForArrow($tokens, $from, $until);
-            --$this->currentLevel;
+            $this->currentLevel = $currentLevel;
         }
     }
 
@@ -754,5 +826,34 @@ $array = [
         }
 
         return $tmpCode;
+    }
+
+    private function getLastTokenIndexOfFn(Tokens $tokens, int $index): int
+    {
+        $index = $tokens->getNextTokenOfKind($index, [[T_DOUBLE_ARROW]]);
+
+        while (true) {
+            $index = $tokens->getNextMeaningfulToken($index);
+
+            if ($tokens[$index]->equalsAny([';', ',', [T_CLOSE_TAG]])) {
+                break;
+            }
+
+            $blockType = Tokens::detectBlockType($tokens[$index]);
+
+            if (null === $blockType) {
+                continue;
+            }
+
+            if ($blockType['isStart']) {
+                $index = $tokens->findBlockEnd($blockType['type'], $index);
+
+                continue;
+            }
+
+            break;
+        }
+
+        return $index;
     }
 }

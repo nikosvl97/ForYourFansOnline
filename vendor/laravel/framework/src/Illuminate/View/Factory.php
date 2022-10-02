@@ -84,6 +84,13 @@ class Factory implements FactoryContract
     protected $renderCount = 0;
 
     /**
+     * The "once" block IDs that have been rendered.
+     *
+     * @var array
+     */
+    protected $renderedOnce = [];
+
+    /**
      * Create a new view factory instance.
      *
      * @param  \Illuminate\View\Engines\EngineResolver  $engines
@@ -180,6 +187,20 @@ class Factory implements FactoryContract
         }
 
         return $this->make($view, $this->parseData($data), $mergeData)->render();
+    }
+
+    /**
+     * Get the rendered content of the view based on the negation of a given condition.
+     *
+     * @param  bool  $condition
+     * @param  string  $view
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
+     * @param  array  $mergeData
+     * @return string
+     */
+    public function renderUnless($condition, $view, $data = [], $mergeData = [])
+    {
+        return $this->renderWhen(! $condition, $view, $data, $mergeData);
     }
 
     /**
@@ -281,7 +302,7 @@ class Factory implements FactoryContract
     public function getEngineFromPath($path)
     {
         if (! $extension = $this->getExtension($path)) {
-            throw new InvalidArgumentException("Unrecognized extension in file: {$path}");
+            throw new InvalidArgumentException("Unrecognized extension in file: {$path}.");
         }
 
         $engine = $this->extensions[$extension];
@@ -293,7 +314,7 @@ class Factory implements FactoryContract
      * Get the extension used by the view file.
      *
      * @param  string  $path
-     * @return string
+     * @return string|null
      */
     protected function getExtension($path)
     {
@@ -350,6 +371,28 @@ class Factory implements FactoryContract
     public function doneRendering()
     {
         return $this->renderCount == 0;
+    }
+
+    /**
+     * Determine if the given once token has been rendered.
+     *
+     * @param  string  $id
+     * @return bool
+     */
+    public function hasRenderedOnce(string $id)
+    {
+        return isset($this->renderedOnce[$id]);
+    }
+
+    /**
+     * Mark the given once token as having been rendered.
+     *
+     * @param  string  $id
+     * @return void
+     */
+    public function markAsRenderedOnce(string $id)
+    {
+        $this->renderedOnce[$id] = true;
     }
 
     /**
@@ -434,9 +477,11 @@ class Factory implements FactoryContract
     public function flushState()
     {
         $this->renderCount = 0;
+        $this->renderedOnce = [];
 
         $this->flushSections();
         $this->flushStacks();
+        $this->flushComponents();
     }
 
     /**

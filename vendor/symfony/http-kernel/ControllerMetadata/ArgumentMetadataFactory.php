@@ -39,7 +39,16 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
         }
 
         foreach ($reflection->getParameters() as $param) {
-            $arguments[] = new ArgumentMetadata($param->getName(), $this->getType($param, $class), $param->isVariadic(), $param->isDefaultValueAvailable(), $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null, $param->allowsNull());
+            $attributes = [];
+            if (\PHP_VERSION_ID >= 80000) {
+                foreach ($param->getAttributes() as $reflectionAttribute) {
+                    if (class_exists($reflectionAttribute->getName())) {
+                        $attributes[] = $reflectionAttribute->newInstance();
+                    }
+                }
+            }
+
+            $arguments[] = new ArgumentMetadata($param->getName(), $this->getType($param, $class), $param->isVariadic(), $param->isDefaultValueAvailable(), $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null, $param->allowsNull(), $attributes);
         }
 
         return $arguments;
