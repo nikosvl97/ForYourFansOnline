@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeds;
+namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
@@ -14,12 +14,12 @@ class PublicPagesTableSeeder extends Seeder
      */
     public function run()
     {
-        
+
 
         \DB::table('public_pages')->delete();
-        
+
         \DB::table('public_pages')->insert(array (
-            0 => 
+            0 =>
             array (
                 'id' => 3,
                 'slug' => 'terms-and-conditions',
@@ -102,7 +102,7 @@ class PublicPagesTableSeeder extends Seeder
                 'created_at' => '2021-09-30 12:07:35',
                 'updated_at' => '2021-09-30 12:07:35',
             ),
-            1 => 
+            1 =>
             array (
                 'id' => 4,
                 'slug' => 'privacy',
@@ -146,7 +146,7 @@ class PublicPagesTableSeeder extends Seeder
             'created_at' => '2021-09-30 12:09:39',
             'updated_at' => '2021-09-30 12:09:39',
         ),
-        2 => 
+        2 =>
         array (
             'id' => 5,
             'slug' => 'help',
@@ -173,7 +173,7 @@ class PublicPagesTableSeeder extends Seeder
             'updated_at' => '2021-09-30 12:10:09',
         ),
     ));
-        
-        
+
+
     }
 }

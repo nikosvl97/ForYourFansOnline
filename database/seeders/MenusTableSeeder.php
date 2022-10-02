@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeds;
+namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
@@ -14,12 +14,12 @@ class MenusTableSeeder extends Seeder
      */
     public function run()
     {
-        
+
 
         \DB::table('menus')->delete();
-        
+
         \DB::table('menus')->insert(array (
-            0 => 
+            0 =>
             array (
                 'id' => 1,
                 'name' => 'admin',
@@ -27,7 +27,7 @@ class MenusTableSeeder extends Seeder
                 'updated_at' => '2021-08-07 18:52:09',
             ),
         ));
-        
-        
+
+
     }
 }

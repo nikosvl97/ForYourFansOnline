@@ -1,16 +1,17 @@
 <?php
 
-use Database\Seeds\PublicPagesTableSeeder;
 use Illuminate\Database\Seeder;
 
-use Database\Seeds\DataTypesTableSeeder;
-use Database\Seeds\DataRowsTableSeeder;
-use Database\Seeds\MenusTableSeeder;
-use Database\Seeds\MenuItemsTableSeeder;
-use Database\Seeds\RolesTableSeeder;
-use Database\Seeds\PermissionsTableSeeder;
-use Database\Seeds\PermissionRoleTableSeeder;
-use Database\Seeds\UserRolesTableSeeder;
+use Database\Seeders\DataTypesTableSeeder;
+use Database\Seeders\DataRowsTableSeeder;
+use Database\Seeders\MenusTableSeeder;
+use Database\Seeders\MenuItemsTableSeeder;
+use Database\Seeders\RolesTableSeeder;
+use Database\Seeders\PermissionsTableSeeder;
+use Database\Seeders\PermissionRoleTableSeeder;
+use Database\Seeders\UserRolesTableSeeder;
+use Database\Seeders\PublicPagesTableSeeder;
+use Database\Seeders\InsertCountries;
 
 class DatabaseSeeder extends Seeder
 {

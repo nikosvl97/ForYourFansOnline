@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeds;
+namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
@@ -3144,7 +3144,7 @@ class DataRowsTableSeeder extends Seeder
                 'id' => 198,
                 'data_type_id' => 29,
                 'field' => 'details',
-                'type' => 'select_dropdown',
+                'type' => 'text',
                 'display_name' => 'Details',
                 'required' => 0,
                 'browse' => 1,
@@ -3152,7 +3152,7 @@ class DataRowsTableSeeder extends Seeder
                 'edit' => 1,
                 'add' => 1,
                 'delete' => 1,
-            'details' => '{"default":"I don\'t like this post","options":{"I don\'t like this post":"I don\'t like this post","Content is offensive or violates Terms of Service.":"Content is offensive or violates Terms of Service.","Content contains stolen material (DMCA)":"Content contains stolen material (DMCA)","Content is spam":"Content is spam","Report abuse":"Report abuse"}}',
+                'details' => '{}',
                 'order' => 7,
             ),
             196 => 
@@ -3168,7 +3168,7 @@ class DataRowsTableSeeder extends Seeder
                 'edit' => 1,
                 'add' => 1,
                 'delete' => 1,
-                'details' => '{"default":"received","options":{"received":"received","seen":"seen","solved":"solved"}}',
+            'details' => '{"default":"I don\'t like this post","options":{"I don\'t like this post":"I don\'t like this post","Content is offensive or violates Terms of Service.":"Content is offensive or violates Terms of Service.","Content contains stolen material (DMCA)":"Content contains stolen material (DMCA)","Content is spam":"Content is spam","Report abuse":"Report abuse"}}',
                 'order' => 8,
             ),
             197 => 
@@ -3176,7 +3176,7 @@ class DataRowsTableSeeder extends Seeder
                 'id' => 200,
                 'data_type_id' => 29,
                 'field' => 'status',
-                'type' => 'text',
+                'type' => 'select_dropdown',
                 'display_name' => 'Status',
                 'required' => 1,
                 'browse' => 1,
@@ -3184,7 +3184,7 @@ class DataRowsTableSeeder extends Seeder
                 'edit' => 1,
                 'add' => 1,
                 'delete' => 1,
-                'details' => '{}',
+                'details' => '{"default":"received","options":{"received":"received","seen":"seen","solved":"solved"}}',
                 'order' => 9,
             ),
             198 => 
@@ -3619,7 +3619,7 @@ class DataRowsTableSeeder extends Seeder
                 'details' => '{}',
                 'order' => 4,
             ),
-            226 =>
+            225 => 
             array (
                 'id' => 240,
                 'data_type_id' => 19,
@@ -3635,7 +3635,7 @@ class DataRowsTableSeeder extends Seeder
                 'details' => '{}',
                 'order' => 9,
             ),
-            227 => 
+            226 => 
             array (
                 'id' => 241,
                 'data_type_id' => 19,
@@ -3650,6 +3650,150 @@ class DataRowsTableSeeder extends Seeder
                 'delete' => 1,
                 'details' => '{}',
                 'order' => 10,
+            ),
+            227 => 
+            array (
+                'id' => 242,
+                'data_type_id' => 34,
+                'field' => 'id',
+                'type' => 'text',
+                'display_name' => 'Id',
+                'required' => 1,
+                'browse' => 0,
+                'read' => 0,
+                'edit' => 0,
+                'add' => 0,
+                'delete' => 0,
+                'details' => '{}',
+                'order' => 1,
+            ),
+            228 => 
+            array (
+                'id' => 243,
+                'data_type_id' => 34,
+                'field' => 'invoice_id',
+                'type' => 'text',
+                'display_name' => 'Invoice Id',
+                'required' => 1,
+                'browse' => 1,
+                'read' => 1,
+                'edit' => 1,
+                'add' => 1,
+                'delete' => 1,
+                'details' => '{}',
+                'order' => 2,
+            ),
+            229 => 
+            array (
+                'id' => 244,
+                'data_type_id' => 34,
+                'field' => 'data',
+                'type' => 'text',
+                'display_name' => 'Data',
+                'required' => 1,
+                'browse' => 0,
+                'read' => 0,
+                'edit' => 0,
+                'add' => 0,
+                'delete' => 0,
+                'details' => '{}',
+                'order' => 3,
+            ),
+            230 => 
+            array (
+                'id' => 245,
+                'data_type_id' => 34,
+                'field' => 'created_at',
+                'type' => 'timestamp',
+                'display_name' => 'Created At',
+                'required' => 0,
+                'browse' => 1,
+                'read' => 1,
+                'edit' => 1,
+                'add' => 0,
+                'delete' => 1,
+                'details' => '{}',
+                'order' => 4,
+            ),
+            231 => 
+            array (
+                'id' => 246,
+                'data_type_id' => 34,
+                'field' => 'updated_at',
+                'type' => 'timestamp',
+                'display_name' => 'Updated At',
+                'required' => 0,
+                'browse' => 0,
+                'read' => 0,
+                'edit' => 0,
+                'add' => 0,
+                'delete' => 0,
+                'details' => '{}',
+                'order' => 5,
+            ),
+            232 => 
+            array (
+                'id' => 247,
+                'data_type_id' => 13,
+                'field' => 'ccbill_subscription_id',
+                'type' => 'text',
+                'display_name' => 'Ccbill Subscription Id',
+                'required' => 0,
+                'browse' => 1,
+                'read' => 1,
+                'edit' => 1,
+                'add' => 1,
+                'delete' => 1,
+                'details' => '{}',
+                'order' => 7,
+            ),
+            233 => 
+            array (
+                'id' => 248,
+                'data_type_id' => 13,
+                'field' => 'provider',
+                'type' => 'select_dropdown',
+                'display_name' => 'Provider',
+                'required' => 1,
+                'browse' => 0,
+                'read' => 1,
+                'edit' => 1,
+                'add' => 1,
+                'delete' => 1,
+                'details' => '{"default":"credit","options":{"stripe":"Stripe","paypal":"Paypal","credit":"Credit"}}',
+                'order' => 9,
+            ),
+            234 => 
+            array (
+                'id' => 249,
+                'data_type_id' => 19,
+                'field' => 'fee',
+                'type' => 'text',
+                'display_name' => 'Fee',
+                'required' => 0,
+                'browse' => 1,
+                'read' => 1,
+                'edit' => 1,
+                'add' => 1,
+                'delete' => 1,
+                'details' => '{}',
+                'order' => 6,
+            ),
+            235 => 
+            array (
+                'id' => 250,
+                'data_type_id' => 19,
+                'field' => 'processed',
+                'type' => 'text',
+                'display_name' => 'Processed',
+                'required' => 1,
+                'browse' => 1,
+                'read' => 1,
+                'edit' => 1,
+                'add' => 1,
+                'delete' => 1,
+                'details' => '{}',
+                'order' => 9,
             ),
         ));
         

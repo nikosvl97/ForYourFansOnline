@@ -58,7 +58,7 @@ class V260 extends Migration
         }
 
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        Artisan::call('db:seed',['--force'=>true,'--class'=>'Database\Seeds\DataRowsTableSeeder']);
+        Artisan::call('db:seed',['--force'=>true,'--class'=>'Database\Seeders\DataRowsTableSeeder']);
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         Artisan::call('optimize:clear');
     }

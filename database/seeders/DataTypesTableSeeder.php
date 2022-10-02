@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeds;
+namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
@@ -14,12 +14,12 @@ class DataTypesTableSeeder extends Seeder
      */
     public function run()
     {
-        
+
 
         \DB::table('data_types')->delete();
-        
+
         \DB::table('data_types')->insert(array (
-            0 => 
+            0 =>
             array (
                 'id' => 1,
                 'name' => 'users',
@@ -37,7 +37,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2021-08-07 18:52:09',
                 'updated_at' => '2021-10-24 17:59:00',
             ),
-            1 => 
+            1 =>
             array (
                 'id' => 2,
                 'name' => 'menus',
@@ -55,7 +55,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2021-08-07 18:52:09',
                 'updated_at' => '2021-08-07 18:52:09',
             ),
-            2 => 
+            2 =>
             array (
                 'id' => 3,
                 'name' => 'roles',
@@ -73,7 +73,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2021-08-07 18:52:09',
                 'updated_at' => '2021-10-23 20:48:27',
             ),
-            3 => 
+            3 =>
             array (
                 'id' => 4,
                 'name' => 'wallets',
@@ -91,7 +91,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2021-08-07 19:37:16',
                 'updated_at' => '2021-10-23 20:47:41',
             ),
-            4 => 
+            4 =>
             array (
                 'id' => 6,
                 'name' => 'attachments',
@@ -109,7 +109,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2021-08-07 20:16:55',
                 'updated_at' => '2021-10-23 20:41:33',
             ),
-            5 => 
+            5 =>
             array (
                 'id' => 9,
                 'name' => 'notifications',
@@ -127,7 +127,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2021-08-07 20:19:11',
                 'updated_at' => '2021-10-23 19:43:57',
             ),
-            6 => 
+            6 =>
             array (
                 'id' => 10,
                 'name' => 'post_comments',
@@ -145,7 +145,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2021-08-07 20:20:55',
                 'updated_at' => '2021-10-23 20:44:14',
             ),
-            7 => 
+            7 =>
             array (
                 'id' => 11,
                 'name' => 'posts',
@@ -163,7 +163,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2021-08-07 20:22:37',
                 'updated_at' => '2022-02-10 00:34:38',
             ),
-            8 => 
+            8 =>
             array (
                 'id' => 12,
                 'name' => 'reactions',
@@ -181,7 +181,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2021-08-07 20:24:58',
                 'updated_at' => '2021-10-23 20:44:52',
             ),
-            9 => 
+            9 =>
             array (
                 'id' => 13,
                 'name' => 'subscriptions',
@@ -197,9 +197,9 @@ class DataTypesTableSeeder extends Seeder
                 'server_side' => 1,
                 'details' => '{"order_column":null,"order_display_column":null,"order_direction":"asc","default_search_key":null,"scope":null}',
                 'created_at' => '2021-08-07 20:25:32',
-                'updated_at' => '2021-10-23 20:45:18',
+                'updated_at' => '2022-08-18 19:29:47',
             ),
-            10 => 
+            10 =>
             array (
                 'id' => 14,
                 'name' => 'transactions',
@@ -217,7 +217,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2021-08-07 20:26:33',
                 'updated_at' => '2021-10-23 20:45:47',
             ),
-            11 => 
+            11 =>
             array (
                 'id' => 15,
                 'name' => 'user_bookmarks',
@@ -235,7 +235,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2021-08-07 20:27:47',
                 'updated_at' => '2021-10-23 20:46:15',
             ),
-            12 => 
+            12 =>
             array (
                 'id' => 16,
                 'name' => 'user_lists',
@@ -253,7 +253,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2021-08-07 20:28:45',
                 'updated_at' => '2021-10-23 20:47:00',
             ),
-            13 => 
+            13 =>
             array (
                 'id' => 17,
                 'name' => 'user_list_members',
@@ -271,7 +271,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2021-08-07 20:29:07',
                 'updated_at' => '2021-10-23 20:46:30',
             ),
-            14 => 
+            14 =>
             array (
                 'id' => 18,
                 'name' => 'user_messages',
@@ -289,7 +289,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2021-08-07 20:42:32',
                 'updated_at' => '2021-10-23 20:47:06',
             ),
-            15 => 
+            15 =>
             array (
                 'id' => 19,
                 'name' => 'withdrawals',
@@ -307,7 +307,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2021-08-07 20:51:14',
                 'updated_at' => '2021-10-23 20:47:45',
             ),
-            16 => 
+            16 =>
             array (
                 'id' => 20,
                 'name' => 'countries',
@@ -325,7 +325,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2021-09-21 18:10:16',
                 'updated_at' => '2021-10-23 20:43:47',
             ),
-            17 => 
+            17 =>
             array (
                 'id' => 21,
                 'name' => 'taxes',
@@ -343,7 +343,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2021-09-21 18:11:55',
                 'updated_at' => '2022-02-01 00:03:22',
             ),
-            18 => 
+            18 =>
             array (
                 'id' => 27,
                 'name' => 'public_pages',
@@ -361,7 +361,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2021-09-29 19:43:27',
                 'updated_at' => '2022-02-01 13:23:32',
             ),
-            19 => 
+            19 =>
             array (
                 'id' => 28,
                 'name' => 'user_verifies',
@@ -379,25 +379,25 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2021-10-20 16:11:44',
                 'updated_at' => '2021-10-23 20:47:29',
             ),
-            20 => 
+            20 =>
             array (
                 'id' => 29,
                 'name' => 'user_reports',
                 'slug' => 'user-reports',
                 'display_name_singular' => 'User Report',
                 'display_name_plural' => 'User Reports',
-                'icon' => NULL,
+                'icon' => 'voyager-eye',
                 'model_name' => 'App\\Model\\UserReport',
                 'policy_name' => NULL,
                 'controller' => NULL,
                 'description' => NULL,
                 'generate_permissions' => 1,
-                'server_side' => 0,
+                'server_side' => 1,
                 'details' => '{"order_column":null,"order_display_column":null,"order_direction":"asc","default_search_key":null,"scope":null}',
                 'created_at' => '2021-11-05 11:32:40',
-                'updated_at' => '2021-11-05 11:44:05',
+                'updated_at' => '2022-06-26 16:10:28',
             ),
-            21 => 
+            21 =>
             array (
                 'id' => 30,
                 'name' => 'contact_messages',
@@ -410,12 +410,12 @@ class DataTypesTableSeeder extends Seeder
                 'controller' => NULL,
                 'description' => NULL,
                 'generate_permissions' => 1,
-                'server_side' => 0,
+                'server_side' => 1,
                 'details' => '{"order_column":null,"order_display_column":null,"order_direction":"asc","default_search_key":null,"scope":null}',
                 'created_at' => '2021-11-19 18:11:33',
-                'updated_at' => '2021-11-19 18:14:17',
+                'updated_at' => '2022-06-24 14:53:36',
             ),
-            22 => 
+            22 =>
             array (
                 'id' => 32,
                 'name' => 'featured_users',
@@ -428,12 +428,12 @@ class DataTypesTableSeeder extends Seeder
                 'controller' => NULL,
                 'description' => NULL,
                 'generate_permissions' => 1,
-                'server_side' => 0,
+                'server_side' => 1,
                 'details' => '{"order_column":null,"order_display_column":null,"order_direction":"asc","default_search_key":null,"scope":null}',
                 'created_at' => '2022-02-01 15:00:10',
-                'updated_at' => '2022-02-01 15:40:46',
+                'updated_at' => '2022-06-26 16:08:35',
             ),
-            23 => 
+            23 =>
             array (
                 'id' => 33,
                 'name' => 'payment_requests',
@@ -446,13 +446,31 @@ class DataTypesTableSeeder extends Seeder
                 'controller' => NULL,
                 'description' => NULL,
                 'generate_permissions' => 1,
-                'server_side' => 0,
+                'server_side' => 1,
                 'details' => '{"order_column":null,"order_display_column":null,"order_direction":"asc","default_search_key":null,"scope":null}',
                 'created_at' => '2022-02-06 16:23:24',
-                'updated_at' => '2022-02-06 19:22:42',
+                'updated_at' => '2022-06-26 14:49:30',
+            ),
+            24 =>
+            array (
+                'id' => 34,
+                'name' => 'invoices',
+                'slug' => 'invoices',
+                'display_name_singular' => 'Invoice',
+                'display_name_plural' => 'Invoices',
+                'icon' => 'voyager-receipt',
+                'model_name' => 'App\\Model\\Invoice',
+                'policy_name' => NULL,
+                'controller' => NULL,
+                'description' => NULL,
+                'generate_permissions' => 1,
+                'server_side' => 0,
+                'details' => '{"order_column":null,"order_display_column":null,"order_direction":"asc","default_search_key":null,"scope":null}',
+                'created_at' => '2022-08-04 19:06:47',
+                'updated_at' => '2022-08-04 19:08:34',
             ),
         ));
-        
-        
+
+
     }
 }

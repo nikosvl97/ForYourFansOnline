@@ -50,13 +50,13 @@ class V440 extends Migration
         }
 
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        Artisan::call('db:seed',['--force'=>true,'--class'=>'Database\Seeds\DataTypesTableSeeder']);
-        Artisan::call('db:seed',['--force'=>true,'--class'=>'Database\Seeds\DataRowsTableSeeder']);
-        Artisan::call('db:seed',['--force'=>true,'--class'=>'Database\Seeds\MenusTableSeeder']);
-        Artisan::call('db:seed',['--force'=>true,'--class'=>'Database\Seeds\MenuItemsTableSeeder']);
-        Artisan::call('db:seed',['--force'=>true,'--class'=>'Database\Seeds\RolesTableSeeder']);
-        Artisan::call('db:seed',['--force'=>true,'--class'=>'Database\Seeds\PermissionsTableSeeder']);
-        Artisan::call('db:seed',['--force'=>true,'--class'=>'Database\Seeds\PermissionRoleTableSeeder']);
+        Artisan::call('db:seed',['--force'=>true,'--class'=>'Database\Seeders\DataTypesTableSeeder']);
+        Artisan::call('db:seed',['--force'=>true,'--class'=>'Database\Seeders\DataRowsTableSeeder']);
+        Artisan::call('db:seed',['--force'=>true,'--class'=>'Database\Seeders\MenusTableSeeder']);
+        Artisan::call('db:seed',['--force'=>true,'--class'=>'Database\Seeders\MenuItemsTableSeeder']);
+        Artisan::call('db:seed',['--force'=>true,'--class'=>'Database\Seeders\RolesTableSeeder']);
+        Artisan::call('db:seed',['--force'=>true,'--class'=>'Database\Seeders\PermissionsTableSeeder']);
+        Artisan::call('db:seed',['--force'=>true,'--class'=>'Database\Seeders\PermissionRoleTableSeeder']);
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         Artisan::call('optimize:clear');
 
