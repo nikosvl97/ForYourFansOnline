@@ -27,8 +27,8 @@ It is mainly based on following techs, plus couple of other dependencies and too
 
 #### Requirements
 
-* PHP 7.3
-* Mysql / MariaDB
+* PHP 7.3 - 8.X
+* Mysql / MariaDB (5.7/8.X)
 * Apache & mod_rewrite / Nginx
 * Node, Composer & at least 2GB of RAM for dev builds
 
