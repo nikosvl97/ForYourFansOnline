@@ -3,7 +3,7 @@
 @slot('header')
         @component('mail::header', ['url' => config('app.url')])
             <!-- header here -->
-            <img src="{{asset(getSetting('site.light_logo'))}}" class="mail-logo">
+            <img src="{{asset(getSetting('site.light_logo'))}}" class="mail-logo" style="width:250px;">
         @endcomponent
 @endslot
 

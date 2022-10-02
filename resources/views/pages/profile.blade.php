@@ -40,6 +40,12 @@
     !!}
 @stop
 
+@if(getSetting('security.recaptcha_enabled') && !Auth::check())
+    @section('meta')
+        {!! NoCaptcha::renderJs() !!}
+    @stop
+@endif
+
 @section('content')
     <div class="row">
         <div class="min-vh-100 col-12 col-md-8 border-right pr-md-0">
@@ -81,7 +87,7 @@
                                 </span>
                                 </div>
                                 <div class="">
-                                    @if($hasSub)
+                                    @if($hasSub || $viewerHasChatAccess)
                                         <span class="p-pill ml-2 pointer-cursor" data-toggle="tooltip" data-placement="top" title="{{__('Send a message')}}" onclick="messenger.showNewMessageDialog()">
                                             @include('elements.icon',['icon'=>'chatbubbles-outline'])
                                         </span>
@@ -139,7 +145,7 @@
                         <span>{{$user->name}}</span>
                         @if($user->email_verified_at && $user->birthdate && ($user->verification && $user->verification->status == 'verified'))
                             <span data-toggle="tooltip" data-placement="top" title="{{__('Verified user')}}">
-                                @include('elements.icon',['icon'=>'checkmark-circle-outline','centered'=>true,'classes'=>'ml-1'])
+                                @include('elements.icon',['icon'=>'checkmark-circle-outline','centered'=>true,'classes'=>'ml-1 text-primary'])
                             </span>
                         @endif
                         @if($hasActiveStream)
@@ -166,9 +172,9 @@
                 <div class="d-flex flex-column flex-md-row justify-content-md-between pb-2 pl-4 pr-4 mb-3 mt-1">
 
                     <div class="d-flex align-items-center mr-2 text-truncate mb-0 mb-md-0">
-                        @include('elements.icon',['icon'=>'calendar-outline','centered'=>false,'classes'=>'mr-1'])
+                        @include('elements.icon',['icon'=>'calendar-clear-outline','centered'=>false,'classes'=>'mr-1'])
                         <div class="text-truncate ml-1">
-                            {{$user->created_at->format('F d')}}
+                            {{ucfirst($user->created_at->translatedFormat('F d'))}}
                         </div>
                     </div>
                     @if($user->location)
@@ -205,133 +211,175 @@
                 <div class="bg-separator border-top border-bottom"></div>
 
                 @include('elements.message-alert',['classes'=>'px-2 pt-4'])
-                @if($user->paid_profile)
-                    @if( (!Auth::check() || Auth::user()->id !== $user->id) && !$hasSub)
+                    @if($user->paid_profile && (!getSetting('site.allow_users_enabling_open_profiles') || (getSetting('site.allow_users_enabling_open_profiles') && !$user->open_profile)))
+                        @if( (!Auth::check() || Auth::user()->id !== $user->id) && !$hasSub)
+                            <div class=" p-4 subscription-holder">
+                                <h6 class="font-weight-bold text-uppercase mb-3">{{__('Subscription')}}</h6>
+                                @if(count($offer))
+                                    <h5 class="m-0 text-bold">{{__('Limited offer main label',['discount'=> round($offer['discountAmount']), 'days_remaining'=> $offer['daysRemaining'] ])}}</h5>
+                                    <small class="">{{__('Offer ends label',['date'=>$offer['expiresAt']->format('d M')])}}</small>
+                                @endif
+                                @if($hasSub)
+                                    <button class="btn btn-round btn-lg btn-primary btn-block mt-3 mb-2 text-center">
+                                        <span>{{__('Subscribed')}}</span>
+                                    </button>
+                                @else
+                                    <button class="btn btn-round btn-lg btn-primary btn-block d-flex justify-content-md-between  justify-content-center mt-3 mb-2 px-5"
+                                            @if(Auth::check())
+                                                data-toggle="modal"
+                                            data-target="#checkout-center"
+                                            data-type="one-month-subscription"
+                                            data-recipient-id="{{$user->id}}"
+                                            data-amount="{{$user->profile_access_price ? $user->profile_access_price : 0}}"
+                                            data-first-name="{{Auth::user()->first_name}}"
+                                            data-last-name="{{Auth::user()->last_name}}"
+                                            data-billing-address="{{Auth::user()->billing_address}}"
+                                            data-country="{{Auth::user()->country}}"
+                                            data-city="{{Auth::user()->city}}"
+                                            data-state="{{Auth::user()->state}}"
+                                            data-postcode="{{Auth::user()->postcode}}"
+                                            data-available-credit="{{Auth::user()->wallet->total}}"
+                                            data-username="{{$user->username}}"
+                                            data-name="{{$user->name}}"
+                                            data-avatar="{{$user->avatar}}"
+                                            @else
+                                                data-toggle="modal"
+                                            data-target="#login-dialog"
+                                        @endif
+                                    >
+                                        <span>{{__('Subscribe')}}</span>
+                                        <span class="d-none d-sm-block">{{config('app.site.currency_symbol') ?? config('app.site.currency_symbol')}}{{$user->profile_access_price}}{{config('app.site.currency_symbol') ? '' : ' ' .config('app.site.currency_code')}} {{__('for')}} {{trans_choice('days', 30,['number'=>30])}}</span>
+                                    </button>
+                                    <div class="d-flex justify-content-between">
+                                        @if($user->profile_access_price_6_months || $user->profile_access_price_12_months)
+                                            <small>
+                                                <div class="pointer-cursor d-flex align-items-center" onclick="Profile.toggleBundles()">
+                                                    <div class="label-more">{{__('Subscriptions bundles')}}</div>
+                                                    <div class="label-less d-none">{{__('Hide bundles')}}</div>
+                                                    <div class="ml-1 label-icon">
+                                                        @include('elements.icon',['icon'=>'chevron-down-outline','centered'=>false])
+                                                    </div>
+                                                </div>
+                                            </small>
+                                        @endif
+                                        @if(count($offer))
+                                            <small class="">{{__('Regular price label',['currency'=>'USD','amount'=>$user->offer->old_profile_access_price])}}</small>
+                                        @endif
+                                    </div>
+
+                                    @if($user->profile_access_price_6_months || $user->profile_access_price_12_months || $user->profile_access_price_3_months)
+                                        <div class="subscription-bundles d-none mt-4">
+                                            @if($user->profile_access_price_3_months)
+                                                <button class="btn btn-round btn-outline-primary btn-block d-flex justify-content-between mt-2 mb-2 px-5"
+                                                        @if(Auth::check())
+                                                            data-toggle="modal"
+                                                        data-target="#checkout-center"
+                                                        data-type="three-months-subscription"
+                                                        data-recipient-id="{{$user->id}}"
+                                                        data-amount="{{$user->profile_access_price_3_months ? $user->profile_access_price_3_months * 3 : 0}}"
+                                                        data-first-name="{{Auth::user()->first_name}}"
+                                                        data-last-name="{{Auth::user()->last_name}}"
+                                                        data-billing-address="{{Auth::user()->billing_address}}"
+                                                        data-country="{{Auth::user()->country}}"
+                                                        data-city="{{Auth::user()->city}}"
+                                                        data-state="{{Auth::user()->state}}"
+                                                        data-postcode="{{Auth::user()->postcode}}"
+                                                        data-available-credit="{{Auth::user()->wallet->total}}"
+                                                        data-username="{{$user->username}}"
+                                                        data-name="{{$user->name}}"
+                                                        data-avatar="{{$user->avatar}}"
+                                                        @else
+                                                            data-toggle="modal"
+                                                        data-target="#login-dialog"
+                                                    @endif
+                                                >
+                                                    <span>{{__('Subscribe')}}</span>
+                                                    <span>{{config('app.site.currency_symbol') ?? config('app.site.currency_symbol')}}{{$user->profile_access_price_3_months * 3}}{{config('app.site.currency_symbol') ? '' : ' ' .config('app.site.currency_code')}} {{__('for')}} {{trans_choice('months', 3,['number'=>3])}}</span>
+                                                </button>
+                                            @endif
+
+                                            @if($user->profile_access_price_6_months)
+                                                <button class="btn btn-round btn-outline-primary btn-block d-flex justify-content-between mt-2 mb-3 px-5"
+                                                        @if(Auth::check())
+                                                            data-toggle="modal"
+                                                        data-target="#checkout-center"
+                                                        data-type="six-months-subscription"
+                                                        data-recipient-id="{{$user->id}}"
+                                                        data-amount="{{$user->profile_access_price_6_months ? $user->profile_access_price_6_months * 6 : 0}}"
+                                                        data-first-name="{{Auth::user()->first_name}}"
+                                                        data-last-name="{{Auth::user()->last_name}}"
+                                                        data-billing-address="{{Auth::user()->billing_address}}"
+                                                        data-country="{{Auth::user()->country}}"
+                                                        data-city="{{Auth::user()->city}}"
+                                                        data-state="{{Auth::user()->state}}"
+                                                        data-postcode="{{Auth::user()->postcode}}"
+                                                        data-available-credit="{{Auth::user()->wallet->total}}"
+                                                        data-username="{{$user->username}}"
+                                                        data-name="{{$user->name}}"
+                                                        data-avatar="{{$user->avatar}}"
+                                                        @else
+                                                            data-toggle="modal"
+                                                        data-target="#login-dialog"
+                                                    @endif
+                                                >
+                                                    <span>{{__('Subscribe')}}</span>
+                                                    <span>{{config('app.site.currency_symbol') ?? config('app.site.currency_symbol')}}{{$user->profile_access_price_6_months * 6}}{{config('app.site.currency_symbol') ? '' : ' ' .config('app.site.currency_code')}} {{__('for')}} {{trans_choice('months', 6,['number'=>6])}}</span>
+                                                </button>
+                                            @endif
+
+                                            @if($user->profile_access_price_12_months)
+                                                <button class="btn btn-round btn-outline-primary btn-block d-flex justify-content-between mt-2 mb-2 px-5"
+                                                        @if(Auth::check())
+                                                            data-toggle="modal"
+                                                        data-target="#checkout-center"
+                                                        data-type="yearly-subscription"
+                                                        data-recipient-id="{{$user->id}}"
+                                                        data-amount="{{$user->profile_access_price_12_months ? $user->profile_access_price_12_months * 12 : 0}}"
+                                                        data-first-name="{{Auth::user()->first_name}}"
+                                                        data-last-name="{{Auth::user()->last_name}}"
+                                                        data-billing-address="{{Auth::user()->billing_address}}"
+                                                        data-country="{{Auth::user()->country}}"
+                                                        data-city="{{Auth::user()->city}}"
+                                                        data-state="{{Auth::user()->state}}"
+                                                        data-postcode="{{Auth::user()->postcode}}"
+                                                        data-available-credit="{{Auth::user()->wallet->total}}"
+                                                        data-username="{{$user->username}}"
+                                                        data-name="{{$user->name}}"
+                                                        data-avatar="{{$user->avatar}}"
+                                                        @else
+                                                            data-toggle="modal"
+                                                        data-target="#login-dialog"
+                                                    @endif
+                                                >
+                                                    <span>{{__('Subscribe')}}</span>
+                                                    <span>{{config('app.site.currency_symbol') ?? config('app.site.currency_symbol')}}{{$user->profile_access_price_12_months * 12}}{{config('app.site.currency_symbol') ? '' : ' ' .config('app.site.currency_code')}} {{__('for')}} {{trans_choice('months', 12,['number'=>12])}}</span>
+                                                </button>
+                                            @endif
+
+                                        </div>
+                                    @endif
+                                @endif
+                            </div>
+                            <div class="bg-separator border-top border-bottom"></div>
+                        @endif
+                    @elseif(!Auth::check() || (Auth::check() && Auth::user()->id !== $user->id))
                         <div class=" p-4 subscription-holder">
-                            <h6 class="font-weight-bold text-uppercase mb-3">{{__('Subscription')}}</h6>
-                            @if(count($offer))
-                                <h5 class="m-0 text-bold">{{__('Limited offer main label',['discount'=> round($offer['discountAmount']), 'days_remaining'=> $offer['daysRemaining'] ])}}</h5>
-                                <small class="">{{__('Offer ends label',['date'=>$offer['expiresAt']->format('d M')])}}</small>
-                            @endif
-                            @if($hasSub)
-                                <button class="btn btn-round btn-lg btn-primary btn-block mt-3 mb-2 text-center">
-                                    <span>{{__('Subscribed')}}</span>
+                            <h6 class="font-weight-bold text-uppercase mb-3">{{__('Follow this creator')}}</h6>
+                            @if(Auth::check())
+                                <button class="btn btn-round btn-lg btn-primary btn-block mt-3 mb-0 manage-follow-button" onclick="Lists.manageFollowsAction('{{$user->id}}')">
+                                    <span class="manage-follows-text">{{\App\Providers\ListsHelperServiceProvider::getUserFollowingType($user->id, true)}}</span>
                                 </button>
                             @else
-                                <button class="btn btn-round btn-lg btn-primary btn-block d-flex justify-content-md-between  justify-content-center mt-3 mb-2 px-5"
-                                        @if(Auth::check())
-                                        data-toggle="modal"
-                                        data-target="#checkout-center"
-                                        data-type="one-month-subscription"
-                                        data-recipient-id="{{$user->id}}"
-                                        data-amount="{{$user->profile_access_price ? $user->profile_access_price : 0}}"
-                                        data-first-name="{{Auth::user()->first_name}}"
-                                        data-last-name="{{Auth::user()->last_name}}"
-                                        data-billing-address="{{Auth::user()->billing_address}}"
-                                        data-country="{{Auth::user()->country}}"
-                                        data-city="{{Auth::user()->city}}"
-                                        data-state="{{Auth::user()->state}}"
-                                        data-postcode="{{Auth::user()->postcode}}"
-                                        data-available-credit="{{Auth::user()->wallet->total}}"
-                                        data-username="{{$user->username}}"
-                                        data-name="{{$user->name}}"
-                                        data-avatar="{{$user->avatar}}"
-                                        @else
+                                <button class="btn btn-round btn-lg btn-primary btn-block mt-3 mb-0 text-center"
                                         data-toggle="modal"
                                         data-target="#login-dialog"
-                                    @endif
                                 >
-                                    <span>{{__('Subscribe')}}</span>
-                                    <span class="d-none d-sm-block">{{config('app.site.currency_symbol') ?? config('app.site.currency_symbol')}}{{$user->profile_access_price}}{{config('app.site.currency_symbol') ? '' : ' ' .config('app.site.currency_code')}} {{__('for')}} {{trans_choice('days', 30,['number'=>30])}}</span>
+                                    <span class="">{{__('Follow')}}</span>
                                 </button>
-                              
-
-                                @if($user->profile_access_price_6_months || $user->profile_access_price_12_months || $user->profile_access_price_3_months)
-                                <button class="btn btn-round btn-lg btn-primary btn-block d-flex justify-content-md-between  justify-content-center mt-3 mb-2 px-5"
-                                        @if($user->profile_access_price_3_months)
-                                            <button class="btn btn-round btn-outline-primary btn-block d-flex justify-content-between mt-2 mb-2 px-5"
-                                                    @if(Auth::check())
-                                                    data-toggle="modal"
-                                                    data-target="#checkout-center"
-                                                    data-type="three-months-subscription"
-                                                    data-recipient-id="{{$user->id}}"
-                                                    data-amount="{{$user->profile_access_price_3_months ? $user->profile_access_price_3_months * 1 : 0}}"
-                                                    data-first-name="{{Auth::user()->first_name}}"
-                                                    data-last-name="{{Auth::user()->last_name}}"
-                                                    data-billing-address="{{Auth::user()->billing_address}}"
-                                                    data-country="{{Auth::user()->country}}"
-                                                    data-city="{{Auth::user()->city}}"
-                                                    data-state="{{Auth::user()->state}}"
-                                                    data-postcode="{{Auth::user()->postcode}}"
-                                                    data-available-credit="{{Auth::user()->wallet->total}}"
-                                                    data-username="{{$user->username}}"
-                                                    data-name="{{$user->name}}"
-                                                    data-avatar="{{$user->avatar}}"
-                                                    @else
-                                                    data-toggle="modal"
-                                                    data-target="#login-dialog"
-                                                    @endif
-                                            >
-                                                <span>{{__('Subscribe')}}</span>
-                                                <span>{{config('app.site.currency_symbol') ?? config('app.site.currency_symbol')}}{{$user->profile_access_price_3_months}}{{config('app.site.currency_symbol') ? '' : ' ' .config('app.site.currency_code')}} {{__('for')}} {{trans_choice('months', 3,['number'=>3])}}</span>
-                                            </button>
-                                        @endif
-
-                                        
-
-                                        @if($user->profile_access_price_12_months)
-                                            <button class="btn btn-round btn-outline-primary btn-block d-flex justify-content-between mt-2 mb-2 px-5"
-                                                    @if(Auth::check())
-                                                    data-toggle="modal"
-                                                    data-target="#checkout-center"
-                                                    data-type="yearly-subscription"
-                                                    data-recipient-id="{{$user->id}}"
-                                                    data-amount="{{$user->profile_access_price_12_months ? $user->profile_access_price_12_months * 12 : 0}}"
-                                                    data-first-name="{{Auth::user()->first_name}}"
-                                                    data-last-name="{{Auth::user()->last_name}}"
-                                                    data-billing-address="{{Auth::user()->billing_address}}"
-                                                    data-country="{{Auth::user()->country}}"
-                                                    data-city="{{Auth::user()->city}}"
-                                                    data-state="{{Auth::user()->state}}"
-                                                    data-postcode="{{Auth::user()->postcode}}"
-                                                    data-available-credit="{{Auth::user()->wallet->total}}"
-                                                    data-username="{{$user->username}}"
-                                                    data-name="{{$user->name}}"
-                                                    data-avatar="{{$user->avatar}}"
-                                                    @else
-                                                    data-toggle="modal"
-                                                    data-target="#login-dialog"
-                                                @endif
-                                            >
-                                                <span>{{__('Subscribe')}}</span>
-                                                <span>{{config('app.site.currency_symbol') ?? config('app.site.currency_symbol')}}{{$user->profile_access_price_12_months * 12}}{{config('app.site.currency_symbol') ? '' : ' ' .config('app.site.currency_code')}} {{__('for')}} {{trans_choice('months', 12,['number'=>12])}}</span>
-                                            </button>
-                                        @endif
-
-                                    </div>
-                                @endif
                             @endif
                         </div>
                         <div class="bg-separator border-top border-bottom"></div>
                     @endif
-                @elseif(!Auth::check() || (Auth::check() && Auth::user()->id !== $user->id))
-                    <div class=" p-4 subscription-holder">
-                        <h6 class="font-weight-bold text-uppercase mb-3">{{__('Follow this creator')}}</h6>
-                        @if(Auth::check())
-                            <button class="btn btn-round btn-lg btn-primary btn-block mt-3 mb-0 manage-follow-button" onclick="Lists.manageFollowsAction('{{$user->id}}')">
-                                <span class="manage-follows-text">{{\App\Providers\ListsHelperServiceProvider::getUserFollowingType($user->id, true)}}</span>
-                            </button>
-                        @else
-                            <button class="btn btn-round btn-lg btn-primary btn-block mt-3 mb-0 text-center"
-                                    data-toggle="modal"
-                                    data-target="#login-dialog"
-                            >
-                                <span class="">{{__('Follow')}}</span>
-                            </button>
-                        @endif
-                    </div>
-                    <div class="bg-separator border-top border-bottom"></div>
-                @endif
                 <div class="mt-3 inline-border-tabs">
                     <nav class="nav nav-pills nav-justified text-bold">
                         <a class="nav-item nav-link {{$activeFilter == false ? 'active' : ''}}" href="{{route('profile',['username'=> $user->username])}}">{{trans_choice('posts', $posts->total(), ['number'=>$posts->total()])}} </a>

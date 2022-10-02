@@ -52,6 +52,13 @@
                 <label class="custom-control-label stepTooltip" for="customRadio6" title="">{{__("CCBill")}}</label>
             </div>
         @endif
+        @if(getSetting('payments.paystack_secret_key'))
+            <div class="custom-control custom-radio mb-1">
+                <input type="radio" id="customRadio7" name="payment-radio-option" class="custom-control-input"
+                       value="payment-paystack">
+                <label class="custom-control-label stepTooltip" for="customRadio7" title="">{{__("Paystack")}}</label>
+            </div>
+        @endif
         @if(getSetting('payments.allow_manual_payments'))
             <div class="custom-control custom-radio mb-1">
                 <input type="radio" id="customRadio4" name="payment-radio-option" class="custom-control-input"

@@ -1,6 +1,6 @@
 @if(count($subscriptions))
     <div class="table-wrapper">
-        @include('elements/message-alert')
+        @include('elements/message-alert', ['classes' =>'p-2'])
         <div class="">
             <div class="col d-flex align-items-center py-3 border-bottom text-bold">
                 <div class="col-3 col-md-4 text-truncate">{{__('To')}}</div>
@@ -38,7 +38,7 @@
                         @endswitch
                     </div>
                     <div class="col-2 text-truncate">{{ucfirst($subscription->provider)}}</div>
-                    <div class="col-2 text-truncate">{{isset($subscription->expires_at) ? ($subscription->status == 'canceled' && $subscription->expires_at < \Carbon\Carbon::now() ? '-' : $subscription->expires_at->format('M d Y')) : ''}}</div>
+                    <div class="col-2 text-truncate">{{isset($subscription->expires_at) ? ($subscription->status == 'canceled' ? '-' : $subscription->expires_at->format('M d Y')) : ''}}</div>
                     <div class="col-2 text-center">
                         @if($subscription->status === \App\Model\Subscription::ACTIVE_STATUS)
                         <div class="dropdown {{Cookie::get('app_rtl') == 'rtl' ? 'dropright' : 'dropleft'}}">
@@ -47,7 +47,7 @@
                             </a>
                             <div class="dropdown-menu">
                                 <!-- Dropdown menu links -->
-                                @if($subscription->status === \App\Model\Subscription::ACTIVE_STATUS)
+                                @if($subscription->status === \App\Model\Subscription::ACTIVE_STATUS && ($subscription->provider !== 'ccbill' || \App\Providers\SettingsServiceProvider::providedCCBillSubscriptionCancellingCredentials()))
                                     <a class="dropdown-item d-flex align-items-center" href="javascript:void(0)" onclick="SubscriptionsSettings.confirmSubCancelation({{$subscription->id}})">
                                         @include('elements.icon',['icon'=>'trash-outline','centered'=>false,'classes'=>'mr-2']) {{__('Cancel subscription')}}
                                     </a>

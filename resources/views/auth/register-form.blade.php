@@ -1,4 +1,4 @@
-<form method="POST" action="{{ route('register') }}">
+<form method="POST" action="{{ route('register') }}" id="register-form">
     @csrf
 
     @if(getSetting('social-login.facebook_client_id') || getSetting('social-login.twitter_client_id') || getSetting('social-login.google_client_id'))
@@ -13,8 +13,6 @@
             </p>
         </div>
     @endif
-
-
 
     <div class="form-group ">
  <img style="width :100%;" src="">
@@ -80,6 +78,18 @@
             </div>
         </div>
     </div>
+
+    @if(getSetting('security.recaptcha_enabled') && !Auth::check())
+        <div class="form-group row d-flex justify-content-center captcha-field">
+            {!! NoCaptcha::display(['data-theme' => (Cookie::get('app_theme') == null ? (getSetting('site.default_user_theme')) : Cookie::get('app_theme') )]) !!}
+            {{--        {!! NoCaptcha::displaySubmit('register-form', 'submit now!', ['data-theme' => (Cookie::get('app_theme') == null ? (getSetting('site.default_user_theme')) : Cookie::get('app_theme') )]) !!}--}}
+            @error('g-recaptcha-response')
+            <span class="text-danger" role="alert">
+                <strong>{{__("Please check the captcha field.")}}</strong>
+            </span>
+            @enderror
+        </div>
+    @endif
 
     <div class="form-group row mb-0">
         <div class="col">

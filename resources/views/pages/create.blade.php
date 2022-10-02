@@ -24,12 +24,6 @@
 
 @section('content')
 
-<!-- NIKOS CHANGES ANJAS PROJECT-->
-@if (Auth::check() && Auth::user()->id == 5)
-<!-- NIKOS CHANGES ANJAS PROJECT-->
-
-
-
     <div class="row">
         <div class="col-12">
             @include('elements.uploaded-file-preview-template')
@@ -51,18 +45,18 @@
                     <div class="w-100">
                         <textarea  id="dropzone-uploader" name="input-text" class="form-control border dropzone w-100" rows="3" spellcheck="false" placeholder="{{__('Write a new post, drag and drop files to add attachments.')}}" value="{{isset($post) ? $post->text : ''}}"></textarea>
                         <span class="invalid-feedback" role="alert">
-                 <strong>{{__('Your post must contain more than 10 characters.')}}</strong>
+                 <strong class="post-invalid-feedback">{{__('Your post must contain more than 10 characters.')}}</strong>
                 </span>
                         <div class="d-flex justify-content-between w-100 mb-3 mt-3">
                             <div class="d-flex">
                                 <div class="mt-1">
-                                    <span class="h-pill h-pill-primary file-upload-button">
+                                    <span class="h-pill h-pill-primary file-upload-button {{!GenericHelper::isUserVerified() && getSetting('site.enforce_user_identity_checks') ? 'disabled' : ''}}">
                                         @include('elements.icon',['icon'=>'document-outline','variant'=>'medium','centered'=>true, 'classes' => 'mr-1'])
                                         <span class="">{{__("Add files")}}</span>
                                     </span>
                                 </div>
                                 <div class="mt-1 ml-2">
-                                    <span class="h-pill h-pill-primary post-price-button" onclick="PostCreate.showSetPricePostDialog()">
+                                    <span class="h-pill h-pill-primary post-price-button {{!GenericHelper::isUserVerified() && getSetting('site.enforce_user_identity_checks') ? 'disabled' : ''}}" onclick="{{!GenericHelper::isUserVerified() && getSetting('site.enforce_user_identity_checks') ? '' : 'PostCreate.showSetPricePostDialog()'}}">
                                         @include('elements.icon',['icon'=>'logo-usd','variant'=>'medium','centered'=>true])
                                         <span class="d-none d-md-block">{{__("Set post price")}}</span>
                                         <span class="d-block d-md-none">{{__("Price")}}</span>
@@ -90,5 +84,5 @@
 
         </div>
     </div>
-@endif
+
 @stop

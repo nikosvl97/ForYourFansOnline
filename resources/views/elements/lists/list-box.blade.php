@@ -5,7 +5,7 @@
                 <h5 class="text-bold mb-1">{{__($list->name)}}</h5>
                 <span class="text-muted text-bold">{{trans_choice('people',count($list->members),['number' => count($list->members)])}} - {{trans_choice('posts', $list->posts_count,['number' => count($list->members)])}}</span>
             </div>
-            <div class="d-flex justify-content-between align-items-center pr-3">
+            <div class="d-flex justify-content-between align-items-center pr-3 list-box-avatars-wrapper">
                 @foreach($list->members->reverse()->slice(0,3) as $member)
                     <img src="{{$member->user->avatar}}" class="rounded-circle user-avatar">
                 @endforeach

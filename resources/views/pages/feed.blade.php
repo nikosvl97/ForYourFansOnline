@@ -45,8 +45,8 @@
                     @include('elements.search-box')
                 </div>
 
-                <div class="d-block d-md-none d-lg-none m-pt-70" style="margin-top:90px">
-                    @include('elements.feed.suggestions-box',['profiles'=>$suggestions, 'isMobile' => true])
+                <div class="d-block d-md-none d-lg-none m-pt-70 feed-suggestions-wrapper">
+                    @include('elements.feed.suggestions-box',['profiles'=>$suggestions, 'isMobile'=> true])
                 </div>
 
                 {{-- @include('elements.user-stories-box')--}}
@@ -67,7 +67,7 @@
                         @include('elements.search-box')
                     </div>
 
-                    @include('elements.feed.suggestions-box',['profiles'=>$suggestions])
+                    @include('elements.feed.suggestions-box',['profiles'=>$suggestions, 'isMobile'=> false])
                     @if(getSetting('custom-code-ads.sidebar_ad_spot'))
                         <div class="d-flex justify-content-center align-items-center mt-4">
                             {!! getSetting('custom-code-ads.sidebar_ad_spot') !!}

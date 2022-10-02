@@ -127,7 +127,7 @@
                             @endif
 
                             @if($stream->canWatchStream && $stream->user->id !== Auth::user()->id)
-                                <div class="d-none d-sm-block">
+                                <div class="">
                                 <span class="p-pill ml-2 pointer-cursor to-tooltip"
                                       data-placement="top"
                                       title="{{__('Send a tip')}}"
@@ -180,8 +180,8 @@
                             <div class="row d-flex justify-content-center align-items-center">
                                 <div class="col-12">
                                     <div class="card p-5">
-                                        <div class="p-5">
-                                            <img src="{{asset('/img/live-stream-locked.svg')}}">
+                                        <div class="p-4 p-md-5">
+                                            <img src="{{asset('/img/live-stream-locked.svg')}}" class="stream-locked">
                                         </div>
                                         <div class="d-flex align-items-center justify-content-center" style=""><span>🔒 Live stream requires a @if(isset($subLocked)) valid <a href="javascript:void(0);" class="stream-subscribe-label">user subscription</a>@endif @if(isset($priceLocked))and an <a href="javascript:void(0);" class="stream-unlock-label">one time fee</a>@endif.</span></div>
                                     </div>

@@ -1,5 +1,12 @@
 @extends('layouts.no-nav')
 @section('page_title', __('Register'))
+
+@if(getSetting('security.recaptcha_enabled') && !Auth::check())
+    @section('meta')
+        {!! NoCaptcha::renderJs() !!}
+    @stop
+@endif
+
 @section('content')
     <div class="container-fluid">
         <div class="row no-gutter">

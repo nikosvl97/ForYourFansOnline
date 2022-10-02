@@ -1,3 +1,3 @@
 <script>
-    window.translations = {!! Cache::get('translations') !!};
+    window.translations = {!! Session::get('translations') !!};
 </script>

@@ -170,28 +170,28 @@
                         <div>
                             <h6>{{__('Payment method')}}</h6>
                             <div class="d-flex text-left radio-group row">
-                                @if(getSetting('payments.stripe_secret_key') && getSetting('payments.stripe_public_key'))
-                                    <div class="p-0 col-6 col-md-3" >
+                                @if(getSetting('payments.stripe_secret_key') && getSetting('payments.stripe_public_key') && !getSetting('payments.stripe_checkout_disabled'))
+                                    <div class="p-0 col-6 col-md-3 stripe-payment-method" >
                                         <div class="radio mx-auto stripe-payment-provider d-flex align-items-center justify-content-center" data-value="stripe">
                                             <img src="{{asset('/img/logos/stripe.svg')}}">
                                         </div>
                                     </div>
                                 @endif
-                                @if(config('paypal.client_id') && config('paypal.secret'))
-                                    <div class="p-0 col-6 col-md-3">
+                                @if(config('paypal.client_id') && config('paypal.secret') && !getSetting('payments.paypal_checkout_disabled'))
+                                    <div class="p-0 col-6 col-md-3 paypal-payment-method">
                                         <div class="radio mx-auto paypal-payment-provider d-flex align-items-center justify-content-center" data-value="paypal">
                                             <img src="{{asset('/img/logos/paypal.svg')}}">
                                         </div>
                                     </div>
                                 @endif
-                                @if(getSetting('payments.coinbase_api_key'))
+                                @if(getSetting('payments.coinbase_api_key') && !getSetting('payments.coinbase_checkout_disabled'))
                                     <div class="p-0 col-6 col-md-3 d-none coinbase-payment-method">
                                         <div class="radio mx-auto coinbase-payment-provider d-flex align-items-center justify-content-center" data-value="coinbase">
                                             <img src="{{asset('/img/logos/coinbase.svg')}}">
                                         </div>
                                     </div>
                                 @endif
-                                @if(getSetting('payments.nowpayments_api_key'))
+                                @if(getSetting('payments.nowpayments_api_key') && !getSetting('payments.nowpayments_checkout_disabled'))
                                     <div class="p-0 col-6 col-md-3 d-none nowpayments-payment-method">
                                         <div class="radio mx-auto nowpayments-payment-provider d-flex align-items-center justify-content-center" data-value="nowpayments">
                                             <img src="{{asset('/img/logos/nowpayments.svg')}}">
@@ -205,6 +205,13 @@
                                         </div>
                                     </div>
                                 @endif
+                                @if(getSetting('payments.paystack_secret_key') && !getSetting('payments.paystack_checkout_disabled'))
+                                    <div class="p-0 col-6 col-md-3 d-none paystack-payment-method">
+                                        <div class="radio mx-auto paystack-payment-provider d-flex align-items-center justify-content-center" data-value="paystack">
+                                            <img src="{{asset('/img/logos/paystack.svg')}}">
+                                        </div>
+                                    </div>
+                                @endif
                                 <div class="p-0 col-6 col-md-3">
                                     <div class="radio mx-auto credit-payment-provider d-flex align-items-center justify-content-center" data-value="credit">
                                         <div class="credit-provider-text">
@@ -215,7 +222,6 @@
                                 </div>
                             </div>
                         </div>
-                        <p class="text-muted mt-1 stripe-comment"> {{__('Note: With Stripe, you can pay with your Credit card, SEPA Debit, SOFORT, iDeal and Bancontact.')}} </p>
                         <div class="payment-error error text-danger text-bold d-none mb-1">{{__('Please select your payment method')}}</div>
                         <p class="text-muted mt-1"> {{__('Note: After clicking on the button, you will be directed to a secure gateway for payment. After completing the payment process, you will be redirected back to the website.')}} </p>
                     </div>

@@ -12,9 +12,7 @@
             </div>
         </div>
         <div>
-            <div class="comments-view">
-            {{$comment->message}}
-          </div>
+            <div class="text-break">{{$comment->message}}</div>
             <div class="d-flex text-muted">
                 <div>{{$comment->created_at->format('g:i A')}}</div>
                 <div class="ml-2">

@@ -61,3 +61,7 @@ $ph-color:                #ced4da !default;
 @import "../../node_modules/placeholder-loading/src/scss/placeholder-loading";
 
 @import "./generic";
+
+.list-item .user-avatar:last-child{
+    margin-left:0px;
+}

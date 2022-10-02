@@ -261,6 +261,9 @@
                                     @endforeach
                                 </tbody>
                             </table>
+                            @if($isServerSide && !count($dataTypeContent))
+                                <div class="d-flex justify-content-center mt-2 mb-2 font-weight-bold">{{__("There are no results.")}}</div>
+                            @endif
                         </div>
                         @if ($isServerSide)
                             <div class="pull-left">

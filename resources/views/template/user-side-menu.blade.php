@@ -55,7 +55,7 @@
             </li>
             @if(getSetting('streams.allow_streams'))
                 <li class="{{ in_array(Route::currentRouteName(), ['my.streams.get', 'public.stream.get', 'public.vod.get']) ? 'active' : ''}}">
-                    <a class="scroll-link d-flex align-items-center" href="{{route('search.get')}}?filter=live">
+                    <a class="scroll-link d-flex align-items-center" href="{{route('my.streams.get')}}">
                         @include('elements.icon',['icon'=>'play-circle-outline','variant'=>'medium','centered'=>false,'classes'=>'mr-2'])
                         {{__('Streams')}}</a>
                 </li>
@@ -70,13 +70,6 @@
                     @include('elements.icon',['icon'=>'list','variant'=>'medium','centered'=>false,'classes'=>'mr-2'])
                     {{__('Lists')}}</a>
             </li>
-
-            <li>
-                  <a class="scroll-link d-flex align-items-center" href="{{route('pages.get',['slug'=>'help'])}}">
-                      @include('elements.icon',['icon'=>'help-circle-outline','variant'=>'medium','centered'=>false,'classes'=>'mr-2'])
-                      {{__('Help and support')}}</a>
-              </li>
-
             <li class="{{Route::currentRouteName() == 'my.settings' ? 'active' : ''}}">
                 <a class="scroll-link d-flex align-items-center" href="{{route('my.settings')}}">
                     @include('elements.icon',['icon'=>'settings-outline','variant'=>'medium','centered'=>false,'classes'=>'mr-2'])
@@ -84,7 +77,11 @@
             </li>
             <div class="menu-divider"></div>
         @endif
-
+        <li>
+            <a class="scroll-link d-flex align-items-center" href="{{route('pages.get',['slug'=>'help'])}}">
+                @include('elements.icon',['icon'=>'help-circle-outline','variant'=>'medium','centered'=>false,'classes'=>'mr-2'])
+                {{__('Help and support')}}</a>
+        </li>
         @if(getSetting('site.allow_theme_switch'))
             <li>
                 <a class="scroll-link d-flex align-items-center dark-mode-switcher" href="#">
