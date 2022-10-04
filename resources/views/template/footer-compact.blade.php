@@ -70,7 +70,7 @@
                             </li>
                         @endif
 
-                        <a class="copyRightInfo" href="https://grandhosting.gr" target="_blank">
+                        <a class="copyRightInfo" href="https://grandhosting.gr?utm_source=foryourfans&utm_medium=click_banner&utm_campaign=footer_logo" target="_blank">
                                   <img style="width:7vh;"src="/img/grandhosting_logo_poweredby.png">
                                </a>
                     </ul>
