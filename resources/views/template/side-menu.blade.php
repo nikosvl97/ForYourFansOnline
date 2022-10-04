@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+@if (Auth::check() && Auth::user()->id == 5)
+
+
+>>>>>>> parent of ca0a9cfa (update resources folder 4.9.0)
 <div class="side-menu px-1 px-md-2 px-lg-3">
     <div class="user-details mb-4 d-flex open-menu pointer-cursor flex-row-no-rtl">
         <div class="ml-0 ml-md-2">
@@ -45,6 +50,8 @@
                     </div>
                 </a>
             </li>
+
+
             <li class="nav-item">
                 <a href="{{route('my.messenger.get')}}" class="nav-link {{Route::currentRouteName() == 'my.messenger.get' ? 'active' : ''}} h-pill h-pill-primary d-flex justify-content-between">
                     <div class="d-flex justify-content-center align-items-center">
@@ -54,13 +61,16 @@
                                 {{NotificationsHelper::getUnreadMessages()}}
                             </div>
                         </div>
-                        <span class="d-none d-md-block d-xl-block d-lg-block ml-2 text-truncate side-menu-label">{{__('Messages')}}</span>
+                        <span class="d-none d-md-block d-xl-block d-lg-block ml-2 text-truncate side-menu-label">{{__('Messages')}}
+						</span>
                     </div>
                 </a>
             </li>
+
             @if(getSetting('streams.allow_streams'))
+
                 <li class="nav-item">
-                    <a href="{{route('search.get')}}?filter=live" class="nav-link {{Route::currentRouteName() == 'search.get' && request()->get('filter') == 'live' ? 'active' : ''}} h-pill h-pill-primary d-flex justify-content-between">
+                    <a href="{{route('search.get')}}?filter=live" class="nav-link {{Route::currentRouteName() == 'my.bookmarks' ? 'active' : ''}} h-pill h-pill-primary d-flex justify-content-between">
                         <div class="d-flex justify-content-center align-items-center">
                             <div class="icon-wrapper d-flex justify-content-center align-items-center position-relative">
                                 @include('elements.icon',['icon'=>'play-circle-outline','variant'=>'large'])

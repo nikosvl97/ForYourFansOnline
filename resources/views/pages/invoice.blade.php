@@ -37,16 +37,16 @@
                                                 </li>
                                                 <li><strong>{{__('Invoice')}}
                                                         {{__('Date')}}
-                                                        :</strong> {{ \Carbon\Carbon::parse($invoice->created_at)->format('Y-m-d')}}
+                                                        :</strong> {{ \Carbon\Carbon::parse($invoice->created_at)->format('D M Y')}}
                                                 </li>
                                                 <li><strong>{{__('Due')}}
                                                         {{__('Date')}}
-                                                        :</strong> {{ \Carbon\Carbon::parse($invoice->created_at)->format('Y-m-d')}}
+                                                        :</strong> {{ \Carbon\Carbon::parse($invoice->created_at)->format('D M Y')}}
                                             </ul>
                                         </div>
                                     </div>
                                     <div class="mt25">
-                                        <ul class="list-unstyled left w-50 text-break">
+                                        <ul class="list-unstyled left">
                                             <li><strong>{{__('Invoiced To')}}</strong></li>
                                             <li>{{$invoice->data['billingDetails']['receiverFirstName']}} {{$invoice->data['billingDetails']['receiverLastName']}}</li>
                                             <li>{{$invoice->data['billingDetails']['receiverBillingAddress']}},
@@ -56,7 +56,7 @@
                                             <li>{{$invoice->data['billingDetails']['receiverCity']}}</li>
                                             <li>{{$invoice->data['billingDetails']['receiverCountryName']}}</li>
                                         </ul>
-                                        <ul class="list-unstyled text-right right w-50 text-break">
+                                        <ul class="list-unstyled text-right right">
                                             <li><strong>{{__('Invoice From')}}</strong></li>
                                             <li>{{$invoice->data['billingDetails']['senderName']}}</li>
                                             <li>{{$invoice->data['billingDetails']['senderAddress']}} {{$invoice->data['billingDetails']['senderState']}} {{$invoice->data['billingDetails']['senderPostcode']}}</li>
@@ -123,11 +123,11 @@
                         </div>
                         <div class="invoice-footer mt25">
                             <p class="text-center">{{__('Generated on')}} {{ \Carbon\Carbon::parse($invoice->created_at)->format('d M Y')}} </p>
-                            <p class="d-flex justify-content-center align-items-center">
-                                <a href="{{route('my.settings',['type'=>'payments'])}}" class="mr-3">{{__("Back")}}</a>
-                                <a href="#" onclick="window.print()" class="btn btn-default ml15 m-0 "> {{__('Print')}}</a>
-                            </p>
                         </div>
+                        <p class="d-flex justify-content-center align-items-center">
+                            <a href="{{route('my.settings',['type'=>'payments'])}}" class="mr-3">{{__("Back")}}</a>
+                            <a href="#" onclick="window.print()" class="btn btn-default ml15 m-0 "> {{__('Print')}}</a>
+                        </p>
                     </div>
                     <!-- End .panel -->
                 </div>

@@ -1,4 +1,4 @@
-<footer class="d-none d-md-block">
+<footer class="d-md-block mobile-ver">
     <!-- A grey container -->
     <div class="greycontainer">
         <!-- A black container -->
@@ -52,13 +52,17 @@
                                 </a>
                             </li>
                         @endif
+<<<<<<< HEAD
                         @if(getSetting('social-media.telegram_link'))
                             <li class="nav-item">
                                 <a class="nav-link pe-1" href="{{getSetting('social-media.telegram_link')}}" target="_blank">
                                     @include('elements.icon',['icon'=>'paper-plane','variant'=>'medium','classes' => 'text-lg opacity-8'])
+=======
+                                <a class="copyRightInfo" href="https://grandhosting.gr?utm_source=foryourfans_{{getSetting('site.name')}}&utm_medium=click_banner&utm_campaign=footer_logo" target="_blank">
+                                   <img style="width:7vh;"src="/img/logos/grandhosting_logo_poweredby.png">
+>>>>>>> parent of ca0a9cfa (update resources folder 4.9.0)
                                 </a>
-                            </li>
-                        @endif
+
                     </ul>
                 </div>
             </div>

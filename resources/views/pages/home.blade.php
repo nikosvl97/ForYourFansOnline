@@ -31,13 +31,13 @@
     <div class="home-header min-vh-75 relative pt-2" >
         <div class="container h-100">
             <div class="row d-flex flex-row align-items-center h-100">
-                <div class="col-12 col-md-6 mt-4 mt-md-0">
+                <div class="col-12 col-md-6">
                     <h1 class="font-weight-bold text-gradient bg-gradient-primary">{{__('Make more money')}},</h1>
                     <h1 class="font-weight-bold text-gradient bg-gradient-primary">{{__('with your content')}}.</h1>
                     <p class="font-weight-bold mt-3">🚀 {{__("Start your own premium creators platform with our ready to go solution.")}}</p>
                     <div class="mt-4">
-                        <a href="{{route('login')}}" class="btn btn-grow bg-gradient-primary  btn-round mb-0 me-1 mt-2 mt-md-0 ">{{__('Try for free')}}</a>
-                        <a href="{{route('search.get')}}" class="btn btn-grow btn-link  btn-round mb-0 me-1 mt-2 mt-md-0 ">
+                        <a href="{{route('login')}}" class="btn bg-gradient-primary  btn-round mb-0 me-1 mt-2 mt-md-0 ">{{__('Try for free')}}</a>
+                        <a href="{{route('search.get')}}" class="btn btn-link  btn-round mb-0 me-1 mt-2 mt-md-0 ">
                             @include('elements.icon',['icon'=>'search-outline','centered'=>false])
                             {{__('Explore')}}</a>
                     </div>
@@ -105,7 +105,7 @@
                                 <p>{{__("become a creator long")}}</p>
                             </div>
                             <div>
-                                <a href="{{Auth::check() ? route('my.settings',['type'=>'verify']) : route('login') }}" class="btn bg-gradient-primary btn-grow btn-round mb-0 me-1 mt-2 mt-md-0 p-3">{{__('Become a creator')}}</a>
+                                <a href="{{Auth::check() ? route('my.settings',['type'=>'verify']) : route('login') }}" class="btn bg-gradient-primary  btn-round mb-0 me-1 mt-2 mt-md-0 p-3">{{__('Become a creator')}}</a>
                             </div>
 
                         </div>

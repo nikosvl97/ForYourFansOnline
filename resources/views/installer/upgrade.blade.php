@@ -13,7 +13,7 @@
         <div class="row no-gutter d-flex justify-content-center align-items-center min-vh-100">
             <div class="col-4">
                 <div class="d-flex justify-content-center pb-5">
-                    <a href="{{route('home')}}">
+                    <a href="{{route('installer.install')}}">
                         <img class="brand-logo" src="{{asset('/img/logo-black.png')}}">
                     </a>
                 </div>

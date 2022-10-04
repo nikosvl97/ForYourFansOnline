@@ -20,11 +20,6 @@
                 ])
          )->withFullUrl()
     !!}
-    <style>
-        .selectize-control.multi .selectize-input>div.active {
-            background:#{{getSetting('colors.theme_color_code')}};
-        }
-    </style>
 @stop
 
 @section('content')

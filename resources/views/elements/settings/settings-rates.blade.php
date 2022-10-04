@@ -58,10 +58,10 @@
             <div class="input-group-prepend">
                 <div class="input-group-prepend">
                     <div class="input-group-text">
-                        <input type="checkbox" aria-label="Checkbox for following text input" name="is_offer" id="is_offer" {{Auth::user()->offer && Auth::user()->offer->expires_at ? 'checked' : ''}}>
+                        <input type="checkbox" aria-label="Checkbox for following text input" name="is_offer" id="is_offer" {{Auth::user()->offer ? 'checked' : ''}}>
                     </div>
                 </div>
-                <input type="date" class="form-control {{ $errors->has('profile_access_offer_date') ? 'is-invalid' : '' }}" id="profile_access_offer_date" name="profile_access_offer_date" aria-describedby="emailHelp" value="{{Auth::user()->offer && Auth::user()->offer->expires_at ? Auth::user()->offer->expires_at->format('Y-m-d') : ''}}">
+                <input type="date" class="form-control {{ $errors->has('profile_access_offer_date') ? 'is-invalid' : '' }}" id="profile_access_offer_date" name="profile_access_offer_date" aria-describedby="emailHelp" value="{{Auth::user()->offer ? Auth::user()->offer->expires_at->format('Y-m-d') : ''}}">
 
             </div>
             <small class="form-text text-muted">

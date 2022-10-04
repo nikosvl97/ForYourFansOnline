@@ -47,8 +47,8 @@
 
     @if(count($post->attachments))
         <div class="post-media">
-            @if($post->isSubbed || (getSetting('site.allow_users_enabling_open_profiles') && $post->user->open_profile))
-                @if((Auth::check() && Auth::user()->id !== $post->user_id && $post->price > 0 && !PostsHelper::hasUserUnlockedPost($post->postPurchases)) || (!Auth::check() && $post->price > 0 ))
+            @if($post->isSubbed)
+                @if(Auth::user()->id !== $post->user_id && $post->price > 0 && !PostsHelper::hasUserUnlockedPost($post->postPurchases))
                     @include('elements.feed.post-locked',['type'=>'post','post'=>$post])
                 @else
                     @if(count($post->attachments) > 1)
@@ -83,7 +83,7 @@
         <div class="footer-actions d-flex justify-content-between">
             <div class="d-flex">
                 {{-- Likes --}}
-                @if($post->isSubbed || (Auth::check() && getSetting('site.allow_users_enabling_open_profiles') && $post->user->open_profile))
+                @if($post->isSubbed)
                     <div class="h-pill h-pill-primary mr-1 rounded react-button {{PostsHelper::didUserReact($post->reactions) ? 'active' : ''}}" data-toggle="tooltip" data-placement="top" title="{{__('Like')}}" onclick="Post.reactTo('post',{{$post->id}})">
                         @include('elements.icon',['icon'=>'heart-outline', 'variant' => 'medium'])
                     </div>
@@ -94,7 +94,7 @@
                 @endif
                 {{-- Comments --}}
                 @if(Route::currentRouteName() != 'posts.get')
-                    @if($post->isSubbed || (Auth::check() && getSetting('site.allow_users_enabling_open_profiles') && $post->user->open_profile))
+                    @if($post->isSubbed)
                         <div class="h-pill h-pill-primary mr-1 rounded" data-toggle="tooltip" data-placement="top" title="{{__('Show comments')}}" onClick="Post.showPostComments({{$post->id}},6)">
                             @include('elements.icon',['icon'=>'chatbubble-outline', 'variant' => 'medium'])
                         </div>
@@ -105,8 +105,8 @@
                     @endif
                 @endif
                 {{-- Tips --}}
-                @if(Auth::check() && $post->user->id != Auth::user()->id)
-                    @if($post->isSubbed || (getSetting('site.allow_users_enabling_open_profiles') && $post->user->open_profile))
+                @if(Auth::check() && $post->user->id != \Illuminate\Support\Facades\Auth::user()->id)
+                    @if($post->isSubbed)
                         <div class="h-pill h-pill-primary send-a-tip"
                              data-toggle="modal"
                              data-target="#checkout-center"
@@ -144,7 +144,7 @@
                     <strong class="text-bold post-reactions-label-count">{{count($post->reactions)}}</strong>
                     <span class="post-reactions-label">{{trans_choice('likes', count($post->reactions))}}</span>
                 </span>
-                @if($post->isSubbed || (Auth::check() && getSetting('site.allow_users_enabling_open_profiles') && $post->user->open_profile))
+                @if($post->isSubbed)
                     <span class="ml-2-h d-none d-lg-block">
                     <a href="{{Route::currentRouteName() != 'posts.get' ? route('posts.get',['post_id'=>$post->id,'username'=>$post->user->username]) : '#comments'}}" class="text-dark-r text-hover">
                         <strong class="post-comments-label-count">{{count($post->comments)}}</strong>
@@ -169,7 +169,7 @@
         </div>
     </div>
 
-    @if($post->isSubbed || (Auth::check() && getSetting('site.allow_users_enabling_open_profiles') && $post->user->open_profile))
+    @if($post->isSubbed)
         <div class="post-comments d-none" {{Route::currentRouteName() == 'posts.get' ? 'id="comments"' : ''}}>
             <hr>
 

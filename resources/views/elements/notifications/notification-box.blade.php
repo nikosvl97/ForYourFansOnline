@@ -1,5 +1,5 @@
 <div class="py-2 notification-box  pl-3 pl-md-4 {{!$notification->read?'unread':''}}">
-    <div class="d-flex flex-row-no-rtl my-1">
+    <div class="d-flex flex-row my-1">
         @if($notification->fromUser)
             <div class="">
                 <img class="rounded-circle avatar" src="{{$notification->fromUser->avatar}}" alt="{{$notification->fromUser->username}}">
@@ -10,7 +10,7 @@
             </div>
         @endif
         <div class="pl-3 w-100">
-            <div class="d-flex flex-row-no-rtl justify-content-between">
+            <div class="d-flex flex-row justify-content-between">
                 @if($notification->fromUser)
                     <div class="d-flex flex-column">
                         <h6 class="text-bold  m-0 p-0 d-flex"><a href="{{route('profile',['username'=>$notification->fromUser->username])}}" class="text-dark-r">{{$notification->fromUser->name}}</a></h6>

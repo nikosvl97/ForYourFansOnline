@@ -1,4 +1,5 @@
 {
+    "A fresh verification link has been sent to your email address.": "A fresh verification link has been sent to your email address.",
     "Account": "Account",
     "Add funds": "Add funds",
     "Add to your lists": "Add to your lists",
@@ -263,7 +264,7 @@
     "Subscribe to": "Subscribe to :username for :currency:amount for each :subscription_interval",
     "Your notifications settings": "Your notifications settings",
     "Your payments & wallet": "Your payments & wallet",
-    "Your post must contain more than 10 characters.": "Your post must contain more than :num character.|Your post must contain more than :num characters.",
+    "Your post must contain more than 10 characters.": "Your post must contain more than 10 characters.",
     "Your privacy and safety matters": "Your privacy and safety matters",
     "and": "and",
     "click here to request another": "click here to request another",
@@ -292,7 +293,7 @@
     "following": ":number following|:number following",
     "to access": "to access",
     "with your content": "with your content",
-    "DMs unavailable without subscription" : "Chat is available for subs/followers only",
+    "DMs unavailable without subscription" : "Chat is available for subscribers only",
 
     "Success": "Success",
     "Error": "Error",
@@ -317,7 +318,6 @@
     "Your live stream is about to end": "Your live stream is about to end",
     "Your live stream is about to end in 30 minutes. You can start another one afterwards.": "Your live stream is about to end in 30 minutes. You can start another one afterwards.",
     "Go to stream": "Go to stream",
-    "Stream url can not be generated. Please enter at least one alphanumeric character in the stream title.": "Stream url can not be generated. Please enter at least one alphanumeric character in the stream title.",
 
     "Cancel subscription" : "Cancel subscription",
     "Are you sure you want to cancel this subscription?" : "Are you sure you want to cancel this subscription?",
@@ -361,8 +361,8 @@
     "subscription-renewal":  "Subscription Renewal",
 
     "post notification" : "post notification",
-    ":name added a new comment on your" : ":name added a new comment on your",
-    "Send you a message: `:message`": "Sent you a message `:message`",
+    ":name added a new comment on your post" : ":name added a new comment on your post.",
+    "Send you a message: `:message`": "Send you a message `:message`",
     "Hello, :name,":  "Hello, :name,",
     "You've received a new comment on one of your posts at :siteName." : "You've received a new comment on one of your posts at :siteName.",
     "Your notifications": "Your notifications",
@@ -373,7 +373,7 @@
     "Manage your subs": "Manage your subs",
     "sent you a tip of": "sent you a tip of",
     "You got a new tip!" : "You got a new tip!",
-    ":name liked your": ":name liked your",
+    ":name liked your post": ":name liked your post.",
     ":name liked your comment":":name liked your comment.",
     "Withdrawal processed": "Your withdrawal of :currencySymbol:amount has been :status.",
     "successfully renewed": "successfully renewed",
@@ -426,29 +426,6 @@
     "Post attachments": "Post attachments",
     "Post comments":"Post comments",
     "Total reactions": "Total reactions",
-    "Go to users": "Go to users",
-    "Go to payments": "Go to payments",
-    "Go to content": "Go to content",
-
-    "New users": "New users",
-    "No prior data": "No prior data",
-    "thousands_separator": ".",
-    "Users roles": "Users roles",
-    "Not Confirmed": "Not Confirmed",
-    "Registered users": "Registered users",
-    "Increase": "Increase",
-    "Decrease":"Decrease",
-    "Constant": "Constant",
-    "No current data":"No current data",
-    "Day": "Day",
-    "Days":"Days",
-    "Month": "Month",
-    "Months":"Months",
-    "Website": "Website",
-    "Visit the official product page": "Visit the official product page",
-    "Visit the official product docs": "Visit the official product docs",
-    "Changelog": "Changelog",
-    "Visit the official product changelog": "Visit the official product changelog",
 
     "Complete your verification": "Complete your verification",
     "Please attach clear photos of your ID card back and front side.": "Please attach clear photos of your ID card back and front side.",
@@ -568,7 +545,6 @@
     "We sent you a new code over your email address.": "We sent you a new code over your email address.",
     "Forget device": "Forget device",
     "Allowed devices": "Allowed devices",
-    "Un-verified devices": "Un-verified devices",
     "on" : "on",
     "Created at": "Created at",
     "Desktop" : "Desktop",
@@ -686,50 +662,5 @@
     "No":"No",
     "You can read more about our": "You can read more about our",
     "terms of usage": "terms of usage",
-    "over this page": "over this page",
-    "post": "post",
-    "Latest media not available.": "Latest media not available.",
-
-    "Having your profile set to private means:": "Having your profile set to private means:",
-    "It will be hidden for search engines and unregistered users entirely.": "It will be hidden for search engines and unregistered users entirely.",
-    "It will also be generally hidden from suggestions and user searches on our platform.": "It will also be generally hidden from suggestions and user searches on our platform.",
-
-    "Payment method": "Payment method",
-    "Note: After clicking on the button, you will be directed to a secure gateway for payment. After completing the payment process, you will be redirected back to the website.": "Note: After clicking on the button, you will be directed to a secure gateway for payment. After completing the payment process, you will be redirected back to the website.",
-    "Billing agreement details": "Billing agreement details",
-    "Add user to list": "Add user to list",
-    "Chose the list you want to add the user into": "Chose the list you want to add the user into.",
-
-    "Follow": "Follow",
-    "Add list": "Add list",
-    "Withdraw": "Withdraw",
-    "Prices & Bundles": "Prices & Bundles",
-    "Your email notifications settings" : "Your email notifications settings",
-    "Follow this creator": "Follow this creator",
-
-    "Hello!": "Hello!",
-    "Regards": "Regards",
-    "A fresh verification link has been sent to your email address.": "A fresh verification link has been sent to your email address.",
-    "Verify Email Address": "Verify Email Address",
-    "Please click the button below to verify your email address.": "Please click the button below to verify your email address.",
-    "If you did not create an account, no further action is required.": "If you did not create an account, no further action is required.",
-    "If you’re having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:": "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:",
-    "Something went wrong when cancelling this subscription": "Something went wrong when cancelling this subscription",
-
-
-    "Open profile": "Open profile",
-    "Having your profile set to open means:": "Having your profile set to open means:",
-    "Both registered and unregistered users will be able to see your posts.": "Both registered and unregistered users will be able to see your posts.",
-    "If account is private, the content will only be available for registered used.": "If account is private, the content will only be available for registered used.",
-    "Paid posts will still be locked for open profiles.": "Paid posts will still be locked for open profiles.",
-
-
-    "A :feeAmount% fee will be applied.": "A :feeAmount% fee will be applied.",
-    "Cannot subscribe to yourself.": "Cannot subscribe to yourself.",
-    "Cannot pay to yourself.": "Cannot pay to yourself.",
-
-    "Profile access is denied.": "Profile access is denied.",
-    "This content is not available for you at the moment.": "This content is not available for you at the moment."
-
-
+    "over this page": "over this page"
 }

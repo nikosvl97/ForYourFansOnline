@@ -18,12 +18,13 @@
                             <div class="col-8">{{__("PHP Version")}}: {{phpversion()}}</div>
                             <div class="col-4 d-flex justify-content-end">
                                 @if(version_compare(phpversion(), '7.2.5') >= 0)
-                                    {{--                                        <div data-toggle="tooltip" data-placement="top" title="{{__("PHP 8+ is not officially supported.")}}">--}}
-                                    {{--                                            @include('elements.icon',['icon'=>'information-circle-outline','variant'=>'medium', 'classes'=>'text-orange'])--}}
-                                    {{--                                        </div>--}}
-                                    {{--                                    @else--}}
-                                    @include('elements.icon',['icon'=>'checkmark-circle-outline','variant'=>'medium', 'classes'=>'text-success'])
-                                    {{--                                    @endif--}}
+                                    @if(version_compare(phpversion(), '8.0.0') >= 0)
+                                        <div data-toggle="tooltip" data-placement="top" title="{{__("PHP 8+ is not officially supported.")}}">
+                                            @include('elements.icon',['icon'=>'information-circle-outline','variant'=>'medium', 'classes'=>'text-orange'])
+                                        </div>
+                                    @else
+                                        @include('elements.icon',['icon'=>'checkmark-circle-outline','variant'=>'medium', 'classes'=>'text-success'])
+                                    @endif
                                 @else
                                     @include('elements.icon',['icon'=>'close-circle-outline','variant'=>'medium', 'classes'=>'text-warning'])
                                 @endif

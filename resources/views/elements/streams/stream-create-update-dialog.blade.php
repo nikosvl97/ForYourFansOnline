@@ -58,7 +58,7 @@
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary stream-save-btn" onclick="Streams.updateStream();">{{__('Save')}}</button>
+                <button type="button" class="btn btn-primary" onclick="Streams.updateStream();">{{__('Save')}}</button>
             </div>
         </div>
     </div>

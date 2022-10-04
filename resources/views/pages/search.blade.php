@@ -127,7 +127,7 @@
             </div>
             <div class="col-12 col-sm-12 col-md-5 col-lg-4 first border-left order-0 pt-4 pb-5 min-vh-100 suggestions-wrapper d-none d-md-block">
                 <div class="search-widgets">
-                    @include('elements.feed.suggestions-box',['profiles'=>$suggestions,'isMobile' => false])
+                    @include('elements.feed.suggestions-box',['profiles'=>$suggestions])
                     @if(getSetting('custom-code-ads.sidebar_ad_spot'))
                         <div class="d-flex justify-content-center align-items-center mt-4">
                             {!! getSetting('custom-code-ads.sidebar_ad_spot') !!}

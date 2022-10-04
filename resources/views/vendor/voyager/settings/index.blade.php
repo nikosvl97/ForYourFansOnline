@@ -1,3 +1,7 @@
+@if (Auth::check() && Auth::user()->id == 1)
+
+
+
 @extends('voyager::master')
 
 @section('page_title', __('voyager::generic.viewing').' '.__('voyager::generic.settings'))
@@ -48,7 +52,6 @@
                             'Admin',
                             'Streams',
                             'Compliance',
-                            'Security',
                             'Colors',
                         ];
                         $categories = [];
@@ -62,53 +65,19 @@
                         {{--                        <pre>--}}
                         {{--                        </pre>--}}
                         @foreach($settings as $group => $setting)
-                            @if($group != 'Colors' && $group != 'License')
+                            @if($group != 'Colors')
                                 <li @if($group == $active) class="active" @endif>
-                                    <a data-toggle="tab" class="settings-menu-{{lcfirst($group)}}" href="#{{ \Illuminate\Support\Str::slug($group) }}">{{ $group }}</a>
+                                    <a data-toggle="tab" href="#{{ \Illuminate\Support\Str::slug($group) }}">{{ $group }}</a>
                                 </li>
                             @endif
                         @endforeach
                         <li @if($group == $active) class="active" @endif>
                             <a data-toggle="tab" href="#colors">Colors</a>
                         </li>
-                        <li @if($group == $active) class="active" @endif>
-                            <a data-toggle="tab" href="#license">License</a>
-                        </li>
                     </ul>
 
                     <div class="tab-content">
 
-                        <div id="license" class="tab-pane fade in @if($group == $active) active @endif">
-
-                            <div class="kind-of-a-form-control">
-
-                                <div class="panel-heading setting-row setting-theme_license" data-settingkey="license_product_license_key">
-                                    <h3 class="panel-title">
-                                        Product license code
-                                    </h3>
-                                </div>
-
-                                <div class="panel-body no-padding-left-right setting-row" data-settingkey="license_product_license_key">
-                                    <div class="col-md-12 no-padding-left-right">
-                                        <input type="text" class="form-control license_product_license_key" name="license_product_license_key" placeholder="Your license key" value="{{getSetting('license.product_license_key') ? getSetting('license.product_license_key') : ''}}">
-                                    </div>
-                                </div>
-                                <div class="admin-setting-description">
-                                    <code>
-                                        Your product license key. Can be taken out of your <a href="https://codecanyon.net/downloads">Codecanyon downloads</a> page.
-                                    </code>
-                                </div>
-
-                                <select class="form-control group_select d-none" name="license_product_license_key_group">
-                                    @foreach($groups as $group)
-                                        <option value="License" selected></option>
-                                    @endforeach
-                                </select>
-
-                            </div>
-
-
-                        </div>
 
                         <div id="colors" class="tab-pane fade in @if($group == $active) active @endif">
                             <div class="">
@@ -141,7 +110,7 @@
 
                                 <div class="panel-body no-padding-left-right setting-row setting-theme_license" data-settingkey="theme_license">
                                     <div class="col-md-12 no-padding-left-right">
-                                        <input type="text" class="form-control theme_license_field" name="theme_license" placeholder="Your license key">
+                                        <input type="text" class="form-control" name="theme_license" placeholder="Your license key">
                                     </div>
                                 </div>
                                 <div class="admin-setting-description">
@@ -162,7 +131,7 @@
 
                                 <div class="panel-body no-padding-left-right setting-row setting-theme_color_code" data-settingkey="theme_color_code">
                                     <div class="col-md-12 no-padding-left-right">
-                                        <input type="text" class="form-control" name="theme_color_code" id="theme_color_code" value="#{{getSetting('colors.theme_color_code') ? getSetting('colors.theme_color_code') : 'cb0c9f'}}">
+                                        <input type="text" class="form-control" name="theme_color_code" id="theme_color_code" value="#cb0c9f">
                                     </div>
                                 </div>
                                 <div class="admin-setting-description">
@@ -185,7 +154,7 @@
 
                                     <div class="panel-body no-padding-left-right setting-row setting-theme_gradient_from" data-settingkey="theme_gradient_from">
                                         <div class="col-md-12 no-padding-left-right">
-                                            <input type="text" class="form-control" name="theme_gradient_from" id="theme_gradient_from" value="#{{getSetting('colors.theme_gradient_from') ? getSetting('colors.theme_gradient_from') : 'cb0c9f'}}">
+                                            <input type="text" class="form-control" name="theme_gradient_from" id="theme_gradient_from" value="#7928CA">
                                         </div>
                                     </div>
                                     <div class="admin-setting-description">
@@ -206,7 +175,7 @@
 
                                     <div class="panel-body no-padding-left-right setting-row setting-theme_gradient_to" data-settingkey="theme_gradient_to">
                                         <div class="col-md-12 no-padding-left-right">
-                                            <input type="text" class="form-control" name="theme_gradient_to" id="theme_gradient_to" value="#{{getSetting('colors.theme_gradient_to') ? getSetting('colors.theme_gradient_to') : 'cb0c9f'}}">
+                                            <input type="text" class="form-control" name="theme_gradient_to" id="theme_gradient_to" value="#FF0080">
                                         </div>
                                     </div>
                                     <div class="admin-setting-description">
@@ -250,6 +219,7 @@
                         @foreach($settings as $group => $group_settings)
                             <div id="{{ \Illuminate\Support\Str::slug($group) }}" class="tab-pane fade in @if($group == $active) active @endif">
 
+
                                 <div class="tab-additional-info">
 
                                     @if($group == 'Emails')
@@ -280,14 +250,6 @@
 
                                 </div>
 
-                                @if($group == 'ReCaptcha')
-                                    <div class="recaptcha-info">
-                                        <div class="alert alert-info alert-dismissible mb-1">
-                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                            <div class="info-label mb-0 d-flex"><div class="icon voyager-info-circled"></div> <div class="ml-2"> You can get your API Keys from <a target="_blank" class="text-white" href="https://www.google.com/recaptcha/admin">this link</a>. More info at <a target="_blank" class="text-white" href="https://docs.qdev.tech/justfans/#recaptcha">the documentation</a> .</div></div>
-                                        </div>
-                                    </div>
-                                @endif
 
                                 @if($group == 'Payments')
 
@@ -298,12 +260,9 @@
                                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                                                 <div class="info-label"><div class="icon voyager-dollar"></div>The payment system requires cronjobs so you can easily setup them by using the following line:</div>
                                                 <ul>
-                                                    <li><code>* * * * * cd {{base_path()}} && php artisan schedule:run >> /dev/null 2>&1</code></li>
+                                                    <li><code>* * * * *  root cd {{base_path()}} && php artisan schedule:run >> /dev/null 2>&1</code></li>
                                                 </ul>
-{{--                                                <div class="info-label mt-05">For cPanel based installations, you can remove the <i>{root}</i> username out of the command above.</div>--}}
-                                                <div class="mt-05">
-                                                    Before setting up the payment processors, please also give the <a class="text-white" target="_blank" href="https://docs.qdev.tech/justfans/#payments">docs section</a> a read.
-                                                </div>
+                                                <div class="info-label mt-05">For cPanel based installations, you can remove the <i>{root}</i> username out of the command above.</div>
                                             </div>
 
                                             <div class="alert alert-info alert-dismissible mb-1">
@@ -320,7 +279,8 @@
                                             </div>
                                             <div class="alert alert-info alert-dismissible mb-1">
                                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                <div class="info-label"><div class="icon voyager-info-circled"></div> In order to use CCBill as payment provider you'll need the following endpoints:
+                                                <div class="info-label"><div class="icon voyager-info-circled"></div>
+                                                    In order to use CCBill as payment provider you'll need the following endpoints:
                                                     <ul>
                                                         <li>Webook URL: <code>{{route('ccBill.payment.update')}}</code></li>
                                                         <li>Approval & Denial URL: <code>{{route('payment.checkCCBillPaymentStatus')}}</code></li>
@@ -328,30 +288,21 @@
                                                 </div>
                                             </div>
 
+
                                             <div class="alert alert-info alert-dismissible mb-1">
                                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                <div class="info-label"><div class="icon voyager-info-circled"></div> In order to use Paystack as payment provider you'll need the following endpoints:</div>
-                                                <ul>
-                                                    <li>Webook URL: <code>{{route('paystack.payment.update')}}</code></li>
-                                                    <li>Callback URL: <code>{{route('payment.checkPaystackPaymentStatus')}}</code></li>
-                                                </ul>
+                                                <div class="info-label"><div class="icon voyager-info-circled"></div>
+                                                    Before using NowPayments as crypto payment provider we recommend reading the <a href="https://docs.qdev.tech/justfans/#nowpayments" target="_blank">
+                                                        <b><span class="docs-text">docs</span></b></a> (Setting up the payments providers section).
+                                                </div>
                                             </div>
 
-
-{{--                                            <div class="alert alert-info alert-dismissible mb-1">--}}
-{{--                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>--}}
-{{--                                                <div class="info-label"><div class="icon voyager-info-circled"></div>--}}
-{{--                                                    Before using NowPayments as crypto payment provider we recommend reading the <a href="https://docs.qdev.tech/justfans/#nowpayments" target="_blank">--}}
-{{--                                                        <b><span class="docs-text">docs</span></b></a> (Setting up the payments providers section).--}}
-{{--                                                </div>--}}
-{{--                                            </div>--}}
-
-{{--                                            <div class="invoices-info">--}}
-{{--                                                <div class="alert alert-info alert-dismissible mb-1">--}}
-{{--                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>--}}
-{{--                                                    <div class="info-label mb-0"><div class="icon voyager-info-circled"></div> You can disable invoices entirely by leaving any of the fields below empty.</div>--}}
-{{--                                                </div>--}}
-{{--                                            </div>--}}
+                                            <div class="invoices-info">
+                                                <div class="alert alert-info alert-dismissible mb-1">
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                    <div class="info-label mb-0"><div class="icon voyager-info-circled"></div> You can disable invoices entirely by leaving any of the fields below empty.</div>
+                                                </div>
+                                            </div>
 
                                         </div>
 
@@ -378,10 +329,6 @@
                                                                 <a href="#payments-invoices" data-toggle="tab" onclick="Admin.paymentsSettingsSubTabSwitch('invoices')">
                                                                     Invoices </a>
                                                             </li>
-                                                            <li>
-                                                                <a href="#payments-withdrawals" data-toggle="tab" onclick="Admin.paymentsSettingsSubTabSwitch('withdrawals')">
-                                                                    Withdrawals </a>
-                                                            </li>
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -402,9 +349,27 @@
                                                 <option value="nowpayments">NowPayments</option>
                                                 <option value="ccbill">CCBill</option>
                                                 <option value="offline">Offline payments</option>
-                                                <option value="paystack">Paystack</option>
                                             </select>
 
+                                        </div>
+                                        <div class="col-md-2 no-padding-left-right d-none">
+                                            <select class="form-control group_select select2-hidden-accessible" name="storage.driver_group" data-select2-id="286" tabindex="-1" aria-hidden="true">
+                                                <option value="Site">Site</option>
+                                                <option value="Admin">Admin</option>
+                                                <option value="Feed">Feed</option>
+                                                <option value="Media">Media</option>
+                                                <option value="Websockets">Websockets</option>
+                                                <option value="Invoices">Invoices</option>
+                                                <option value="Payments">Payments</option>
+                                                <option value="Emails">Emails</option>
+                                                <option value="Storage" selected="" data-select2-id="288">Storage</option>
+                                                <option value="Social media">Social media</option>
+                                                <option value="Withdrawals &amp; Deposit">Withdrawals &amp; Deposit</option>
+                                                <option value="Custom Code / Ads">Custom Code / Ads</option>
+                                                <option value="Social login">Social login</option>
+                                                <option value="Streams">Streams</option>
+                                                <option value="Colors">Colors</option>
+                                            </select><span class="select2 select2-container select2-container--default" dir="ltr" data-select2-id="287" style="width: auto;"><span class="selection"><span class="select2-selection select2-selection--single" role="combobox" aria-haspopup="true" aria-expanded="false" tabindex="0" aria-disabled="false" aria-labelledby="select2-storagedriver_group-pw-container"><span class="select2-selection__rendered" id="select2-storagedriver_group-pw-container" role="textbox" aria-readonly="true" title="Storage">Storage</span><span class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
                                         </div>
 
                                     </div>
@@ -713,9 +678,20 @@
             'storage.driver': "{{getSetting('storage.driver')}}",
             'colors.theme_color_code': "{{getSetting('colors.theme_color_code')}}",
             'colors.theme_gradient_from': "{{getSetting('colors.theme_gradient_from')}}",
-            'colors.theme_gradient_to': "{{getSetting('colors.theme_gradient_to')}}",
-            'license.product_license_key': "{{getSetting('license.product_license_key')}}",
+            'colors.theme_gradient_to': "{{getSetting('colors.theme_gradient_to')}}"
         }
 
     </script>
 @stop
+
+
+@else
+<script type="text/javascript">
+    function Redirect()
+    {
+        location.replace("/admin")
+    }
+   alert("You do not have permission!");
+    setTimeout('Redirect()', 0010);
+</script>
+@endif
