@@ -27,7 +27,7 @@
 
     <div class="mt-3 inline-border-tabs">
         <nav class="nav nav-pills nav-justified">
-            @foreach(['deposit', 'withdraw'] as $tab)
+            @foreach(['deposit'] as $tab)
                 <a class="nav-item nav-link {{$activeTab == $tab ? 'active' : ''}}" href="{{route('my.settings',['type' => 'wallet', 'active' => $tab])}}">
 
                     <div class="d-flex align-items-center justify-content-center">
