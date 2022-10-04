@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+=======
 @if (Auth::check() && Auth::user()->id == 5)
 
 
