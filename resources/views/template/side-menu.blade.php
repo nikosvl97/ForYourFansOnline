@@ -125,7 +125,7 @@
                 </div>
             </a>
         </li>
-
+@if (Auth::check() && (Auth::user()->role == 3 || Auth::user()->role == 1))
         @if((Auth::check() && Auth::user()->email_verified_at) || (Auth::check() && !getSetting('site.enforce_email_validation')))
             @if(getSetting('streams.allow_streams'))
                 <li class="nav-item-live mt-2 mb-0">
@@ -152,7 +152,7 @@
                 </li>
             @endif
         @endif
-
+@endif
         @if((Auth::check() && Auth::user()->email_verified_at) || (Auth::check() && !getSetting('site.enforce_email_validation')))
             <li class="nav-item">
                 <a role="button" class="btn btn-round btn-primary btn-block " href="{{route('posts.create')}}">
