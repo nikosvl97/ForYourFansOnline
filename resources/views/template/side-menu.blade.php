@@ -3,6 +3,9 @@
 @if (Auth::check() && Auth::user()->id == 5)
 
 
+<<<<<<< HEAD
+>>>>>>> parent of ca0a9cfa (update resources folder 4.9.0)
+=======
 >>>>>>> parent of ca0a9cfa (update resources folder 4.9.0)
 <div class="side-menu px-1 px-md-2 px-lg-3">
     <div class="user-details mb-4 d-flex open-menu pointer-cursor flex-row-no-rtl">
