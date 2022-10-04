@@ -152,7 +152,7 @@
                 </li>
             @endif
         @endif
-@endif
+
         @if((Auth::check() && Auth::user()->email_verified_at) || (Auth::check() && !getSetting('site.enforce_email_validation')))
             <li class="nav-item">
                 <a role="button" class="btn btn-round btn-primary btn-block " href="{{route('posts.create')}}">
@@ -162,6 +162,6 @@
             </li>
         @endif
 
-
+@endif
     </ul>
 </div>
