@@ -23,7 +23,7 @@
 @stop
 
 @section('content')
-
+@if (Auth::check() && Auth::user()->role_id == '3' )
     <div class="row">
         <div class="col-12">
             @include('elements.uploaded-file-preview-template')
@@ -84,5 +84,5 @@
 
         </div>
     </div>
-
+@endif
 @stop

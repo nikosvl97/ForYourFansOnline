@@ -16,8 +16,11 @@
                 <div class="col-12 col-md-7 content-md pr-5">
                     <form class="well" role="form" method="post" action="{{route('contact.send')}}">
                         <div class="col">
-                            <h3 class="h1s text-bold">{{__("Contact us")}}</h3>
-                            <p class="mb-4">{{__("Don't hesitate to contact us for any matter. We will get back to you asap.")}}</p>
+                          <h2 class="h1s text-bold">{{__("Delete account")}}</h2>
+            <h5 class="h1s text-bold" style="color:red;">{{__("Important!")}}</h5>
+
+                          <p class="mb-4" style="color:red;">{{__("Before deleting your account, you must cancel all active subscriptions on your profile. Otherwise the subscription may continue working!")}}</p>
+             <p class="mb-4" style="color:red;">{{__("After sending the form, your account will be permanently deleted!")}}</p>
 
                             @csrf
                             @if(session('success'))
@@ -69,7 +72,7 @@
                             @endif
 
                             <div class="form-group">
-                                <button class="btn btn-primary " type="submit">{{__("Submit")}}</button>
+                                <button class="btn btn-primary " type="submit">{{__("Submit and delete my account permanently")}}</button>
                             </div>
 
                         </div>

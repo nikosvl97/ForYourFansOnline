@@ -8,7 +8,17 @@
                 <div class="clearfix"></div>
                 <br />
                 <div class="copyRightInfo d-flex flex-column-reverse flex-md-row d-md-flex justify-content-md-between">
-                    <p class="">&copy; {{date('Y')}} {{getSetting('site.name')}}. {{__('All rights reserved.')}}</p>
+                    <p class="">&copy; {{date('Y')}} {{getSetting('site.name')}} | Powered by <a href="https://mepunkt.de" target ="_blank">mepunkt.de</a> Werbeagentur Nürnberg </p>
+
+                    <a class="copyRightInfo" href="{{route('pages.get',['slug'=>'impressum'])}}" target="_blank">
+                                   Impressum | 
+                                </a>
+					<a class="copyRightInfo" href="{{route('pages.get',['slug'=>'terms-and-conditions'])}}" target="_blank">
+                                   AGB | 
+                                </a>
+					<a class="copyRightInfo" href="{{route('pages.get',['slug'=>'privacy'])}}" target="_blank">
+                                   Datenschutzerklärung
+                                </a>
                     <ul class="d-flex flex-row nav m-2 mt-md-0">
                         @if(getSetting('social-media.facebook_url'))
                             <li class="nav-item">
@@ -59,6 +69,10 @@
                                 </a>
                             </li>
                         @endif
+
+                        <a class="copyRightInfo" href="https://grandhosting.gr" target="_blank">
+                                  <img style="width:7vh;"src="/img/logos/grandhosting_logo_poweredby.png">
+                               </a>
                     </ul>
                 </div>
             </div>

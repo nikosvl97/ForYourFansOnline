@@ -2,21 +2,14 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-8 mb-4 mx-auto text-center">
-                <a href="{{route('pages.get',['slug'=>'help'])}}" target="" class="text-secondary text-lg m-2">
-                    {{__('Help')}}
-                </a>
-                <a href="{{route('contact')}}" class="text-secondary text-lg m-2">
-                    {{__('Contact page')}}
-                </a>
+
                 <a href="{{route('pages.get',['slug'=>'privacy'])}}" target="" class="text-secondary text-lg m-2">
                     {{__('Privacy')}}
                 </a>
                 <a href="{{route('pages.get',['slug'=>'terms-and-conditions'])}}" target="" class="text-secondary text-lg m-2">
                     {{__('Terms & conditions')}}
                 </a>
-                <a href="https://docs.qdev.tech/justfans/" target="_blank" class="text-secondary text-lg m-2">
-                    {{__('Documentation')}}
-                </a>
+
             </div>
             <div class="col-lg-8 mx-auto text-center mb-3 mt-2">
                 <div class="d-flex justify-content-center">

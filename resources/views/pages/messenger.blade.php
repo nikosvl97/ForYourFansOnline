@@ -74,6 +74,27 @@
                             @endif
                         </div>
                         <div class="dropzone-previews dropzone w-100 ppl-0 pr-0 pt-1 pb-1"></div>
+
+                        @php
+                          $active = DB::table('subscriptions')
+						                    ->where('sender_user_id', [Auth::user()->id])
+						                          ->where('status', ['completed'])
+                   		                 ->get('status');
+
+						                             echo $active;
+
+                          $canceled = DB::table('subscriptions')
+               						->where('sender_user_id', [Auth::user()->id])
+
+               						->where('expires_at', '>' , Carbon\Carbon::now())
+                                  		 ->get('status')     ;
+
+						                             echo $canceled;
+
+                        @endphp
+@if (Auth::check() && Auth::user()->role_id != '3' )
+                          @if( $active == '[{"status":"completed"}]' || $canceled == '[{"status":"canceled"}]')
+
                         <div class="conversation-writeup pt-1 pb-1 d-flex align-items-center mb-1 {{!$lastContactID ? 'hidden' : ''}}">
                             <form class="message-form w-100 pl-3">
                                 <div class="input-group messageBoxInput-wrapper">
@@ -99,6 +120,53 @@
                                 </button>
                             </div>
                         </div>
+
+                        @else
+
+						<div style="
+    width: 100%;
+    text-align: center;
+    padding: 1em;
+    background: #d5d5d5;
+    border-radius: 5em;
+    margin-bottom: 0.2em;
+">
+                          {{__('Your subscription has been expired')}}
+
+
+                        </div>
+						@endif
+
+@else
+
+
+<div class="conversation-writeup pt-1 pb-1 d-flex align-items-center mb-1 {{!$lastContactID ? 'hidden' : ''}}">
+    <form class="message-form w-100 pl-3">
+        <div class="input-group messageBoxInput-wrapper">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="receiverID" id="receiverID" value="">
+            <textarea name="message" class="form-control messageBoxInput dropzone" placeholder="{{__('Write a message..')}}" onkeyup="messenger.textAreaAdjust(this)"></textarea>
+            <div class="input-group-append z-index-3 d-flex align-items-center justify-content-center">
+                <span class="h-pill h-pill-primary rounded mr-3 trigger" data-toggle="tooltip" data-placement="top" title="Like" >😊</span>
+            </div>
+        </div>
+        {{--                                    <span class="invalid-feedback pl-4 text-bold" role="alert">Please enter a message</span>--}}
+    </form>
+    <div class="messenger-buttons-wrapper d-flex">
+        <button class="btn btn-outline-primary btn-rounded-icon messenger-button attach-file mx-2 file-upload-button">
+            <div class="d-flex justify-content-center align-items-center">
+                @include('elements.icon',['icon'=>'document','variant'=>''])
+            </div>
+        </button>
+        <button class="btn btn-outline-primary btn-rounded-icon messenger-button send-message mr-2" onClick="messenger.sendMessage()">
+            <div class="d-flex justify-content-center align-items-center">
+                @include('elements.icon',['icon'=>'paper-plane','variant'=>''])
+            </div>
+        </button>
+    </div>
+</div>
+
+@endif        
                     </div>
                 </div>
             </div>
