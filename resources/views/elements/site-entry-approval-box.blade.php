@@ -6,13 +6,26 @@
             </div>
 
             <div class="d-flex justify-content-center align-items-center mt-4 mb-2 px-3 px-md-0">
-                 <h4 class="text-uppercase text-bolder">{{__("Enter only if you are over 18")}}</h4>
-            </div>
+              <h4 class="text-uppercase text-bolder"><center>{{__("Enter only if you are over 18")}}</center></h4>
+</div>
+<center>
+<div class="modal-body">
+<p>
+{{__("In my member area you get access to exclusive content (pictures & videos), live chats with me & much more.")}}<br>
+{{__("You can choose between a 1 month subscription for €19.99 and a 3 month subscription for €49.99.")}}<br>
+{{__("See you! ❤️")}}<br>
+</p>
 
-            <div class="modal-body">
-                <p>{{__("The website contains content of adult nature and is only available to adults. If you are under the age of 18 (or 21 in some countries), if it is illegal to view such material in your jurisdiction or if it offends you, please do not continue.")}}</p>
-            </div>
+</div>
 
+
+
+<div class="modal-body">
+<p>{{__("Access only from 18. By using the website I accept the ")}}  <a href="{{route('pages.get',['slug'=>'terms-and-conditions'])}}">{{__("Terms & conditions")}}</a> {{__("and")}} <a href="{{route('pages.get',['slug'=>'privacy'])}}">{{__("Privacy policy")}}</a>.</p>
+<p>	{{__("This site only uses technically necessary cookies.")}}</p>
+</div>
+
+</center>
             <div class="d-flex">
                 <div class="col-6">
                     <button type="submit" class="btn  btn-primary btn-block" onClick="acceptSiteEntry();">
@@ -25,9 +38,7 @@
                     </button>
                 </div>
             </div>
-            <div class="modal-body pt-2 pb-2">
-                <p class="text-muted">{{__("You can read more about our")}} <a href="{{route('pages.get',['slug'=>'terms-and-conditions'])}}">{{__("terms of usage")}}</a> {{__("over this page")}}.</p>
-            </div>
+
         </div>
     </div>
 </div>
