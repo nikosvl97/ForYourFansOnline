@@ -81,7 +81,7 @@
 						                          ->where('status', ['completed'])
                    		                 ->get('status');
 
-						                             echo $active;
+						                       //      echo $active;
 
                           $canceled = DB::table('subscriptions')
                						->where('sender_user_id', [Auth::user()->id])
@@ -89,7 +89,7 @@
                						->where('expires_at', '>' , Carbon\Carbon::now())
                                   		 ->get('status')     ;
 
-						                             echo $canceled;
+						                           //  echo $canceled;
 
                         @endphp
 @if (Auth::check() && Auth::user()->role_id != '3' )
@@ -166,7 +166,7 @@
     </div>
 </div>
 
-@endif        
+@endif
                     </div>
                 </div>
             </div>
