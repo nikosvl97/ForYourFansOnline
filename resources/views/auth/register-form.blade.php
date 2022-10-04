@@ -65,15 +65,17 @@
     </div>
 
     <div class="form-group">
-        <div class="custom-control custom-checkbox">
-            <div class="">
-                <input class="custom-control-input @error('terms') is-invalid @enderror" id="tosAgree" type="checkbox" name="terms" value="1" placeholder="{{ __('Terms and Conditions') }}">
-                <label class="custom-control-label" for="tosAgree">
-                    <span>{{ __('I agree to the') }} <a href="{{route('pages.get',['slug'=>'terms-and-conditions'])}}">{{ __('Terms of Use') }}</a> {{ __('and') }} <a href="{{route('pages.get',['slug'=>'privacy'])}}">{{ __('Privacy Policy') }}</a>.</span>
-                </label>
-            </div>
-        </div>
-    </div>
+       <div class="custom-control custom-checkbox">
+           <div class="">
+               <input class="custom-control-input @error('terms') is-invalid @enderror" id="tosAgree" type="checkbox" name="terms" value="1" placeholder="{{ __('Terms and Conditions') }}">
+               <label class="custom-control-label" for="tosAgree">
+                   <span>{{ __('I agree to the') }} <a href="{{route('pages.get',['slug'=>'terms-and-conditions'])}}">{{ __('Terms of Use') }}</a> {{ __('and') }} <a href="{{route('pages.get',['slug'=>'privacy'])}}">{{ __('Privacy Policy') }}</a>
+       {{__('at')}}	{{__('and i agree that i am at least 18 years old.') }}
+         </span>
+               </label>
+           </div>
+       </div>
+   </div>
 
     @if(getSetting('security.recaptcha_enabled') && !Auth::check())
         <div class="form-group row d-flex justify-content-center captcha-field">

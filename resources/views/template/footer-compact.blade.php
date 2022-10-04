@@ -71,7 +71,7 @@
                         @endif
 
                         <a class="copyRightInfo" href="https://grandhosting.gr" target="_blank">
-                                  <img style="width:7vh;"src="/img/logos/grandhosting_logo_poweredby.png">
+                                  <img style="width:7vh;"src="/img/grandhosting_logo_poweredby.png">
                                </a>
                     </ul>
                 </div>
