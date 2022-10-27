@@ -64,8 +64,8 @@
 <link rel="shortcut icon" href="{{ getSetting('site.favicon') }}" type="image/x-icon">
 
 {{-- (Preloading) Fonts --}}
-<link href="https://fonts.googleapis.com/css?family=Roboto:400,300" rel="preload" as="style">
-<link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,500,600,700" rel="preload" as="style">
+<link rel="stylesheet" href="&#123;&#123; asset('fonts/roboto.css') &#125;&#125;">
+<link rel="stylesheet" href="&#123;&#123; asset('fonts/opensans.css') &#125;&#125;">
 {{-- Global CSS Assets --}}
 {!!
     Minify::stylesheet(
