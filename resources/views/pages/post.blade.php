@@ -47,5 +47,5 @@
     </div>
     @include('elements.photoswipe-container')
     @include('elements.feed.post-delete-dialog')
-    @include('template.checkout')
+    @include('elements.checkout.checkout-box')
 @stop

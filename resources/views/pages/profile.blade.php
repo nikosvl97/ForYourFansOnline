@@ -66,23 +66,29 @@
                             @if(Auth::check())
                                 <div class="">
                                 <span class="p-pill ml-2 pointer-cursor to-tooltip"
-                                      data-placement="top"
-                                      title="{{__('Send a tip')}}"
-                                      data-toggle="modal"
-                                      data-target="#checkout-center"
-                                      data-type="tip"
-                                      data-first-name="{{Auth::user()->first_name}}"
-                                      data-last-name="{{Auth::user()->last_name}}"
-                                      data-billing-address="{{Auth::user()->billing_address}}"
-                                      data-country="{{Auth::user()->country}}"
-                                      data-city="{{Auth::user()->city}}"
-                                      data-state="{{Auth::user()->state}}"
-                                      data-postcode="{{Auth::user()->postcode}}"
-                                      data-available-credit="{{Auth::user()->wallet->total}}"
-                                      data-username="{{$user->username}}"
-                                      data-name="{{$user->name}}"
-                                      data-avatar="{{$user->avatar}}"
-                                      data-recipient-id="{{$user->id}}">
+                                      @if((Auth::user()->email_verified_at && getSetting('site.enforce_email_validation')) || !getSetting('site.enforce_email_validation'))
+                                          data-placement="top"
+                                          title="{{__('Send a tip')}}"
+                                          data-toggle="modal"
+                                          data-target="#checkout-center"
+                                          data-type="tip"
+                                          data-first-name="{{Auth::user()->first_name}}"
+                                          data-last-name="{{Auth::user()->last_name}}"
+                                          data-billing-address="{{Auth::user()->billing_address}}"
+                                          data-country="{{Auth::user()->country}}"
+                                          data-city="{{Auth::user()->city}}"
+                                          data-state="{{Auth::user()->state}}"
+                                          data-postcode="{{Auth::user()->postcode}}"
+                                          data-available-credit="{{Auth::user()->wallet->total}}"
+                                          data-username="{{$user->username}}"
+                                          data-name="{{$user->name}}"
+                                          data-avatar="{{$user->avatar}}"
+                                          data-recipient-id="{{$user->id}}"
+                                      @else
+                                          data-placement="top"
+                                          title="{{__('Please verify your account')}}"
+                                      @endif
+                                >
                                  @include('elements.icon',['icon'=>'cash-outline'])
                                 </span>
                                 </div>
@@ -213,7 +219,7 @@
                 @include('elements.message-alert',['classes'=>'px-2 pt-4'])
                     @if($user->paid_profile && (!getSetting('site.allow_users_enabling_open_profiles') || (getSetting('site.allow_users_enabling_open_profiles') && !$user->open_profile)))
                         @if( (!Auth::check() || Auth::user()->id !== $user->id) && !$hasSub)
-                            <div class=" p-4 subscription-holder">
+                            <div class="p-4 subscription-holder">
                                 <h6 class="font-weight-bold text-uppercase mb-3">{{__('Subscription')}}</h6>
                                 @if(count($offer))
                                     <h5 class="m-0 text-bold">{{__('Limited offer main label',['discount'=> round($offer['discountAmount']), 'days_remaining'=> $offer['daysRemaining'] ])}}</h5>
@@ -224,32 +230,11 @@
                                         <span>{{__('Subscribed')}}</span>
                                     </button>
                                 @else
-                                    <button class="btn btn-round btn-lg btn-primary btn-block d-flex justify-content-md-between  justify-content-center mt-3 mb-2 px-5"
-                                            @if(Auth::check())
-                                                data-toggle="modal"
-                                            data-target="#checkout-center"
-                                            data-type="one-month-subscription"
-                                            data-recipient-id="{{$user->id}}"
-                                            data-amount="{{$user->profile_access_price ? $user->profile_access_price : 0}}"
-                                            data-first-name="{{Auth::user()->first_name}}"
-                                            data-last-name="{{Auth::user()->last_name}}"
-                                            data-billing-address="{{Auth::user()->billing_address}}"
-                                            data-country="{{Auth::user()->country}}"
-                                            data-city="{{Auth::user()->city}}"
-                                            data-state="{{Auth::user()->state}}"
-                                            data-postcode="{{Auth::user()->postcode}}"
-                                            data-available-credit="{{Auth::user()->wallet->total}}"
-                                            data-username="{{$user->username}}"
-                                            data-name="{{$user->name}}"
-                                            data-avatar="{{$user->avatar}}"
-                                            @else
-                                                data-toggle="modal"
-                                            data-target="#login-dialog"
-                                        @endif
-                                    >
-                                        <span>{{__('Subscribe')}}</span>
-                                        <span class="d-none d-sm-block">{{config('app.site.currency_symbol') ?? config('app.site.currency_symbol')}}{{$user->profile_access_price}}{{config('app.site.currency_symbol') ? '' : ' ' .config('app.site.currency_code')}} {{__('for')}} {{trans_choice('days', 30,['number'=>30])}}</span>
-                                    </button>
+                                    @if(!GenericHelper::isEmailEnforcedAndValidated())
+                                        <i>{{__('Your email address is not verified.')}} <a href="{{route('verification.notice')}}">{{__("Click here")}}</a> {{__("to re-send the confirmation email.")}}</i>
+                                    @endif
+
+                                    @include('elements.checkout.subscribe-button-30')
                                     <div class="d-flex justify-content-between">
                                         @if($user->profile_access_price_6_months || $user->profile_access_price_12_months)
                                             <small>
@@ -270,90 +255,15 @@
                                     @if($user->profile_access_price_6_months || $user->profile_access_price_12_months || $user->profile_access_price_3_months)
                                         <div class="subscription-bundles d-none mt-4">
                                             @if($user->profile_access_price_3_months)
-                                                <button class="btn btn-round btn-outline-primary btn-block d-flex justify-content-between mt-2 mb-2 px-5"
-                                                        @if(Auth::check())
-                                                            data-toggle="modal"
-                                                        data-target="#checkout-center"
-                                                        data-type="three-months-subscription"
-                                                        data-recipient-id="{{$user->id}}"
-                                                        data-amount="{{$user->profile_access_price_3_months ? $user->profile_access_price_3_months * 3 : 0}}"
-                                                        data-first-name="{{Auth::user()->first_name}}"
-                                                        data-last-name="{{Auth::user()->last_name}}"
-                                                        data-billing-address="{{Auth::user()->billing_address}}"
-                                                        data-country="{{Auth::user()->country}}"
-                                                        data-city="{{Auth::user()->city}}"
-                                                        data-state="{{Auth::user()->state}}"
-                                                        data-postcode="{{Auth::user()->postcode}}"
-                                                        data-available-credit="{{Auth::user()->wallet->total}}"
-                                                        data-username="{{$user->username}}"
-                                                        data-name="{{$user->name}}"
-                                                        data-avatar="{{$user->avatar}}"
-                                                        @else
-                                                            data-toggle="modal"
-                                                        data-target="#login-dialog"
-                                                    @endif
-                                                >
-                                                    <span>{{__('Subscribe')}}</span>
-                                                    <span>{{config('app.site.currency_symbol') ?? config('app.site.currency_symbol')}}{{$user->profile_access_price_3_months * 3}}{{config('app.site.currency_symbol') ? '' : ' ' .config('app.site.currency_code')}} {{__('for')}} {{trans_choice('months', 3,['number'=>3])}}</span>
-                                                </button>
+                                                @include('elements.checkout.subscribe-button-90')
                                             @endif
 
                                             @if($user->profile_access_price_6_months)
-                                                <button class="btn btn-round btn-outline-primary btn-block d-flex justify-content-between mt-2 mb-3 px-5"
-                                                        @if(Auth::check())
-                                                            data-toggle="modal"
-                                                        data-target="#checkout-center"
-                                                        data-type="six-months-subscription"
-                                                        data-recipient-id="{{$user->id}}"
-                                                        data-amount="{{$user->profile_access_price_6_months ? $user->profile_access_price_6_months * 6 : 0}}"
-                                                        data-first-name="{{Auth::user()->first_name}}"
-                                                        data-last-name="{{Auth::user()->last_name}}"
-                                                        data-billing-address="{{Auth::user()->billing_address}}"
-                                                        data-country="{{Auth::user()->country}}"
-                                                        data-city="{{Auth::user()->city}}"
-                                                        data-state="{{Auth::user()->state}}"
-                                                        data-postcode="{{Auth::user()->postcode}}"
-                                                        data-available-credit="{{Auth::user()->wallet->total}}"
-                                                        data-username="{{$user->username}}"
-                                                        data-name="{{$user->name}}"
-                                                        data-avatar="{{$user->avatar}}"
-                                                        @else
-                                                            data-toggle="modal"
-                                                        data-target="#login-dialog"
-                                                    @endif
-                                                >
-                                                    <span>{{__('Subscribe')}}</span>
-                                                    <span>{{config('app.site.currency_symbol') ?? config('app.site.currency_symbol')}}{{$user->profile_access_price_6_months * 6}}{{config('app.site.currency_symbol') ? '' : ' ' .config('app.site.currency_code')}} {{__('for')}} {{trans_choice('months', 6,['number'=>6])}}</span>
-                                                </button>
+                                                @include('elements.checkout.subscribe-button-182')
                                             @endif
 
                                             @if($user->profile_access_price_12_months)
-                                                <button class="btn btn-round btn-outline-primary btn-block d-flex justify-content-between mt-2 mb-2 px-5"
-                                                        @if(Auth::check())
-                                                            data-toggle="modal"
-                                                        data-target="#checkout-center"
-                                                        data-type="yearly-subscription"
-                                                        data-recipient-id="{{$user->id}}"
-                                                        data-amount="{{$user->profile_access_price_12_months ? $user->profile_access_price_12_months * 12 : 0}}"
-                                                        data-first-name="{{Auth::user()->first_name}}"
-                                                        data-last-name="{{Auth::user()->last_name}}"
-                                                        data-billing-address="{{Auth::user()->billing_address}}"
-                                                        data-country="{{Auth::user()->country}}"
-                                                        data-city="{{Auth::user()->city}}"
-                                                        data-state="{{Auth::user()->state}}"
-                                                        data-postcode="{{Auth::user()->postcode}}"
-                                                        data-available-credit="{{Auth::user()->wallet->total}}"
-                                                        data-username="{{$user->username}}"
-                                                        data-name="{{$user->name}}"
-                                                        data-avatar="{{$user->avatar}}"
-                                                        @else
-                                                            data-toggle="modal"
-                                                        data-target="#login-dialog"
-                                                    @endif
-                                                >
-                                                    <span>{{__('Subscribe')}}</span>
-                                                    <span>{{config('app.site.currency_symbol') ?? config('app.site.currency_symbol')}}{{$user->profile_access_price_12_months * 12}}{{config('app.site.currency_symbol') ? '' : ' ' .config('app.site.currency_code')}} {{__('for')}} {{trans_choice('months', 12,['number'=>12])}}</span>
-                                                </button>
+                                               @include('elements.checkout.subscribe-button-365')
                                             @endif
 
                                         </div>
@@ -427,7 +337,7 @@
 
     @if(Auth::check())
         @include('elements.lists.list-add-user-dialog',['user_id' => $user->id, 'lists' => ListsHelper::getUserLists()])
-        @include('template.checkout')
+        @include('elements.checkout.checkout-box')
         @include('elements.messenger.send-user-message',['receiver'=>$user])
     @else
         @include('elements.modal-login')

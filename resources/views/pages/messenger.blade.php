@@ -28,6 +28,7 @@
             '/js/plugins/media/mediaswipe.js',
             '/js/plugins/media/mediaswipe-loader.js',
             '/libs/@joeattardi/emoji-button/dist/index.js',
+            '/libs/xss/dist/xss.min.js',
             '/js/pages/lists.js',
             '/js/pages/checkout.js',
             '/libs/pusher-js-auth/lib/pusher-auth.js'
@@ -41,7 +42,7 @@
     @include('elements.report-user-or-post',['reportStatuses' => ListsHelper::getReportTypes()])
     @include('elements.feed.post-delete-dialog')
     @include('elements.feed.post-list-management')
-    @include('template.checkout')
+    @include('elements.checkout.checkout-box')
     <div class="row">
         <div class="min-vh-100 col-12">
             <div class="container messenger min-vh-100">
@@ -108,12 +109,12 @@
                                 {{--                                    <span class="invalid-feedback pl-4 text-bold" role="alert">Please enter a message</span>--}}
                             </form>
                             <div class="messenger-buttons-wrapper d-flex">
-                                <button class="btn btn-outline-primary btn-rounded-icon messenger-button attach-file mx-2 file-upload-button">
+                                <button class="btn btn-outline-primary btn-rounded-icon messenger-button attach-file mx-2 file-upload-button to-tooltip" data-placement="top" title="{{__('Attach file')}}">
                                     <div class="d-flex justify-content-center align-items-center">
                                         @include('elements.icon',['icon'=>'document','variant'=>''])
                                     </div>
                                 </button>
-                                <button class="btn btn-outline-primary btn-rounded-icon messenger-button send-message mr-2" onClick="messenger.sendMessage()">
+                                <button class="btn btn-outline-primary btn-rounded-icon messenger-button send-message mr-2 to-tooltip" onClick="messenger.sendMessage()" data-placement="top" title="{{__('Send message')}}">
                                     <div class="d-flex justify-content-center align-items-center">
                                         @include('elements.icon',['icon'=>'paper-plane','variant'=>''])
                                     </div>

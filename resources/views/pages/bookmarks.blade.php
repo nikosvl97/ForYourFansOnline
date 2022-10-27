@@ -67,7 +67,7 @@
                 </div>
                 @include('elements.feed.posts-loading-spinner')
             </div>
-            @include('template.checkout')
+            @include('elements.checkout.checkout-box')
         </div>
     </div>
 @stop

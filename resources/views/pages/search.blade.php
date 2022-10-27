@@ -136,6 +136,6 @@
                 </div>
             </div>
         </div>
-        @include('template.checkout')
+        @include('elements.checkout.checkout-box')
     </div>
 @stop
