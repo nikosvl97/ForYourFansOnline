@@ -31,7 +31,7 @@
                 </div>
             </a>
         </li>
-        @if((Auth::check() && Auth::user()->email_verified_at) || (Auth::check() && !getSetting('site.enforce_email_validation')))
+        @if(GenericHelper::isEmailEnforcedAndValidated())
             <li class="nav-item">
                 <a href="{{route('my.notifications')}}" class="nav-link h-pill h-pill-primary {{Route::currentRouteName() == 'my.notifications' ? 'active' : ''}} d-flex justify-content-between">
                     <div class="d-flex justify-content-center align-items-center">
@@ -126,7 +126,8 @@
             </a>
         </li>
 @if (Auth::check() && Auth::user()->role_id == '3' )
-        @if((Auth::check() && Auth::user()->email_verified_at) || (Auth::check() && !getSetting('site.enforce_email_validation')))
+
+        @if(GenericHelper::isEmailEnforcedAndValidated())
             @if(getSetting('streams.allow_streams'))
                 <li class="nav-item-live mt-2 mb-0">
                     <a role="button" class="btn btn-round btn-outline-danger btn-block px-3" href="{{route('my.streams.get')}}{{StreamsHelper::getUserInProgressStream() ? '' : ( !GenericHelper::isUserVerified() && getSetting('site.enforce_user_identity_checks') ? '' : '?action=create')}}">
@@ -153,7 +154,7 @@
             @endif
         @endif
 
-        @if((Auth::check() && Auth::user()->email_verified_at) || (Auth::check() && !getSetting('site.enforce_email_validation')))
+        @if(GenericHelper::isEmailEnforcedAndValidated())
             <li class="nav-item">
                 <a role="button" class="btn btn-round btn-primary btn-block " href="{{route('posts.create')}}">
                     <span class="d-none d-md-block d-xl-block d-lg-block ml-2 text-truncate new-post-label">{{__('New post')}}</span>
@@ -163,5 +164,6 @@
         @endif
 
 @endif
+
     </ul>
 </div>
