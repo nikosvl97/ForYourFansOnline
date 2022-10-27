@@ -35,6 +35,10 @@
 
     </style>
 
+    @if(!empty(config('voyager.additional_css')))<!-- Additional CSS -->
+        @foreach(config('voyager.additional_css') as $css)<link rel="stylesheet" type="text/css" href="{{ asset($css) }}">@endforeach
+    @endif
+
     @yield('pre_css')
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
 
