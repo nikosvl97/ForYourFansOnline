@@ -214,6 +214,7 @@
     "Send a message": "Send a message",
     "Send a new message": "Send a new message",
     "Send a new message to": "Send a new message to :user",
+    "Before sending a new message, please subscribe to a creator a follow a free profile." : "Before sending a new message, please subscribe to a creator a follow a free profile.",
     "Send a tip": "Send a tip",
     "Set your birthdate.": "Set your birthdate.",
     "Settings": "Settings",
@@ -253,6 +254,9 @@
     "Videos": "Videos",
     "Website URL": "Website URL",
     "Write a message..": "Write a message..",
+    "Attach file": "Attach file",
+    "Send message": "Send message",
+    "Message price": "Message price",
     "You got no messages yet.": "You got no messages yet.",
 
     "Attachment removed." : "Attachment removed.",
@@ -395,10 +399,10 @@
 
     "requested": "requested",
     "rejected": "rejected",
-    "verified": "verificata",
+    "verified": "verified",
     "post-unlock": "post unlock",
 
-    "Email identity checked" : "'Your identity check at :siteName got :status.",
+    "Email identity checked" : "Your identity check at :siteName got :status.",
 
     "Your identity check failed." : "Your identity check failed.",
     "Your identity check passed." : "Your identity check passed.",
@@ -480,6 +484,10 @@
     "Copyright": "Copyright",
 
     "Verify email": "Verify email",
+    "Please verify your account": "Please verify your email",
+    "Your email address is not verified.": "Your email address is not verified.",
+    "Click here" : "Click here",
+    "to re-send the confirmation email." : "to re-send the confirmation email.",
     "Page not found": "Page not found",
 
     "Install the script": "Install the script",
