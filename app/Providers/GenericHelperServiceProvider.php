@@ -40,9 +40,9 @@ class GenericHelperServiceProvider extends ServiceProvider
     public static function isUserVerified()
     {
         if (
-        (Auth::user()->verification && Auth::user()->verification->status == 'verified') &&
-        Auth::user()->birthdate &&
-        Auth::user()->email_verified_at
+            (Auth::user()->verification && Auth::user()->verification->status == 'verified') &&
+            Auth::user()->birthdate &&
+            Auth::user()->email_verified_at
         ) {
             return true;
         } else {
@@ -106,6 +106,14 @@ class GenericHelperServiceProvider extends ServiceProvider
     public static function isMobileDevice(){
         $agent = new Agent();
         return $agent->isMobile();
+    }
+
+    /**
+     * Returns true if email enforce is not enabled or if is set to true and user is verified
+     * @return bool
+     */
+    public static function isEmailEnforcedAndValidated(){
+            return ((Auth::check() && Auth::user()->email_verified_at) || (Auth::check() && !getSetting('site.enforce_email_validation')));
     }
 
 }

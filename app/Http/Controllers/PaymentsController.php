@@ -735,7 +735,7 @@ class PaymentsController extends Controller
                             $subscription = $transaction->subscription;
                             $subscription->ccbill_subscription_id = $subscriptionId;
                             if($saleSuccess) {
-                                $expiresDate = new \DateTime('+'.PaymentsServiceProvider::getSubscriptionMonthlyIntervalByTransactionType($transaction->type).' month', new \DateTimeZone('UTC'));
+                                $expiresDate = new \DateTime('+'.$this->paymentHandler->getCCBillRecurringPeriodInDaysByTransaction($transaction).' days', new \DateTimeZone('UTC'));
                                 if ($subscription->status != Subscription::ACTIVE_STATUS) {
                                     $subscription->status = Subscription::ACTIVE_STATUS;
                                     $subscription->expires_at = $expiresDate;

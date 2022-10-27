@@ -234,4 +234,12 @@ class SettingsServiceProvider extends ServiceProvider
         return getSetting('payments.ccbill_datalink_username')
             && getSetting('payments.payments.ccbill_datalink_password');
     }
+
+    public static function allowWithdrawals($user) {
+        return !getSetting('payments.withdrawal_allow_only_for_verified')
+            || (getSetting('payments.withdrawal_allow_only_for_verified')
+            && $user->email_verified_at
+            && $user->birthdate
+            && ($user->verification && $user->verification->status == 'verified'));
+    }
 }

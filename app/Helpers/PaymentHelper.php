@@ -1580,8 +1580,6 @@ class PaymentHelper
                     break;
                 case Transaction::POST_UNLOCK:
                     $post = Post::query()->where('id', $transaction->post_id)->first();
-//                    dump((string)$post->price);
-//                    dump($transactionAmountWithoutTaxes);
                     if((string)$post->price === $transactionAmountWithoutTaxes) {
                         $valid = true;
                     }
