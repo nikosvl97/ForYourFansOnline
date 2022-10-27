@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-class WithdrawalsFee extends Migration
+class V490 extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,21 @@ class WithdrawalsFee extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('settings')) {
+
+        DB::table('migrations')
+            ->whereIn('migration', [
+                '2138_09_26_172825_withdrawals_fee'
+            ])
+            ->delete();
+
+        $sc = DB::table('settings')
+            ->whereIn('key', [
+                'payments.withdrawal_default_fee_percentage',
+                'payments.withdrawal_allow_fees',
+            ])
+            ->count();
+
+        if (Schema::hasTable('settings') && !($sc == 2) ) {
             DB::table('settings')->insert(
                 array(
                     array (
@@ -43,7 +57,7 @@ class WithdrawalsFee extends Migration
                 )
             );
 
-            if (Schema::hasTable('withdrawals')) {
+            if (Schema::hasTable('withdrawals') &&  !Schema::hasColumn('users', 'phone')) {
                 Schema::table('withdrawals', function (Blueprint $table) {
                     $table->float('fee')->after('message')->default(0)->nullable();
                 });

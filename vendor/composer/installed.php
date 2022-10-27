@@ -5,7 +5,7 @@
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '421c57fc157b76a7235c6c9675e3180e3ae7efa9',
+        'reference' => 'f310c9617ea1181443ceef7113446e0ef66c203e',
         'name' => 'theqdev/justfans',
         'dev' => true,
     ),
@@ -1067,8 +1067,8 @@
         'psr/simple-cache-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '1.0',
-                1 => '1.0|2.0',
+                0 => '1.0|2.0',
+                1 => '1.0',
             ),
         ),
         'psy/psysh' => array(
@@ -1641,7 +1641,7 @@
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '421c57fc157b76a7235c6c9675e3180e3ae7efa9',
+            'reference' => 'f310c9617ea1181443ceef7113446e0ef66c203e',
             'dev_requirement' => false,
         ),
         'theseer/tokenizer' => array(
