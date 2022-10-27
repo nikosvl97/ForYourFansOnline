@@ -8,6 +8,7 @@
                 </button>
             </div>
             <div class="modal-body">
+                <div class="new-message-has-contacts">
                 <form id="userMessageForm" role="form" autocomplete="off">
                     <div class="mfv-errorBox"></div>
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -25,8 +26,17 @@
                         </div>
                     </div>
                 </form>
-                <div class="modal-footer pl-0 pr-0 {{!isset($user) ? '' : 'pb-0'}}">
-                    <button type="submit" onclick="messenger.{{isset($user) ? 'sendDMFromProfilePage' : 'createConversation'}}()"  class="btn-primary btn mr-0 new-conversation-label"> {{__('Send')}} </button>
+                </div>
+                <div class="new-message-no-contacts">
+                    {{__("Before sending a new message, please subscribe to a creator a follow a free profile.")}}
+                </div>
+            </div>
+            <div class="modal-footer {{!isset($user) ? '' : 'pb-0'}}">
+                <div class="new-message-no-contacts">
+                    <button type="button" class="btn btn-white mb-0"  data-dismiss="modal">{{__('Close')}}</button>
+                </div>
+                <div class="new-message-has-contacts">
+                <button type="submit" onclick="messenger.{{isset($user) ? 'sendDMFromProfilePage' : 'createConversation'}}()"  class="btn-primary btn mr-0 new-conversation-label mb-0"> {{__('Send')}} </button>
                 </div>
             </div>
         </div><!-- /.modal-content -->
