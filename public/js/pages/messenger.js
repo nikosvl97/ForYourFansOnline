@@ -4,7 +4,7 @@
  *
  */
 "use strict";
-/* global app, user, messengerVars, pusher, FileUpload, Lists, Pusher, PusherBatchAuthorizer, updateButtonState, mswpScanPage, trans, bootstrapDetectBreakpoint, incrementNotificationsCount, EmojiButton */
+/* global app, user, messengerVars, pusher, FileUpload, Lists, Pusher, PusherBatchAuthorizer, updateButtonState, mswpScanPage, trans, bootstrapDetectBreakpoint, incrementNotificationsCount, EmojiButton, filterXSS */
 
 $(function () {
 
@@ -31,7 +31,10 @@ var messenger = {
         conversation:[],
         activeConversationUserID:null,
         activeConversationUser:null,
-        currentBreakPoint: 'lg'
+        currentBreakPoint: 'lg',
+        // Used for disabling new message dialog box if no contacts are available
+        fetchedContactsListsCount: 0,
+        hasAvailableFetchedContacts: true,
     },
 
     pusher: null,
@@ -174,12 +177,10 @@ var messenger = {
      */
     sendMessage: function() {
         updateButtonState('loading',$('.send-message'));
-        if($('.messageBoxInput').val().length === 0){
-            $('.messageBoxInput').addClass('is-invalid');
+        // Validation
+        if($('.messageBoxInput').val().length === 0 && FileUpload.attachaments.length === 0){
             updateButtonState('loaded',$('.send-message'));
             return false;
-        }else{
-            $('.messageBoxInput').removeClass('is-invalid');
         }
         $.ajax({
             type: 'POST',
@@ -519,7 +520,7 @@ var messenger = {
      * @returns {*}
      */
     parseMessage: function(text){
-        return text.replaceAll('\n','<br/>');
+        return filterXSS(text.replaceAll('\n','<br/>'));
     },
 
     /**
@@ -534,6 +535,13 @@ var messenger = {
      * Instantiates & applies selectize on the new conversation modal
      */
     initSelectizeUserList: function(){
+        $('#messageModal').on('show.bs.modal', function() {
+            // TODO: Use default set to off, as on page load, there might be a second where the dialog is shown having the form displayed
+            if(messenger.state.fetchedContactsListsCount === 1 && !messenger.state.hasAvailableFetchedContacts){
+                $('.new-message-has-contacts').hide();
+                $('.new-message-no-contacts').show();
+            }
+        });
         if(typeof Selectize !== 'undefined') {
             $('#select-repo').selectize({
                 valueField: 'id',
@@ -567,6 +575,8 @@ var messenger = {
                             callback();
                         },
                         success: function (res) {
+                            messenger.state.fetchedContactsListsCount += 1;
+                            messenger.state.hasAvailableFetchedContacts = Object.values(res).length > 0 ? true : false;
                             callback(Object.values(res));
                         }
                     });
@@ -630,10 +640,10 @@ function contactElement(contact){
       <div class="col-12 d-flex pt-2 pb-2 contact-box contact-${contact.contactID}" onclick="messenger.fetchConversation(${contact.contactID})">
         <img src="${ avatar }" class="contact-avatar rounded-circle"/>
         <div class="m-0 ml-md-3 d-none d-lg-flex d-md-flex d-xl-flex justify-content-center flex-column text-truncate">
-            <div class="m-0 text-truncate overflow-hidden contact-name ${contact.lastMessageSenderID !== user.user_id && contact.isSeen === 0 ? 'font-weight-bold' : ''}">${name}</div>
+            <div class="m-0 text-truncate overflow-hidden contact-name ${contact.lastMessageSenderID !== user.user_id && contact.isSeen === 0 ? 'font-weight-bold' : ''}">${filterXSS(name)}</div>
             <small class="message-excerpt-holder d-flex text-truncate">
                 <span class="text-muted mr-1 ${contact.lastMessageSenderID !== user.user_id ? 'd-none' : ''}"> You: </span>
-                <div class="m-0 text-muted contact-message text-truncate ${contact.lastMessageSenderID !== user.user_id && contact.isSeen === 0 ? 'font-weight-bold' : ''}" >${contact.lastMessage}</div>
+                <div class="m-0 text-muted contact-message text-truncate ${contact.lastMessageSenderID !== user.user_id && contact.isSeen === 0 ? 'font-weight-bold' : ''}" >${filterXSS(contact.lastMessage)}</div>
                 <div class="d-flex"> <div class="font-weight-bold ml-1">∙</div>&nbsp;${contact.created_at}</div>
             </small>
         </div>
@@ -696,9 +706,7 @@ function messageElement(message){
 
     return `
       <div class="col-12 no-gutters pt-1 pb-1 message-box px-0" data-messageid="${message.id}">
-        <div class="col-12 d-flex  ${isSender ? 'sender d-flex flex-row-reverse pr-1' : 'pl-0'}">
-            <div class="m-0 message-bubble text-break alert alert- ${isSender ? 'alert-primary text-white' : 'alert-default'}">${messenger.parseMessage(message.message)}</div>
-        </div>
+        ${message.message === null ? '' : messageBubble(isSender, message)}
         <div class="col-12 d-flex  ${isSender ? 'sender d-flex flex-row-reverse pr-1' : 'pl-0'}">
             <div class="attachments-holder row no-gutters flex-row-reverse">
                 ${attachmentsHtml}
@@ -706,4 +714,18 @@ function messageElement(message){
         </div>
       </div>
     `;
+}
+
+/**
+ * Message bubble component
+ * @param isSender
+ * @param message
+ * @returns {string}
+ */
+function messageBubble(isSender, message) {
+    return `
+        <div class="col-12 d-flex  ${isSender ? 'sender d-flex flex-row-reverse pr-1' : 'pl-0'}">
+            <div class="m-0 message-bubble text-break alert alert- ${isSender ? 'alert-primary text-white' : 'alert-default'}">${messenger.parseMessage(message.message)}</div>
+        </div>
+`;
 }

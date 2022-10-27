@@ -198,3 +198,12 @@
 .conversation-writeup .input-group-append {
     margin-left: -45px;
 }
+
+.new-message-no-contacts{
+    display: none;
+}
+
+.conversation-writeup .btn-rounded-icon {
+    width: 35px!important;
+    height: 35px!important;
+}

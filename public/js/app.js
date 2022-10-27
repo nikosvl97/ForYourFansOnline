@@ -4,7 +4,7 @@
  *
  */
 "use strict";
-/* global app, user, pusher, Pusher, PostsPaginator, notifications */
+/* global app, user, pusher, Pusher, PostsPaginator, notifications, filterXSS */
 
 // Init
 $(function () {
@@ -126,7 +126,7 @@ $(function () {
             incrementNotificationsCount('.menu-notification-badge.notifications-menu-count');
             const location = window.location.href;
             if(!(location.indexOf('my/messenger') >= 0) && data.type === 'new-message') {
-                launchToast('success', trans(toastTitle), data.message);
+                launchToast('success', trans(toastTitle), filterXSS(data.message));
             }
             if (window.location.href !== null && window.location.href.indexOf('/my/notifications') >= 0) {
                 notifications.updateUserNotificationsList(this.getNotificationsActiveFilter());

@@ -279,10 +279,6 @@
     padding: 5px;
 }
 
-.remember-me-text{
-    padding:0 5px;
-}
-
 .user-edit-avatar{
     width:200px;
     height:auto;
@@ -448,4 +444,14 @@ label{
 
 .custom-pages .no-sort.no-click.bread-actions{
     width: 300px;
+}
+
+#rememberMeGroup .controls{
+    display: flex;
+    align-content: center;
+}
+
+.remember-me-text{
+    padding-top: 9px;
+    padding-left: 4px;
 }
