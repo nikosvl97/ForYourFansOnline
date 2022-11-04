@@ -7,6 +7,7 @@
         '/libs/bootstrap/dist/js/bootstrap.min.js',
         '/js/plugins/toasts.js',
         '/libs/cookieconsent/build/cookieconsent.min.js',
+        '/libs/xss/dist/xss.min.js',
         '/js/app.js',
     ],
     (isset($additionalJs) ? $additionalJs : [])

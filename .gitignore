@@ -3,3 +3,5 @@ resources/lang/ro.json
 resources/views/vendor/voyager/partials/app-footer.blade.php
 database/seeders/RolesTableSeeder.php
 resources/views/pages/contact.blade.php
+resources/views/template/footer-compact.blade.php
+resources/views/template/footer.blade.php
