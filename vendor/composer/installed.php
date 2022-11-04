@@ -5,7 +5,7 @@
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => 'f310c9617ea1181443ceef7113446e0ef66c203e',
+        'reference' => '5bf256cb3c74ea1a244065efc189304d5a45519c',
         'name' => 'theqdev/justfans',
         'dev' => true,
     ),
@@ -1641,7 +1641,7 @@
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => 'f310c9617ea1181443ceef7113446e0ef66c203e',
+            'reference' => '5bf256cb3c74ea1a244065efc189304d5a45519c',
             'dev_requirement' => false,
         ),
         'theseer/tokenizer' => array(
