@@ -924,3 +924,25 @@ a.text-dark:hover,  a.text-light:hover,  a.text-white:hover,  a.text-black:hover
     left: 100%;
     margin-left: 15px;
 }
+
+/* Messenger */
+
+.messageBoxInput{
+    line-height: 1.7rem;
+}
+
+.message-action-button{
+    width:26px;
+    height:26px;
+}
+
+.message-action-button:hover{
+    @if $color-scheme-alt == dark {
+        background-color: $gray-200;
+    } @else {
+        background-color: $gray-600;
+    }
+    border-radius: 50%;
+}
+
+

@@ -401,13 +401,14 @@
     "rejected": "rejected",
     "verified": "verified",
     "post-unlock": "post unlock",
+    "message-unlock": "paid message",
 
     "Email identity checked" : "Your identity check at :siteName got :status.",
 
     "Your identity check failed." : "Your identity check failed.",
     "Your identity check passed." : "Your identity check passed.",
     "Create a post" : "Create a post",
-    "Confirm post save" : "Confirm post save",
+    "Confirm action" : "Confirm action",
     "Some attachments are still being uploaded." : "Some attachments are still being uploaded.",
     "Are you sure you want to continue?" : "Are you sure you want to continue?",
 
@@ -695,6 +696,10 @@
     "You can read more about our": "You can read more about our",
     "terms of usage": "terms of usage",
     "over this page": "over this page",
+
+    "You already paid access for this message": "You already paid access for this message",
+    "Unlock message": "Unlock message",
+    "Unlock message for": "Unlock message for",
     "post": "post",
     "Latest media not available.": "Latest media not available.",
 
@@ -724,7 +729,6 @@
     "If you’re having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:": "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:",
     "Something went wrong when cancelling this subscription": "Something went wrong when cancelling this subscription",
 
-
     "Open profile": "Open profile",
     "Having your profile set to open means:": "Having your profile set to open means:",
     "Both registered and unregistered users will be able to see your posts.": "Both registered and unregistered users will be able to see your posts.",
@@ -737,7 +741,12 @@
     "Cannot pay to yourself.": "Cannot pay to yourself.",
 
     "Profile access is denied.": "Profile access is denied.",
-    "This content is not available for you at the moment.": "This content is not available for you at the moment."
+    "This content is not available for you at the moment.": "This content is not available for you at the moment.",
 
+    "Locked message": "Locked message",
+    "Unlock for" : "Unlock for",
+    "Set message price": "Set message price",
+    "Paid messages are locked for subscribers as well. Text is not locked, only media.": "Only media assets are locked, text is visible.",
+    "Locked posts must contain at least one attachment.": "Locked posts must contain at least one attachment."
 
 }
