@@ -7,6 +7,7 @@
                 <input type="hidden" name="amount" id="payment-deposit-amount" value="">
                 <input type="hidden" name="transaction_type" id="payment-type" value="">
                 <input type="hidden" name="post_id" id="post" value="">
+                <input type="hidden" name="user_message_id" id="userMessage" value="">
                 <input type="hidden" name="recipient_user_id" id="recipient" value="">
                 <input type="hidden" name="provider" id="provider" value="">
                 <input type="hidden" name="first_name" id="paymentFirstName" value="">

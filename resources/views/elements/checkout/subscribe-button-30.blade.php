@@ -1,4 +1,4 @@
-<button class="btn btn-round btn-lg btn-primary btn-block d-flex justify-content-md-between  justify-content-center mt-3 mb-2 px-5 to-tooltip {{!GenericHelper::isEmailEnforcedAndValidated() ? 'disabled' : ''}}"
+<button class="btn btn-round btn-lg btn-primary btn-block d-flex justify-content-md-between  justify-content-center mt-3 mb-2 px-5 to-tooltip {{Auth::check() && !GenericHelper::isEmailEnforcedAndValidated() ? 'disabled' : ''}}"
         @if(Auth::check())
             @if((Auth::user()->email_verified_at && getSetting('site.enforce_email_validation')) || !getSetting('site.enforce_email_validation'))
                 data-toggle="modal"

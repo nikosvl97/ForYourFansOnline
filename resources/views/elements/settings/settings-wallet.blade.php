@@ -27,13 +27,13 @@
 
     <div class="mt-3 inline-border-tabs">
         <nav class="nav nav-pills nav-justified">
-            @foreach(['deposit'] as $tab)
+            @foreach(\App\Providers\SettingsServiceProvider::allowWithdrawals(Auth::user()) ? ['deposit', 'withdraw'] : ['deposit'] as $tab)
                 <a class="nav-item nav-link {{$activeTab == $tab ? 'active' : ''}}" href="{{route('my.settings',['type' => 'wallet', 'active' => $tab])}}">
 
                     <div class="d-flex align-items-center justify-content-center">
                         @if($tab == 'deposit')
                             @include('elements.icon',['icon'=>'wallet','variant'=>'medium','classes'=>'mr-2'])
-                        @else
+                        @elseif(\App\Providers\SettingsServiceProvider::allowWithdrawals(Auth::user()))
                             @include('elements.icon',['icon'=>'card','variant'=>'medium','classes'=>'mr-2'])
                         @endif
                         {{__(ucfirst($tab))}}
@@ -44,7 +44,7 @@
         </nav>
     </div>
 
-    @if($activeTab != null && $activeTab === 'withdraw')
+    @if($activeTab != null && $activeTab === 'withdraw' && \App\Providers\SettingsServiceProvider::allowWithdrawals(Auth::user()))
         @include('elements/settings/settings-wallet-withdraw')
     @else
         @include('elements/settings/settings-wallet-deposit')
