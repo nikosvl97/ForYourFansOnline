@@ -125,7 +125,7 @@
                             <p class="text-center">{{__('Generated on')}} {{ \Carbon\Carbon::parse($invoice->created_at)->format('d M Y')}} </p>
                             <p class="d-flex justify-content-center align-items-center">
                                 <a href="{{route('my.settings',['type'=>'payments'])}}" class="mr-3">{{__("Back")}}</a>
-                                <a href="#" onclick="window.print()" class="btn btn-default ml15 m-0 "> {{__('Print')}}</a>
+                                <a href="#" onclick="window.print()" class="btn btn-primary btn-sm ml15 m-0 "> {{__('Print')}}</a>
                             </p>
                         </div>
                     </div>

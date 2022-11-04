@@ -230,8 +230,11 @@
                                         <span>{{__('Subscribed')}}</span>
                                     </button>
                                 @else
-                                    @if(!GenericHelper::isEmailEnforcedAndValidated())
-                                        <i>{{__('Your email address is not verified.')}} <a href="{{route('verification.notice')}}">{{__("Click here")}}</a> {{__("to re-send the confirmation email.")}}</i>
+
+                                    @if(Auth::check())
+                                        @if(!GenericHelper::isEmailEnforcedAndValidated())
+                                            <i>{{__('Your email address is not verified.')}} <a href="{{route('verification.notice')}}">{{__("Click here")}}</a> {{__("to re-send the confirmation email.")}}</i>
+                                        @endif
                                     @endif
 
                                     @include('elements.checkout.subscribe-button-30')

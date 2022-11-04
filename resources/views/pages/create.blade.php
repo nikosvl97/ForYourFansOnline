@@ -24,11 +24,12 @@
 
 @section('content')
 @if (Auth::check() && Auth::user()->role_id == '3' )
+
     <div class="row">
         <div class="col-12">
             @include('elements.uploaded-file-preview-template')
             @include('elements.post-price-setup',['postPrice'=>(isset($post) ? $post->price : 0)])
-            @include('elements.post-save-confirmation')
+            @include('elements.attachments-uploading-dialog')
             <div class="d-flex justify-content-between pt-4 pb-3 px-3 border-bottom">
                 <h5 class="text-truncate text-bold  {{(Cookie::get('app_theme') == null ? (getSetting('site.default_user_theme') == 'dark' ? '' : 'text-dark-r') : (Cookie::get('app_theme') == 'dark' ? '' : 'text-dark-r'))}}">{{Route::currentRouteName() == 'posts.create' ? __('New post') : __('Edit post')}}</h5>
             </div>
@@ -85,4 +86,5 @@
         </div>
     </div>
 @endif
+
 @stop
