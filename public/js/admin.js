@@ -24,7 +24,7 @@ $(function () {
             while (key === undefined && possible.length > 0) {
                 key = possible.pop();
             }
-            if (key && (key == '115' || key == '83' ) && (e.ctrlKey || e.metaKey) && !(e.altKey)) {
+            if (key && (key === '115' || key == '83' ) && (e.ctrlKey || e.metaKey) && !(e.altKey)) {
                 e.preventDefault();
                 $('.save-settings-form').submit();
                 return false;

@@ -4,7 +4,10 @@
  *
  */
 "use strict";
-/* global app, user, messengerVars, pusher, FileUpload, Lists, Pusher, PusherBatchAuthorizer, updateButtonState, mswpScanPage, trans, bootstrapDetectBreakpoint, incrementNotificationsCount, EmojiButton, filterXSS */
+/* global app, user, messengerVars, pusher, FileUpload,
+  Lists, Pusher, PusherBatchAuthorizer, updateButtonState,
+  mswpScanPage, trans, bootstrapDetectBreakpoint, incrementNotificationsCount,
+  EmojiButton, filterXSS, launchToast, initTooltips */
 
 $(function () {
 
@@ -32,9 +35,12 @@ var messenger = {
         activeConversationUserID:null,
         activeConversationUser:null,
         currentBreakPoint: 'lg',
+        redirectedToMessage: false,
         // Used for disabling new message dialog box if no contacts are available
         fetchedContactsListsCount: 0,
         hasAvailableFetchedContacts: true,
+        messagePrice: 5,
+        isPaidMessage: false,
     },
 
     pusher: null,
@@ -163,6 +169,7 @@ var messenger = {
                     messenger.state.activeConversationUserID = userID;
                     messenger.setActiveContact(userID);
                     messenger.reloadConversationHeader();
+                    initTooltips();
                 }
                 else{
                     // messenger.state.contacts = result.data
@@ -175,7 +182,24 @@ var messenger = {
      * Sends the message
      * @returns {boolean}
      */
-    sendMessage: function() {
+    sendMessage: function(forceSave = false) {
+
+        // Checking if files are being uploaded
+        if(FileUpload.isLoading === true && forceSave === false){
+            $('.confirm-post-save').unbind('click');
+            $('.confirm-post-save').on('click',function () {
+                messenger.sendMessage(true);
+            });
+            $('#confirm-post-save').modal('show');
+            return false;
+        }
+
+        // Check if locked message has at least one attachment
+        if(messenger.state.isPaidMessage && FileUpload.attachaments.length === 0){
+            $('#no-attachments-locked-post').modal('show');
+            return false;
+        }
+
         updateButtonState('loading',$('.send-message'));
         // Validation
         if($('.messageBoxInput').val().length === 0 && FileUpload.attachaments.length === 0){
@@ -188,7 +212,8 @@ var messenger = {
             data: {
                 'message': $('.conversation-writeup .messageBoxInput').val(),
                 'attachments' : FileUpload.attachaments,
-                'receiverID' : $('.conversation-writeup #receiverID').val()
+                'receiverID' : $('.conversation-writeup #receiverID').val(),
+                'price': messenger.state.isPaidMessage ? messenger.state.messagePrice : 0
             },
             dataType: 'json',
             success: function (result) {
@@ -200,7 +225,13 @@ var messenger = {
                 messenger.hideEmptyChatElements();
                 messenger.clearFileUploadsState();
                 messenger.resetTextAreaHeight();
-                updateButtonState('loaded',$('.send-message'));
+                messenger.clearMessagePrice();
+                updateButtonState('loaded', $('.send-message'));
+                $('#confirm-post-save').modal('hide');
+                initTooltips();
+            },
+            error: function (result) {
+                launchToast('danger',trans('Error'),result.responseJSON.message);
             }
         });
     },
@@ -259,6 +290,7 @@ var messenger = {
                 messenger.fetchConversation(contactID);
                 messenger.hideEmptyChatElements();
                 messenger.initLiveSockets();
+                initTooltips();
             }
         });
     },
@@ -379,9 +411,31 @@ var messenger = {
             conversationHtml += messageElement(value);
         });
         $('.conversation-content').html(conversationHtml);
-        // Scrolling down to last message
-        if($('.conversation-content .message-box').length){
-            $(".conversation-content").animate({ scrollTop: $('.conversation-content')[0].scrollHeight}, 800);
+
+        // Navigating to last message or last paid mesage
+        let urlParams = new URLSearchParams(window.location.search);
+        // Scrolling to newly unlocked message if this redirect comes from a message-unlock payment
+        if(urlParams.has('token') && !messenger.state.redirectedToMessage) {
+            let token = '#m-'.concat(urlParams.get('token'));
+            if($('.conversation-content .message-box').length && $('.conversation-content').find(token).length){
+                let offset = $('.conversation-content').find(token).offset().top - $('.conversation-content').offset().top + $('.conversation-content').scrollTop();
+                $(".conversation-content").animate({scrollTop: offset}, 'slow');
+            }
+
+            $('.conversation-content').find(token).animate({
+                backgroundColor: "rgba(203,12,159,.2)",
+            }, 1000).delay(2000).queue(function() {
+                $('.conversation-content').find(token).animate({
+                    backgroundColor: "rgba(0,0,0,0)",
+                }, 1000).dequeue();
+            });
+
+            messenger.state.redirectedToMessage = true;
+        } else {
+            // Scrolling down to last message
+            if($('.conversation-content .message-box').length){
+                $(".conversation-content").animate({ scrollTop: $('.conversation-content')[0].scrollHeight + 100}, 800);
+            }
         }
         $('.conversation-loading-box').addClass('d-none');
         messenger.initLinks();
@@ -624,6 +678,101 @@ var messenger = {
             // console.error(e)
         }
 
+    },
+
+    showSetPriceDialog: function () {
+        $('#message-set-price-dialog').modal('show');
+    },
+
+    clearMessagePrice: function(){
+        messenger.state.messagePrice = 5;
+        messenger.state.isPaidMessage = false;
+        $('#message-price').val(5);
+        $('.message-price-lock').removeClass('d-none');
+        $('.message-price-close').addClass('d-none');
+        $('#message-set-price-dialog').modal('hide');
+    },
+
+    saveMessagePrice: function(){
+        messenger.state.isPaidMessage = true;
+        messenger.state.messagePrice = $('#message-price').val();
+        if(parseInt(messenger.state.messagePrice) <= 0){
+            $('#message-price').addClass('is-invalid');
+            return false;
+        }
+        $('.message-price-lock').addClass('d-none');
+        $('.message-price-close').removeClass('d-none');
+        $('#message-set-price-dialog').modal('hide');
+        $('#message-price').removeClass('is-invalid');
+    },
+
+    /**
+     * Parses messenger's attachment previews
+     * @param file
+     * @returns {string}
+     */
+    parseMessageAttachment: function(file){
+        let attachmentsHtml = '';
+        switch (file.type) {
+            case 'avi':
+            case 'mp4':
+            case 'wmw':
+            case 'mpeg':
+            case 'm4v':
+            case 'moov':
+            case 'mov':
+                attachmentsHtml = `
+                <a href="${file.path}" rel="mswp" title="" class="mr-2 mt-2">
+                    <div class="video-wrapper">
+                     <video class="video-preview" src="${file.path}" width="150" height="150" controls autoplay muted></video>
+                    </div>
+                 </a>`;
+                break;
+            case 'mp3':
+            case 'wav':
+            case 'ogg':
+                attachmentsHtml = `
+                <a href="${file.path}" rel="mswp" title="" class="mr-2 mt-2 d-flex align-items-center">
+                    <div class="video-wrapper">
+                         <audio id="video-preview" src="${file.path}" controls type="audio/mpeg" muted></audio>
+                    </div>
+                 </a>`;
+                break;
+            case 'png':
+            case 'jpg':
+            case 'jpeg':
+                attachmentsHtml = `
+                    <a href="${file.path}" rel="mswp" title="">
+                        <img src="${file.thumbnail}" class="mr-2 mt-2">
+                    </a>`;
+                break;
+            default:
+                attachmentsHtml = `<img src="${file.thumbnail}" class="mr-2 mt-2">`;
+                break;
+        }
+        return attachmentsHtml;
+    },
+
+    /**
+     * Removes own comments
+     * @param messageID
+     */
+    deleteMessage: function (messageID) {
+        if(confirm(trans("Are you sure you want to delete this comment?"))){
+            $.ajax({
+                type: 'DELETE',
+                dataType: 'json',
+                url: app.baseUrl + '/my/messenger/delete/' + messageID,
+                success: function () {
+                    let element = $('*[data-messageid="'+messageID+'"]');
+                    element.remove();
+                    launchToast('success',trans('Success'),trans('Message removed'));
+                },
+                error: function (result) {
+                    launchToast('danger',trans('Error'),result.responseJSON.message);
+                }
+            });
+        }
     }
 
 };
@@ -644,7 +793,7 @@ function contactElement(contact){
             <small class="message-excerpt-holder d-flex text-truncate">
                 <span class="text-muted mr-1 ${contact.lastMessageSenderID !== user.user_id ? 'd-none' : ''}"> You: </span>
                 <div class="m-0 text-muted contact-message text-truncate ${contact.lastMessageSenderID !== user.user_id && contact.isSeen === 0 ? 'font-weight-bold' : ''}" >${filterXSS(contact.lastMessage)}</div>
-                <div class="d-flex"> <div class="font-weight-bold ml-1">∙</div>&nbsp;${contact.created_at}</div>
+                <div class="d-flex"> <div class="font-weight-bold ml-1">${(contact.created_at !== null ? '∙' :'')}</div>${(contact.created_at !== null ? '&nbsp;' + contact.created_at : '')}</div>
             </small>
         </div>
       </div>
@@ -664,56 +813,35 @@ function messageElement(message){
 
     let attachmentsHtml = '';
     message.attachments.map(function (file) {
-        switch (file.type) {
-        case 'avi':
-        case 'mp4':
-        case 'wmw':
-        case 'mpeg':
-        case 'm4v':
-        case 'moov':
-        case 'mov':
-            attachmentsHtml += `
-                <a href="${file.path}" rel="mswp" title="" class="mr-2 mt-2">
-                    <div class="video-wrapper">
-                     <video class="video-preview" src="${file.path}" width="150" height="150" controls autoplay muted></video>
-                    </div>
-                 </a>`;
-            break;
-        case 'mp3':
-        case 'wav':
-        case 'ogg':
-            attachmentsHtml += `
-                <a href="${file.path}" rel="mswp" title="" class="mr-2 mt-2 d-flex align-items-center">
-                    <div class="video-wrapper">
-                         <audio id="video-preview" src="${file.path}" controls type="audio/mpeg" muted></audio>
-                    </div>
-                 </a>`;
-            break;
-        case 'png':
-        case 'jpg':
-        case 'jpeg':
-            attachmentsHtml += `
-                    <a href="${file.path}" rel="mswp" title="">
-                        <img src="${file.thumbnail}" class="mr-2 mt-2">
-                    </a>`;
-            break;
-        default:
-            attachmentsHtml += `<img src="${file.thumbnail}" class="mr-2 mt-2">`;
-            break;
-        }
-
+        attachmentsHtml += messenger.parseMessageAttachment(file);
     });
 
-    return `
-      <div class="col-12 no-gutters pt-1 pb-1 message-box px-0" data-messageid="${message.id}">
-        ${message.message === null ? '' : messageBubble(isSender, message)}
-        <div class="col-12 d-flex  ${isSender ? 'sender d-flex flex-row-reverse pr-1' : 'pl-0'}">
-            <div class="attachments-holder row no-gutters flex-row-reverse">
-                ${attachmentsHtml}
-            </div>
-        </div>
-      </div>
+    /* Paid message preview */
+    if(message.hasUserUnlockedMessage === false && message.price > 0 && !isSender){
+        return `
+          <div class="col-12 no-gutters pt-1 pb-1 message-box px-0" data-messageid="${message.id}" id="m-${message.id}">
+                    <div class="m-0 paid-message-box message-box text-break alert ${isSender ? 'alert-primary text-white' : 'alert-default'}">
+                        <div class="col-12 d-flex mb-2 ${isSender ? 'sender d-flex flex-row-reverse pr-1' : 'pl-0'}">
+                            ${message.message === null ? '' : messenger.parseMessage(message.message)}
+                        </div>
+                        <div class="d-flex justify-content-center">
+                        ${lockedMessagePreview({'id' : message.id, 'price': message.price},message.sender)}
+                        </div>
+                    </div>
+                </div>
+          </div>
+        `;
+    }
+    else{
+        /* Regular message preview */
+        return `
+          <div class="col-12 no-gutters pt-1 pb-1 message-box px-0" data-messageid="${message.id}" id="m-${message.id}">
+            ${message.message === null ? '' : messageBubble(isSender, message)}
+            ${messageAttachments(isSender, attachmentsHtml, message)}
+          </div>
     `;
+    }
+
 }
 
 /**
@@ -724,8 +852,99 @@ function messageElement(message){
  */
 function messageBubble(isSender, message) {
     return `
-        <div class="col-12 d-flex  ${isSender ? 'sender d-flex flex-row-reverse pr-1' : 'pl-0'}">
-            <div class="m-0 message-bubble text-break alert alert- ${isSender ? 'alert-primary text-white' : 'alert-default'}">${messenger.parseMessage(message.message)}</div>
+        <div class="d-flex flex-row">
+                <div class="col-12 d-flex  ${isSender ? 'sender d-flex flex-row-reverse pr-1' : 'pl-0'}">
+                    <div class="m-0 message-bubble text-break alert ${isSender ? 'alert-primary text-white' : 'alert-default'}">${messenger.parseMessage(message.message)}</div>
+                    ${isSender ? messageActions(true, message) : ''}
+                </div>
         </div>
+    `;
+}
+
+function messageAttachments(isSender, attachmentsHtml, message){
+    return `
+             <div class="col-12 d-flex  ${isSender ? 'sender d-flex flex-row-reverse pr-1' : 'pl-0'}">
+                <div class="attachments-holder row no-gutters flex-row-reverse">
+                    ${attachmentsHtml}
+                </div>
+                ${attachmentsHtml.length && isSender ? messageActions(true, message) : ''}
+            </div>
+     `;
+}
+
+function messageActions(showDeleteButton, message){
+    return `
+        <div class="d-flex message-actions-wrapper">
+            ${showDeleteButton ? `
+                <div class="d-flex justify-content-center align-items-center pointer-cursor mr-2">
+                    <div class="to-tooltip message-action-button d-flex justify-content-center align-items-center"  data-placement="top" title="${trans('Delete')}" onClick="messenger.deleteMessage(${message.id})">
+                        <ion-icon name="trash-outline"></ion-icon>
+                    </div>
+                </div>
+            ` : ``}
+
+           ${message.price > 0 ? `
+            <div class="d-flex justify-content-center align-items-center mr-2">
+                <div class="to-tooltip message-action-button d-flex justify-content-center align-items-center"  data-placement="top" title="${trans('Paid message')}">
+                    <ion-icon name="cash-outline"></ion-icon>
+                 </div>
+            </div>
+        ` : ``}
+      </div>
+    `;
+}
+
+/**
+ * Locked message preview element
+ * @param messageData
+ * @param senderData
+ * @returns {string}
+ */
+function lockedMessagePreview(messageData, senderData) {
+    return `
+            <div class="card ${app.theme === 'light' ? 'bg-gradient-faded-light-vertical' : 'bg-gradient-faded-dark-vertical'}">
+              <div>
+              <div class="lockedPreviewWrapper">
+                  <img class="card-img" src="${messengerVars.lockedMessageSVGPath}" >
+              </div>
+                  <div class="card-img-overlay d-flex flex-column-reverse">
+                           ${lockedMessagePaymentButton(messageData, senderData)}
+                    </div>
+                  </div>
+              </div>
+            </div>
 `;
+}
+
+/**
+ * Locked message payment button
+ * @param messageData
+ * @param senderData
+ * @returns {string}
+ */
+function lockedMessagePaymentButton(messageData, senderData) {
+    return `
+                <button
+                class="btn btn-round btn-primary btn-block d-flex align-items-center justify-content-center justify-content-lg-between mt-2 mb-0"
+                        data-toggle="modal"
+                        data-target="#checkout-center"
+                        data-type="message-unlock"
+                        data-recipient-id="${senderData.id}"
+                        data-amount="${messageData.price}"
+                        data-first-name="${user.billingData.first_name}"
+                        data-last-name="${user.billingData.last_name}"
+                        data-billing-address="${user.billingData.billing_address}"
+                        data-country="${user.billingData.country}"
+                        data-city="${user.billingData.city}"
+                        data-state="${user.billingData.state}"
+                        data-postcode="${user.billingData.postcode}"
+                        data-available-credit="${user.billingData.credit}"
+                        data-username="${senderData.username}"
+                        data-name="${senderData.first_name}"
+                        data-avatar="${senderData.avatar}"
+                        data-message-id="${messageData.id}"
+                >
+                <span class="d-none d-md-block">${trans('Locked message')}</span>  <span>${trans('Unlock for')} ${app.currencySymbol}${messageData.price}</span>
+                </button>
+    `;
 }

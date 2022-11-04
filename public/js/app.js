@@ -106,8 +106,7 @@ $(function () {
     });
 
     // Initialize tooltips
-    $('[data-toggle="tooltip"]').tooltip();
-    $('.to-tooltip').tooltip();
+    initTooltips();
 
     // Initialize user connection to pusher
     try {
@@ -172,6 +171,14 @@ function log(v,type = 'log') {
         }
     }
     return true;
+}
+
+/**
+ * Instantiates tooltips
+ */
+function initTooltips(){
+    $('[data-toggle="tooltip"]').tooltip();
+    $('.to-tooltip').tooltip();
 }
 
 /**

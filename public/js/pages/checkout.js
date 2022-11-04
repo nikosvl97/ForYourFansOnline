@@ -52,6 +52,7 @@ $(function () {
         var postcode = $(e.relatedTarget).data('postcode');
         var availableCredit = $(e.relatedTarget).data('available-credit');
         var streamId = $(e.relatedTarget).data('stream-id');
+        var userMessageId = $(e.relatedTarget).data('message-id');
 
         checkout.initiatePaymentData(
             type,
@@ -66,7 +67,8 @@ $(function () {
             state,
             postcode,
             availableCredit,
-            streamId
+            streamId,
+            userMessageId
         );
         checkout.updateUserDetails(avatar, username, name);
         checkout.fillCountrySelectOptions();
@@ -126,6 +128,11 @@ $(function () {
             paymentTitle = trans('Join streaming');
             paymentDescription = trans('Join streaming now for') + ' ' + app.currencySymbol + amount;
             checkout.togglePaymentProviders(true, ['.nowpayments-payment-method', '.coinbase-payment-method', '.ccbill-payment-method', '.stripe-payment-method', '.paypal-payment-method', '.paystack-payment-method']);
+        } else if (type === 'message-unlock') {
+            $('.payment-body .checkout-amount-input').addClass('d-none');
+            paymentTitle = trans('Unlock message');
+            paymentDescription = trans('Unlock message for') + ' ' + app.currencySymbol + amount;
+            checkout.togglePaymentProviders(true, ['.nowpayments-payment-method', '.coinbase-payment-method', '.ccbill-payment-method', '.stripe-payment-method', '.paypal-payment-method', '.paystack-payment-method']);
         }
 
         if (paymentTitle !== '' || paymentDescription !== '') {
@@ -169,7 +176,7 @@ var checkout = {
     /**
      * Initiates the payment data payload
      */
-    initiatePaymentData: function (type, amount, post, recipient, firstName, lastName, billingAddress, country, city, state, postcode, availableCredit, streamId) {
+    initiatePaymentData: function (type, amount, post, recipient, firstName, lastName, billingAddress, country, city, state, postcode, availableCredit, streamId, messageId) {
         checkout.paymentData = {
             type: type,
             amount: amount,
@@ -183,7 +190,8 @@ var checkout = {
             state: state,
             postcode: postcode,
             availableCredit: availableCredit,
-            stream: streamId
+            stream: streamId,
+            messageId: messageId
         };
     },
 
@@ -205,6 +213,7 @@ var checkout = {
         $('#payment-deposit-amount').val(checkout.paymentData.totalAmount);
         $('#paymentTaxes').val(JSON.stringify(checkout.paymentData.taxes));
         $('#stream').val(checkout.paymentData.stream);
+        $('#userMessage').val(checkout.paymentData.messageId);
     },
 
     stripe: null,
@@ -317,14 +326,17 @@ var checkout = {
      */
     checkoutAmountValidation: function () {
         const checkoutAmount = $('#checkout-amount').val();
-        // For all payments besides post-unlocks, apply a 5-500 min max constrain
-        if ( (checkout.paymentData.type !== 'post-unlock' && (checkoutAmount.length > 0 && checkoutAmount >= app.tipMinAmount && checkoutAmount <= app.tipMaxAmount)) || checkout.paymentData.type === 'post-unlock') {
-            $('#checkout-amount').removeClass('is-invalid');
-            $('#paypal-deposit-amount').val(checkoutAmount);
-            if (checkout.paymentData.availableCredit < checkoutAmount) {
-                $(".credit-payment-provider").css("pointer-events", "none");
-            }
-            return true;
+        let skipAmountValidationPaymentTypes = ['post-unlock', 'message-unlock'];
+        // For all payments besides unlocks, apply a 5-500 min max constrain
+        if ((!skipAmountValidationPaymentTypes.includes(checkout.paymentData.type)
+            && (checkoutAmount.length > 0 && checkoutAmount >= app.tipMinAmount && checkoutAmount <= app.tipMaxAmount))
+            || skipAmountValidationPaymentTypes.includes(checkout.paymentData.type)) {
+                $('#checkout-amount').removeClass('is-invalid');
+                $('#paypal-deposit-amount').val(checkoutAmount);
+                if (checkout.paymentData.availableCredit < checkoutAmount) {
+                    $(".credit-payment-provider").css("pointer-events", "none");
+                }
+                return true;
         } else {
             $('#checkout-amount').addClass('is-invalid');
             return false;
@@ -405,13 +417,6 @@ var checkout = {
         $('input[name="billingState"]').val(checkout.paymentData.state);
         $('input[name="billingPostcode"]').val(checkout.paymentData.postcode);
         $('textarea[name="billingAddress"]').val(checkout.paymentData.billingAddress);
-        $('#paypalFirstName').val(checkout.paymentData.firstName);
-        $('#paypalLastName').val(checkout.paymentData.lastName);
-        $('#paypalBillingAddress').val(checkout.paymentData.billingAddress);
-        $('#paypalCity').val(checkout.paymentData.city);
-        $('#paypalState').val(checkout.paymentData.state);
-        $('#paypalPostcode').val(checkout.paymentData.postcode);
-        $('#paypalCountry').val(checkout.paymentData.country);
     },
 
     /**
