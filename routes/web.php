@@ -85,6 +85,7 @@ Route::group(['middleware' => ['auth','verified','2fa']], function () {
             Route::get('/fetchContacts', ['uses' => 'MessengerController@fetchContacts', 'as' => 'fetch']);
             Route::get('/fetchMessages/{userID}', 'MessengerController@fetchMessages', ['as' => 'fetch.user']);
             Route::post('/sendMessage', 'MessengerController@sendMessage', ['as' => 'send']);
+            Route::delete('/delete/{commentID}', 'MessengerController@deleteMessage', ['as' => 'delete']);
             Route::post('/authorizeUser', 'MessengerController@authorizeUser', ['as' => 'authorize']);
             Route::post('/markSeen', 'MessengerController@markSeen', ['as' => 'mark']);
             Route::post('/getUserSearch', 'MessengerController@getUserSearch', ['as' => 'search']);
