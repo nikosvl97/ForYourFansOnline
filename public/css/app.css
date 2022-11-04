@@ -291,6 +291,11 @@ body {
     box-sizing: content-box !important;
 }
 
+.input-group-prepend .ion-icon-wrapper{
+    width: 20px!important;
+    height: 20px!important;
+}
+
 .ion-icon-inner, .ion-icon-inner svg{
     display: block;
     height: 100%;

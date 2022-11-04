@@ -39,7 +39,8 @@
 }
 
 .contact-message{
-    display:inline-block;max-width: 80px
+    display:inline-block;
+    max-width: 80px
 }
 
 .message-box{
@@ -48,15 +49,39 @@
 
 .message-bubble{
     text-align: left;
-    font-size:15px;
+    font-size:1rem;
     border-radius: 18px;
     border-top-left-radius: 0px;
-    padding: 8px 10px 8px 10px;
+    padding: 9px 12px 9px 12px;
 }
 
 .sender .message-bubble{
     border-top-left-radius: 18px;
     border-top-right-radius: 0px;
+}
+
+/* Paid message preview box*/
+.paid-message-box{
+    width: 300px!important;
+    border-radius: 18px;
+    border-top-left-radius: 0px;
+}
+
+.paid-message-box img{
+    width: 100%;
+}
+
+.paid-message-box .lockedPreviewWrapper{
+    width:260px!important;
+}
+
+@media (min-width: 767px) {
+    .paid-message-box .lockedPreviewWrapper{
+        width: 400px!important;
+    }
+    .paid-message-box{
+        width: 430px!important;
+    }
 }
 
 .message-bubble a:hover{
@@ -206,4 +231,16 @@
 .conversation-writeup .btn-rounded-icon {
     width: 35px!important;
     height: 35px!important;
+}
+
+.messageBoxInput{
+    line-height: 1.7rem;
+}
+
+.message-actions-wrapper {
+    display:none!important;
+}
+
+.message-box:hover .message-actions-wrapper {
+    display:flex!important;
 }
