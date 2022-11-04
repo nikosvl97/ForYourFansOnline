@@ -4,7 +4,6 @@ use PhpCsFixer\Config;
 use PhpCsFixer\Finder;
 
 $rules = [
-    'exclude' => 'database/migrations',
     'array_syntax' => ['syntax' => 'short'],
     'blank_line_after_namespace' => true,
     'blank_line_after_opening_tag' => true,
@@ -156,6 +155,7 @@ $finder = Finder::create()
         __DIR__.'/routes',
         __DIR__.'/tests',
     ])
+    ->exclude('migrations')
     ->name('*.php')
     ->notName('*.blade.php')
     ->ignoreDotFiles(true)
