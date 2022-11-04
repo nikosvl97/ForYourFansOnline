@@ -567,4 +567,21 @@ class PostsHelperServiceProvider extends ServiceProvider
                 ]
             )->first() != null;
     }
+
+    /**
+     * Checks if user paid access for this message
+     * @param $userId
+     * @param $messageId
+     * @return bool
+     */
+    public static function userPaidForMessage($userId, $messageId){
+        return Transaction::query()->where(
+                [
+                    'user_message_id' => $messageId,
+                    'sender_user_id' => $userId,
+                    'type' => Transaction::MESSAGE_UNLOCK,
+                    'status' => Transaction::APPROVED_STATUS
+                ]
+            )->first() != null;
+    }
 }

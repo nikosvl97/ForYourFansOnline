@@ -10,6 +10,7 @@ use App\Model\UserMessage;
 use App\Providers\AttachmentServiceProvider;
 use App\Providers\EmailsServiceProvider;
 use App\Providers\GenericHelperServiceProvider;
+use App\Providers\ListsHelperServiceProvider;
 use App\Providers\NotificationServiceProvider;
 use App\Providers\PostsHelperServiceProvider;
 use App\User;
@@ -38,8 +39,12 @@ class MessengerController extends Controller
             $lastContactID = $lastContact[0]->receiverID == Auth::user()->id ? $lastContact[0]->senderID : $lastContact[0]->receiverID;
         }
         // handles messenger tips
-        if(!empty($request->get('tip'))) {
-            $transaction = Transaction::where(['sender_user_id' => Auth::user()->id, 'type' => Transaction::CHAT_TIP_TYPE])->orderBy('id', 'DESC')->first();
+        if(!empty($request->get('tip')) || !empty($request->get('messageUnlock'))) {
+            $transaction = Transaction::query()
+                ->where('sender_user_id', Auth::user()->id)
+                ->whereIn('type', [Transaction::CHAT_TIP_TYPE, Transaction::MESSAGE_UNLOCK])
+                ->orderBy('id', 'DESC')
+                ->first();
             if($transaction) {
                 $lastContactID = $transaction->recipient_user_id;
             }
@@ -51,6 +56,7 @@ class MessengerController extends Controller
                 'pusherDebug' => (bool) env('APP_DEBUG'),
                 'pusherCluster' => config('broadcasting.connections.pusher.options.cluster'),
                 'bootFullMessenger' => true,
+                'lockedMessageSVGPath' => asset('/img/post-locked.svg')
             ],
             'mediaSettings' => [
                 'allowed_file_extensions' => '.'.str_replace(',', ',.', AttachmentServiceProvider::filterExtensions('videosFallback')),
@@ -63,6 +69,16 @@ class MessengerController extends Controller
                     'blocked'=>Auth::user()->lists->firstWhere('type', 'blocked')->id,
                     'following'=>Auth::user()->lists->firstWhere('type', 'followers')->id,
                 ],
+                'billingData' => [
+                    'first_name' => Auth::user()->first_name,
+                    'last_name' => Auth::user()->last_name,
+                    'billing_address' => Auth::user()->billing_address,
+                    'country' => Auth::user()->country,
+                    'city' => Auth::user()->city,
+                    'state' => Auth::user()->state,
+                    'postcode' => Auth::user()->postcode,
+                    'credit' => Auth::user()->wallet->total,
+                ]
             ],
         ]);
 
@@ -139,8 +155,9 @@ class MessengerController extends Controller
         $contacts = DB::select($query, [$userID, $userID]);
 
         foreach ($contacts as $contact) {
-            $dateDiff = Carbon::createFromTimeStamp(strtotime($contact->created_at))->diffForHumans(null, true, true);
-            $contact->created_at = $dateDiff;
+            if($contact->created_at){
+                $contact->created_at = Carbon::createFromTimeStamp(strtotime($contact->created_at))->diffForHumans(null, true, true);
+            }
             $contact->senderAvatar = GenericHelperServiceProvider::getStorageAvatarPath($contact->senderAvatar);
             $contact->receiverAvatar = GenericHelperServiceProvider::getStorageAvatarPath($contact->receiverAvatar);
         }
@@ -166,19 +183,31 @@ class MessengerController extends Controller
     {
         $senderID = Auth::user()->id;
         $receiverID = $request->route('userID');
+
+        // Checking access
+        if(!self::checkMessengerAccess($senderID,$receiverID)){
+            return response()->json(['success' => false, 'errors' => [__('Not authorized')], 'message'=> __('Not authorized')], 403);
+        }
+
         $conversation = UserMessage::with(['sender', 'receiver', 'attachments'])->where(function ($q) use ($senderID, $receiverID) {
             $q->where('sender_id', $senderID)
-                ->where('receiver_id', $receiverID);
-        })
+              ->where('receiver_id', $receiverID);
+            })
             ->orWhere(
                 function ($q) use ($senderID, $receiverID) {
                     $q->where('receiver_id', $senderID)
-                        ->Where('sender_id', $receiverID);
+                       ->Where('sender_id', $receiverID);
                 }
             )
-            ->orderBy('created_at')
+            ->leftJoin('transactions', function ($join) {
+                    $join->on('transactions.user_message_id', '=', 'user_messages.id' );
+                    $join->on('transactions.sender_user_id', '=', DB::raw(Auth::user()->id));
+                })
+            ->orderBy('user_messages.created_at')
+            ->select(['user_messages.*', DB::raw('COALESCE(transactions.id,NULL) as hasUserUnlockedMessage')])
             ->get()
             ->map(function ($message) {
+                $message->hasUserUnlockedMessage = $message->hasUserUnlockedMessage ? true : false;
                 $message->sender->profileUrl = route('profile', ['username'=> $message->sender->username]);
                 $message->receiver->profileUrl = route('profile', ['username'=> $message->receiver->username]);
                 $message = self::cleanUpMessageData($message);
@@ -200,16 +229,23 @@ class MessengerController extends Controller
      */
     public function sendMessage(Request $request)
     {
-        //TODO: Add more access in place
+
         $senderID = (int) Auth::user()->id;
         $receiverID = (int) $request->get('receiverID');
         $messageValue = $request->get('message');
+        $messagePrice = $request->get('price');
         $isFirstMessage = $request->get('new');
+
+        // Checking access
+        if(!self::checkMessengerAccess($senderID,$receiverID)){
+            return response()->json(['success' => false, 'errors' => [__('Not authorized')], 'message'=> __('Not authorized')], 403);
+        }
 
         $message = UserMessage::create([
             'sender_id' => $senderID,
             'receiver_id' => $receiverID,
             'message' => $messageValue,
+            'price' => $messagePrice
         ]);
 
         NotificationServiceProvider::createNewUserMessageNotification($message);
@@ -233,7 +269,16 @@ class MessengerController extends Controller
             }
         }
 
-        $message = UserMessage::with(['sender', 'receiver', 'attachments'])->where('id', $message['id'])->first();
+        $message = UserMessage::with(['sender', 'receiver', 'attachments'])->where('user_messages.id', $message['id'])
+            ->leftJoin('transactions', function ($join) {
+                $join->on('transactions.user_message_id', '=', 'user_messages.id' );
+                $join->on('transactions.sender_user_id', '=', DB::raw(Auth::user()->id));
+            })
+            ->select(['user_messages.*', DB::raw('COALESCE(transactions.id,NULL) as hasUserUnlockedMessage')])
+            ->first();
+        $message->hasUserUnlockedMessage = $message->hasUserUnlockedMessage ? true : false;
+        $message->sender->profileUrl = route('profile', ['username'=> $message->sender->username]);
+        $message->receiver->profileUrl = route('profile', ['username'=> $message->receiver->username]);
         $message = self::cleanUpMessageData($message);
 
         // Sending the email
@@ -423,7 +468,62 @@ class MessengerController extends Controller
             unset($message->sender[$prop]);
             unset($message->receiver[$prop]);
         }
+        if($message->hasUserUnlockedMessage == false && ($message->price && $message->price > 0) && $message->sender->id !== Auth::user()->id){
+            unset($message->attachments);
+            $message->attachments = collect([]);
+        }
         return $message;
     }
+
+    protected static function checkMessengerAccess($viewerID, $contactId){
+        $hasSub = false;
+        if (Auth::check()) {
+            $viewerUser = Auth::user();
+        }
+        else{
+            $viewerUser = User::where('id',$viewerID)->first();
+        }
+        $contactUser = User::where('id',$contactId)->first();
+        if ($viewerUser) {
+            $hasSub = PostsHelperServiceProvider::hasActiveSub($viewerUser->id, $contactUser->id);
+            if ($viewerUser->id === $contactUser){
+                $hasSub = true;
+            }
+            if(!$contactUser->paid_profile && ListsHelperServiceProvider::loggedUserIsFollowingUser($contactUser->id)){
+                $hasSub = true;
+            }
+            if($viewerUser->role_id === 1){
+                $hasSub = true;
+            }
+            // handles chat access for creators so they can message their subscribers without subscribing back
+            if(PostsHelperServiceProvider::hasActiveSub($contactUser->id, $viewerUser->id)){
+                $hasSub = true;
+            }
+        }
+        return $hasSub;
+    }
+
+
+    /**
+     * Method used for deleting messenger messages
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deleteMessage(Request $request){
+        $messageID = $request->route('commentID');
+        $message = UserMessage::where('id', $messageID)->where('sender_id', Auth::user()->id)->first();
+        if(!$message){
+            return response()->json(['success' => false, 'message' => __('Message can not be found.')],500);
+        }
+        try {
+            $message->delete();
+            return response()->json([
+                'status' => 'success',
+            ]);
+        } catch (\Exception $exception) {
+            return response()->json(['success' => false, 'message' => $exception->getMessage()],500);
+        }
+    }
+
 
 }

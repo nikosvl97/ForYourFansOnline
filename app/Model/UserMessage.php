@@ -12,7 +12,7 @@ class UserMessage extends Model
      *
      * @var array
      */
-    protected $fillable = ['sender_id', 'receiver_id', 'message', 'replyTo', 'isSeen'];
+    protected $fillable = ['sender_id', 'receiver_id', 'message', 'price', 'replyTo', 'isSeen'];
 
     /**
      * The attributes that should be hidden for arrays.

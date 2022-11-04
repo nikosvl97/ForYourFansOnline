@@ -56,6 +56,7 @@ class PaymentsController extends Controller
             $transaction['sender_user_id'] = Auth::user()->id;
             $transaction['recipient_user_id'] = $request->get('recipient_user_id');
             $transaction['post_id'] = $request->get('post_id');
+            $transaction['user_message_id'] = $request->get('user_message_id');
             $transaction['type'] = $transactionType;
             $transaction['status'] = Transaction::INITIATED_STATUS;
             $transaction['amount'] = $request->get('amount');
@@ -101,9 +102,11 @@ class PaymentsController extends Controller
                 case Transaction::CHAT_TIP_TYPE:
                 case Transaction::STREAM_ACCESS:
                 case Transaction::POST_UNLOCK:
+                case Transaction::MESSAGE_UNLOCK:
                     $userId = Auth::user()->id;
                     $postId = $transaction['post_id'];
                     $streamId = $transaction['stream_id'];
+                    $messageId = $transaction['user_message_id'];
                     if($recipientUser->id === $transaction['sender_user_id']) {
                         return $this->paymentHandler->redirectByTransaction(
                             $transaction,
@@ -120,6 +123,11 @@ class PaymentsController extends Controller
                         return $this->paymentHandler->redirectByTransaction(
                             $transaction,
                             $errorMessage = __('You already paid for this streaming')
+                        );
+                    } elseif($transactionType === Transaction::MESSAGE_UNLOCK && PostsHelperServiceProvider::userPaidForMessage($userId, $messageId)){
+                        return $this->paymentHandler->redirectByTransaction(
+                            $transaction,
+                            $errorMessage = __('You already paid access for this message')
                         );
                     }
 

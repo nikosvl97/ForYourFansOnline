@@ -13,6 +13,7 @@ use App\Model\Stream;
 use App\Model\Subscription;
 use App\Model\Tax;
 use App\Model\Transaction;
+use App\Model\UserMessage;
 use App\Providers\InvoiceServiceProvider;
 use App\Providers\NotificationServiceProvider;
 use App\Providers\PaymentsServiceProvider;
@@ -942,6 +943,8 @@ class PaymentHelper
                     $description = trans('Unlock post for').' '.SettingsServiceProvider::getWebsiteCurrencySymbol().$transaction->amount;
                 } elseif ($transaction->type === Transaction::STREAM_ACCESS) {
                     $description = trans('Join streaming for').' '.SettingsServiceProvider::getWebsiteCurrencySymbol().$transaction->amount;
+                } elseif ($transaction->type === Transaction::MESSAGE_UNLOCK) {
+                    $description = trans('Unlock message for').' '.SettingsServiceProvider::getWebsiteCurrencySymbol().$transaction->amount;
                 }
             }
         }
@@ -977,6 +980,8 @@ class PaymentHelper
                     $successMessage = __('You successfully unlocked this post.');
                 } elseif ($transaction->type === Transaction::STREAM_ACCESS) {
                     $successMessage = __('You successfully paid for this streaming.');
+                } elseif ($transaction->type === Transaction::MESSAGE_UNLOCK) {
+                    $successMessage = __('You successfully unlocked this message.');
                 }
 
                 return $this->handleRedirectByTransaction($transaction, $recipient, $successMessage, $success = true);
@@ -1074,6 +1079,16 @@ class PaymentHelper
             }
             return Redirect::route('public.stream.get', ['streamID' => $transaction->stream_id, 'slug' => $transaction->stream->slug])
                 ->with($labelType, $message);
+        } elseif ($transaction->type === Transaction::MESSAGE_UNLOCK) {
+            if(in_array($transaction->payment_provider, [Transaction::COINBASE_PROVIDER, Transaction::NOWPAYMENTS_PROVIDER, Transaction::CCBILL_PROVIDER])) {
+                if($transaction->status === Transaction::INITIATED_STATUS || $transaction->status === Transaction::PENDING_STATUS){
+                    $labelType = 'warning';
+                    $message = __('Your payment have been successfully initiated but needs to await for approval');
+                } else if($transaction->status === Transaction::CANCELED_STATUS){
+                    $message = __('Payment canceled');
+                }
+            }
+            return Redirect::route('my.messenger.get', ['messageUnlock' => 1, 'token' => $transaction->user_message_id])->with($labelType, $message);
         }
     }
 
@@ -1587,6 +1602,12 @@ class PaymentHelper
                 case Transaction::STREAM_ACCESS:
                     $stream = Stream::query()->where('id', $transaction->stream_id)->first();
                     if($stream && (string)$stream->price === $transactionAmountWithoutTaxes) {
+                        $valid = true;
+                    }
+                    break;
+                case Transaction::MESSAGE_UNLOCK:
+                    $message = UserMessage::query()->where('id', $transaction->user_message_id)->first();
+                    if((string)$message->price === $transactionAmountWithoutTaxes) {
                         $valid = true;
                     }
                     break;

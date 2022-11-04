@@ -65,3 +65,13 @@ function getLicenseType(){
     }
     return $licenseType;
 }
+
+function handledExec($command, $throw_exception = true) {
+    $result = exec('('.$command.')', $output, $return_code);
+    if ($throw_exception) {
+        if (($result === false) || ($return_code !== 0)) {
+            throw new Exception('Error processing command: ' . $command . "\n\n" . implode("\n", $output) . "\n\n");
+        }
+    }
+    return implode("\n", $output);
+}
